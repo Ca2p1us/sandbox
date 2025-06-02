@@ -1,0 +1,439 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global/global}
+    \entry{masaya8028}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=c48abbccef6fac3896f5f2c563bc707a}{%
+           family={Qiita},
+           familyi={Q\bibinitperiod}}}%
+      }
+      \strng{namehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{fullhash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{fullhashraw}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{bibnamehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authorbibnamehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authornamehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authorfullhash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authorfullhashraw}{c48abbccef6fac3896f5f2c563bc707a}
+      \field{extraname}{1}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{SVM(サポートベクターマシン)についてまとめてみました - Qiita}
+      \verb{urlraw}
+      \verb https://qiita.com/masaya8028/items/cdecf3d8eeb4e02e11ac
+      \endverb
+      \verb{url}
+      \verb https://qiita.com/masaya8028/items/cdecf3d8eeb4e02e11ac
+      \endverb
+      \warn{\item online entry 'masaya8028' (cite.bib): Invalid format 'Accessed: 2025-05-02' of date field 'urldate' - ignoring}
+    \endentry
+    \entry{lagrange}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=8e0fa6088da37889cfb415eef281c7fb}{%
+           family={risalc.info},
+           familyi={r\bibinitperiod}}}%
+      }
+      \strng{namehash}{8e0fa6088da37889cfb415eef281c7fb}
+      \strng{fullhash}{8e0fa6088da37889cfb415eef281c7fb}
+      \strng{fullhashraw}{8e0fa6088da37889cfb415eef281c7fb}
+      \strng{bibnamehash}{8e0fa6088da37889cfb415eef281c7fb}
+      \strng{authorbibnamehash}{8e0fa6088da37889cfb415eef281c7fb}
+      \strng{authornamehash}{8e0fa6088da37889cfb415eef281c7fb}
+      \strng{authorfullhash}{8e0fa6088da37889cfb415eef281c7fb}
+      \strng{authorfullhashraw}{8e0fa6088da37889cfb415eef281c7fb}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{ラグランジュ未定乗数法 ～ 基本から解説 ～ - 理数アラカルト -}
+      \verb{urlraw}
+      \verb https://risalc.info/src/Lagrange-multiplier.html
+      \endverb
+      \verb{url}
+      \verb https://risalc.info/src/Lagrange-multiplier.html
+      \endverb
+      \warn{\item online entry 'lagrange' (cite.bib): Invalid format 'Accessed: 2025-05-02' of date field 'urldate' - ignoring}
+    \endentry
+    \entry{kkt-condition}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=db583c68c99b19e1560c5770edb4655c}{%
+           family={www.msi.co.jp},
+           familyi={w\bibinitperiod}}}%
+      }
+      \strng{namehash}{db583c68c99b19e1560c5770edb4655c}
+      \strng{fullhash}{db583c68c99b19e1560c5770edb4655c}
+      \strng{fullhashraw}{db583c68c99b19e1560c5770edb4655c}
+      \strng{bibnamehash}{db583c68c99b19e1560c5770edb4655c}
+      \strng{authorbibnamehash}{db583c68c99b19e1560c5770edb4655c}
+      \strng{authornamehash}{db583c68c99b19e1560c5770edb4655c}
+      \strng{authorfullhash}{db583c68c99b19e1560c5770edb4655c}
+      \strng{authorfullhashraw}{db583c68c99b19e1560c5770edb4655c}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{KKT 条件 — 数理最適化用語集}
+      \verb{urlraw}
+      \verb https://www.msi.co.jp/solution/nuopt/docs/glossary/articles/Karush-Kuhn-TuckerCondition.html
+      \endverb
+      \verb{url}
+      \verb https://www.msi.co.jp/solution/nuopt/docs/glossary/articles/Karush-Kuhn-TuckerCondition.html
+      \endverb
+      \warn{\item online entry 'kkt-condition' (cite.bib): Invalid format 'Accessed: 2025-05-02' of date field 'urldate' - ignoring}
+    \endentry
+    \entry{kerneltrick}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=efcae3706cc83d193e3ebc89f9b96205}{%
+           family={機械学習と情報技術},
+           familyi={機\bibinitperiod}}}%
+      }
+      \strng{namehash}{efcae3706cc83d193e3ebc89f9b96205}
+      \strng{fullhash}{efcae3706cc83d193e3ebc89f9b96205}
+      \strng{fullhashraw}{efcae3706cc83d193e3ebc89f9b96205}
+      \strng{bibnamehash}{efcae3706cc83d193e3ebc89f9b96205}
+      \strng{authorbibnamehash}{efcae3706cc83d193e3ebc89f9b96205}
+      \strng{authornamehash}{efcae3706cc83d193e3ebc89f9b96205}
+      \strng{authorfullhash}{efcae3706cc83d193e3ebc89f9b96205}
+      \strng{authorfullhashraw}{efcae3706cc83d193e3ebc89f9b96205}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{カーネル法とカーネルトリックを図を用いて解説する | 機械学習と情報技術}
+      \field{year}{2022}
+      \verb{urlraw}
+      \verb https://disassemble-channel.com/kernel-method-kernel-trick/#google_vignette
+      \endverb
+      \verb{url}
+      \verb https://disassemble-channel.com/kernel-method-kernel-trick/#google_vignette
+      \endverb
+      \warn{\item online entry 'kerneltrick' (cite.bib): Invalid format 'Accessed: 2025-05-24' of date field 'urldate' - ignoring}
+    \endentry
+    \entry{ting}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=c48abbccef6fac3896f5f2c563bc707a}{%
+           family={Qiita},
+           familyi={Q\bibinitperiod}}}%
+      }
+      \strng{namehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{fullhash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{fullhashraw}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{bibnamehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authorbibnamehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authornamehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authorfullhash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authorfullhashraw}{c48abbccef6fac3896f5f2c563bc707a}
+      \field{extraname}{2}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{カーネル法のお話 - Qiita}
+      \verb{urlraw}
+      \verb https://qiita.com/ting/items/cc49b3703a9ea1067041
+      \endverb
+      \verb{url}
+      \verb https://qiita.com/ting/items/cc49b3703a9ea1067041
+      \endverb
+      \warn{\item online entry 'ting' (cite.bib): Invalid format 'Accessed: 2025-05-02' of date field 'urldate' - ignoring}
+    \endentry
+    \entry{kernelchoice}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=e67d6b9c9afdf99076b7f354484ac5c9}{%
+           family={化学とインフォマティクスと時々雑記},
+           familyi={化\bibinitperiod}}}%
+      }
+      \strng{namehash}{e67d6b9c9afdf99076b7f354484ac5c9}
+      \strng{fullhash}{e67d6b9c9afdf99076b7f354484ac5c9}
+      \strng{fullhashraw}{e67d6b9c9afdf99076b7f354484ac5c9}
+      \strng{bibnamehash}{e67d6b9c9afdf99076b7f354484ac5c9}
+      \strng{authorbibnamehash}{e67d6b9c9afdf99076b7f354484ac5c9}
+      \strng{authornamehash}{e67d6b9c9afdf99076b7f354484ac5c9}
+      \strng{authorfullhash}{e67d6b9c9afdf99076b7f354484ac5c9}
+      \strng{authorfullhashraw}{e67d6b9c9afdf99076b7f354484ac5c9}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{【初心者向け】ガウス過程回帰〜カーネル関数についてわかりやすく説明〜}
+      \field{year}{2023}
+      \verb{urlraw}
+      \verb https://boritaso-blog.com/gaussian_process_regression_kernel/
+      \endverb
+      \verb{url}
+      \verb https://boritaso-blog.com/gaussian_process_regression_kernel/
+      \endverb
+      \warn{\item online entry 'kernelchoice' (cite.bib): Invalid format 'Accessed: 2025-05-24' of date field 'urldate' - ignoring}
+    \endentry
+    \entry{cross}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=445d96dd0aeab0dcfe777567b3427ddc}{%
+           family={Media},
+           familyi={M\bibinitperiod},
+           given={AI\bibnamedelima Academy},
+           giveni={A\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+      }
+      \strng{namehash}{445d96dd0aeab0dcfe777567b3427ddc}
+      \strng{fullhash}{445d96dd0aeab0dcfe777567b3427ddc}
+      \strng{fullhashraw}{445d96dd0aeab0dcfe777567b3427ddc}
+      \strng{bibnamehash}{445d96dd0aeab0dcfe777567b3427ddc}
+      \strng{authorbibnamehash}{445d96dd0aeab0dcfe777567b3427ddc}
+      \strng{authornamehash}{445d96dd0aeab0dcfe777567b3427ddc}
+      \strng{authorfullhash}{445d96dd0aeab0dcfe777567b3427ddc}
+      \strng{authorfullhashraw}{445d96dd0aeab0dcfe777567b3427ddc}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{交差検証（クロスバリデーション）とは？合わせてグリッドサーチに関しても学ぼう！ - AI Academy Media}
+      \field{year}{2020}
+      \verb{urlraw}
+      \verb https://aiacademy.jp/media/?p=263
+      \endverb
+      \verb{url}
+      \verb https://aiacademy.jp/media/?p=263
+      \endverb
+      \warn{\item online entry 'cross' (cite.bib): Invalid format 'Accessed: 2025-05-25' of date field 'urldate' - ignoring}
+    \endentry
+    \entry{beiz}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=c48abbccef6fac3896f5f2c563bc707a}{%
+           family={Qiita},
+           familyi={Q\bibinitperiod}}}%
+      }
+      \strng{namehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{fullhash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{fullhashraw}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{bibnamehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authorbibnamehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authornamehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authorfullhash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authorfullhashraw}{c48abbccef6fac3896f5f2c563bc707a}
+      \field{extraname}{3}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{ベイズ最適化 from Scratch - Qiita}
+      \field{year}{2022}
+      \verb{urlraw}
+      \verb https://qiita.com/meltyyyyy/items/e67f22f98a96e30e5461
+      \endverb
+      \verb{url}
+      \verb https://qiita.com/meltyyyyy/items/e67f22f98a96e30e5461
+      \endverb
+      \warn{\item online entry 'beiz' (cite.bib): Invalid format 'Accessed: 2025-05-25' of date field 'urldate' - ignoring}
+    \endentry
+    \entry{patern}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=81c72b9113aa83d4a71694f67aacf782}{%
+           family={本谷秀堅},
+           familyi={本\bibinitperiod}}}%
+      }
+      \strng{namehash}{81c72b9113aa83d4a71694f67aacf782}
+      \strng{fullhash}{81c72b9113aa83d4a71694f67aacf782}
+      \strng{fullhashraw}{81c72b9113aa83d4a71694f67aacf782}
+      \strng{bibnamehash}{81c72b9113aa83d4a71694f67aacf782}
+      \strng{authorbibnamehash}{81c72b9113aa83d4a71694f67aacf782}
+      \strng{authornamehash}{81c72b9113aa83d4a71694f67aacf782}
+      \strng{authorfullhash}{81c72b9113aa83d4a71694f67aacf782}
+      \strng{authorfullhashraw}{81c72b9113aa83d4a71694f67aacf782}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{パターン認識講義資料}
+    \endentry
+    \entry{Ckernel}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=e211c47ae9bd18043664245759d42e0b}{%
+           family={ai.reinforz.co.jp},
+           familyi={a\bibinitperiod}}}%
+      }
+      \strng{namehash}{e211c47ae9bd18043664245759d42e0b}
+      \strng{fullhash}{e211c47ae9bd18043664245759d42e0b}
+      \strng{fullhashraw}{e211c47ae9bd18043664245759d42e0b}
+      \strng{bibnamehash}{e211c47ae9bd18043664245759d42e0b}
+      \strng{authorbibnamehash}{e211c47ae9bd18043664245759d42e0b}
+      \strng{authornamehash}{e211c47ae9bd18043664245759d42e0b}
+      \strng{authorfullhash}{e211c47ae9bd18043664245759d42e0b}
+      \strng{authorfullhashraw}{e211c47ae9bd18043664245759d42e0b}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{SVMのC値とカーネルタイプの選び方：最新研究から学ぶ最適化の秘訣 | Reinforz.ai}
+      \field{year}{2024}
+      \verb{urlraw}
+      \verb https://ai.reinforz.co.jp/797
+      \endverb
+      \verb{url}
+      \verb https://ai.reinforz.co.jp/797
+      \endverb
+      \warn{\item online entry 'Ckernel' (cite.bib): Invalid format 'Accessed: 2025-05-24' of date field 'urldate' - ignoring}
+    \endentry
+    \entry{dual-problem}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=bbb2f356173acfad5f97e146f49fd73e}{%
+           family={MyEnigma},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{bbb2f356173acfad5f97e146f49fd73e}
+      \strng{fullhash}{bbb2f356173acfad5f97e146f49fd73e}
+      \strng{fullhashraw}{bbb2f356173acfad5f97e146f49fd73e}
+      \strng{bibnamehash}{bbb2f356173acfad5f97e146f49fd73e}
+      \strng{authorbibnamehash}{bbb2f356173acfad5f97e146f49fd73e}
+      \strng{authornamehash}{bbb2f356173acfad5f97e146f49fd73e}
+      \strng{authorfullhash}{bbb2f356173acfad5f97e146f49fd73e}
+      \strng{authorfullhashraw}{bbb2f356173acfad5f97e146f49fd73e}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{最適化問題における双対問題とは？ - MyEnigma}
+      \verb{urlraw}
+      \verb https://myenigma.hatenablog.com/entry/2017/01/30/083441#google_vignette
+      \endverb
+      \verb{url}
+      \verb https://myenigma.hatenablog.com/entry/2017/01/30/083441#google_vignette
+      \endverb
+      \warn{\item online entry 'dual-problem' (cite.bib): Invalid format 'Accessed: 2025-05-02' of date field 'urldate' - ignoring}
+    \endentry
+    \entry{sparce}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=d810f970a9af988ec0cc12ecd0a74426}{%
+           family={IT（シンクイット）},
+           familyi={I\bibinitperiod},
+           given={Think},
+           giveni={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{d810f970a9af988ec0cc12ecd0a74426}
+      \strng{fullhash}{d810f970a9af988ec0cc12ecd0a74426}
+      \strng{fullhashraw}{d810f970a9af988ec0cc12ecd0a74426}
+      \strng{bibnamehash}{d810f970a9af988ec0cc12ecd0a74426}
+      \strng{authorbibnamehash}{d810f970a9af988ec0cc12ecd0a74426}
+      \strng{authornamehash}{d810f970a9af988ec0cc12ecd0a74426}
+      \strng{authorfullhash}{d810f970a9af988ec0cc12ecd0a74426}
+      \strng{authorfullhashraw}{d810f970a9af988ec0cc12ecd0a74426}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{実感しよう! スパース性が「潜む」データ}
+      \field{year}{2020}
+      \verb{urlraw}
+      \verb https://thinkit.co.jp/article/17713
+      \endverb
+      \verb{url}
+      \verb https://thinkit.co.jp/article/17713
+      \endverb
+      \warn{\item online entry 'sparce' (cite.bib): Invalid format 'Accessed: 2025-05-16' of date field 'urldate' - ignoring}
+    \endentry
+    \entry{gradient-descent}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=bf4ef7b690daac58412711786df2bcf9}{%
+           family={-},
+           familyi={\bibinithyphendelim \bibinitperiod},
+           given={米国データサイエンティストのブログ},
+           giveni={米\bibinitperiod}}}%
+      }
+      \strng{namehash}{bf4ef7b690daac58412711786df2bcf9}
+      \strng{fullhash}{bf4ef7b690daac58412711786df2bcf9}
+      \strng{fullhashraw}{bf4ef7b690daac58412711786df2bcf9}
+      \strng{bibnamehash}{bf4ef7b690daac58412711786df2bcf9}
+      \strng{authorbibnamehash}{bf4ef7b690daac58412711786df2bcf9}
+      \strng{authornamehash}{bf4ef7b690daac58412711786df2bcf9}
+      \strng{authorfullhash}{bf4ef7b690daac58412711786df2bcf9}
+      \strng{authorfullhashraw}{bf4ef7b690daac58412711786df2bcf9}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{最急降下法を図と数式で理解する(超重要)【機械学習入門3】 - 米国データサイエンティストのブログ}
+      \verb{urlraw}
+      \verb https://datawokagaku.com/gradient_descent/
+      \endverb
+      \verb{url}
+      \verb https://datawokagaku.com/gradient_descent/
+      \endverb
+      \warn{\item online entry 'gradient-descent' (cite.bib): Invalid format 'Accessed: 2025-05-02' of date field 'urldate' - ignoring}
+    \endentry
+    \entry{optimize}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=70074ad700ccfd49b6edca85fa9114d6}{%
+           family={nomulog},
+           familyi={n\bibinitperiod}}}%
+      }
+      \strng{namehash}{70074ad700ccfd49b6edca85fa9114d6}
+      \strng{fullhash}{70074ad700ccfd49b6edca85fa9114d6}
+      \strng{fullhashraw}{70074ad700ccfd49b6edca85fa9114d6}
+      \strng{bibnamehash}{70074ad700ccfd49b6edca85fa9114d6}
+      \strng{authorbibnamehash}{70074ad700ccfd49b6edca85fa9114d6}
+      \strng{authornamehash}{70074ad700ccfd49b6edca85fa9114d6}
+      \strng{authorfullhash}{70074ad700ccfd49b6edca85fa9114d6}
+      \strng{authorfullhashraw}{70074ad700ccfd49b6edca85fa9114d6}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{サポートベクターマシン(SVM)の最適化}
+      \verb{urlraw}
+      \verb https://www.nomuyu.com/svm_optimize/#st-toc-h-9
+      \endverb
+      \verb{url}
+      \verb https://www.nomuyu.com/svm_optimize/#st-toc-h-9
+      \endverb
+      \warn{\item online entry 'optimize' (cite.bib): Invalid format 'Accessed: 2025-05-02' of date field 'urldate' - ignoring}
+    \endentry
+    \entry{soft-mergin}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=c48abbccef6fac3896f5f2c563bc707a}{%
+           family={Qiita},
+           familyi={Q\bibinitperiod}}}%
+      }
+      \strng{namehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{fullhash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{fullhashraw}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{bibnamehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authorbibnamehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authornamehash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authorfullhash}{c48abbccef6fac3896f5f2c563bc707a}
+      \strng{authorfullhashraw}{c48abbccef6fac3896f5f2c563bc707a}
+      \field{extraname}{4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{SVMをおさらい（ソフトマージン線形SVMの編） - Qiita}
+      \verb{urlraw}
+      \verb https://qiita.com/s-nakagawa2/items/2845e601180aef0765ef
+      \endverb
+      \verb{url}
+      \verb https://qiita.com/s-nakagawa2/items/2845e601180aef0765ef
+      \endverb
+      \warn{\item online entry 'soft-mergin' (cite.bib): Invalid format 'Accessed: 2025-05-02' of date field 'urldate' - ignoring}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
