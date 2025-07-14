@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>実験用FM音源</h1>
+    <br />
+    <table>
+      <tr>
+        <th>Algorithm</th>
+        <td>
+          <input id="alg" type="range" min="1" max="8" step="1" value="1" />
+        </td>
+        <td id="algval">1</td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <th>switch</th>
+        <td>
+          <input id="swt" type="range" min="1" max="2" step="1" value="1" />
+        </td>
+        <td id="swtval">1</td>
+      </tr>
+    </table>
+
+    <br />
+    <button id="key">Press and Hold this button</button>
+    or Press and Hold "SPACE"key
+    <br />
+    <canvas id="canvas" width="500" height="256"></canvas>
+    <table border="1" cellspacing="0">
+      <tr>
+        <td></td>
+        <td>ratio</td>
+        <td>atack</td>
+        <td>decay</td>
+        <td>sustain</td>
+        <td>release</td>
+      </tr>
+      <tr>
+        <td>op1</td>
+        <td id="ratio1"></td>
+        <td id="atack1"></td>
+        <td id="decay1"></td>
+        <td id="sustain1"></td>
+        <td id="release1"></td>
+      </tr>
+      <tr>
+        <td>op2</td>
+        <td id="ratio2"></td>
+        <td id="atack2"></td>
+        <td id="decay2"></td>
+        <td id="sustain2"></td>
+        <td id="release2"></td>
+      </tr>
+      <tr>
+        <td>op3</td>
+        <td id="ratio3"></td>
+        <td id="atack3"></td>
+        <td id="decay3"></td>
+        <td id="sustain3"></td>
+        <td id="release3"></td>
+      </tr>
+      <tr>
+        <td>op4</td>
+        <td id="ratio4"></td>
+        <td id="atack4"></td>
+        <td id="decay4"></td>
+        <td id="sustain4"></td>
+        <td id="release4"></td>
+      </tr>
+    </table>
+    <script>
+      window.addEventListener("load", () => {
+        const audioctx = new AudioContext();
+        const ana = new AnalyserNode(audioctx);
+        const OP = new Array(5);
+        const op = new Array(5);
+        const gain = new Array(5);
+        class operator {
+          constructor() {
+            this.level = 1;
+            this.ratio = getRandom(1, 10);
+            this.atack = 1 / Math.tan(getRandom_f(Math.atan(2), Math.PI / 2));
+            this.decay = getRandom_f(0, 1);
+            this.sustain = getRandom_f(0, 1);
+            this.release = getRandom_f(0, 0.5);
+          }
+        }
+        for (let i = 1; i < 5; i++) {
+          OP[i] = new operator();
+          op[i] = new OscillatorNode(audioctx);
+          gain[i] = new GainNode(audioctx, { gain: 0 });
+        }
+        ///////アルゴリズム３
+        op[3].connect(gain[3]).connect(op[2].frequency);
+        op[4].connect(gain[4]).connect(op[1].frequency);
+        op[2].connect(gain[2]).connect(op[1].frequency);
+        op[1].connect(gain[1]).connect(audioctx.destination);
+        gain[1].connect(ana);
+        audioctx.suspend();
+
+        for (let j = 1; j < 5; j++) {
+          op[j].start();
+        }
+
+        Setup();
+
+        document.getElementById("ratio1").innerHTML = 1;
+        document.getElementById("atack1").innerHTML = OP[1].atack;
+        document.getElementById("decay1").innerHTML = OP[1].decay;
+        document.getElementById("sustain1").innerHTML = OP[1].sustain;
+        document.getElementById("release1").innerHTML = OP[1].release;
+        document.getElementById("ratio2").innerHTML = OP[2].ratio;
+        document.getElementById("atack2").innerHTML = OP[2].atack;
+        document.getElementById("decay2").innerHTML = OP[2].decay;
+        document.getElementById("sustain2").innerHTML = OP[2].sustain;
+        document.getElementById("release2").innerHTML = OP[2].release;
+        document.getElementById("ratio3").innerHTML = OP[3].ratio;
+        document.getElementById("atack3").innerHTML = OP[3].atack;
+        document.getElementById("decay3").innerHTML = OP[3].decay;
+        document.getElementById("sustain3").innerHTML = OP[3].sustain;
+        document.getElementById("release3").innerHTML = OP[3].release;
+        document.getElementById("ratio4").innerHTML = OP[4].ratio;
+        document.getElementById("atack4").innerHTML = OP[4].atack;
+        document.getElementById("decay4").innerHTML = OP[4].decay;
+        document.getElementById("sustain4").innerHTML = OP[4].sustain;
+        document.getElementById("release4").innerHTML = OP[4].release;
+
+        document.getElementById("key").addEventListener("mousedown", () => {
+          audioctx.resume();
+          //const t0 = audioctx.currentTime;
+          // gain[4].gain = 0;
+          // gain[3].gain = 0;
+          // gain[2].gain = 0;
+          // gain[1].gain = 0;
+        });
+        document.getElementById("key").addEventListener("mouseup", () => {
+          audioctx.suspend();
+        });
+
+        function getRandom(min, max) {
+          var random = Math.floor(Math.random() * (max + 1 - min)) + min;
+          return random;
+        }
+        function getRandom_f(min, max) {
+          var random = Math.random() * (max - min) + min;
+          return random;
+        }
+        function Setup() {
+          op[1].frequency.value = 440;
+          op[2].frequency.value = op[1].frequency.value * OP[2].ratio;
+          op[3].frequency.value = op[1].frequency.value * OP[3].ratio;
+          op[4].frequency.value = op[1].frequency.value * OP[4].ratio;
+          // op[4].frequency.value = 600;
+          gain[1].gain.value = 0.5;
+          gain[4].gain.value = 1000; //変調指数
+          // gain[4].gain.value = 440; //変調指数
+        }
+        // function Enverope_up(t0,GAIN,OP,AtkLevel){
+        //     const t1 = t0 + OP.atack;
+        //     const d = OP.decay;
+        //     const s = AtkLevel*OP.sustain;
+        //     GAIN.gain.setValueAtTime(0, t0);
+        //     GAIN.gain.linearRampToValueAtTime(AtkLevel, t1);
+        //     GAIN.gain.linearRampToValueAtTime(s,t1+d);
+        //     GAIN.gain.setValueAtTime(s,t1+d);
+        // }
+        // function Enverope_down(t0,GAIN,OP){
+        //     const r = OP.release;
+        //     if(GAIN.gain.cancelAndHoldAtTime)
+        //             GAIN.gain.cancelAndHoldAtTime(t0);
+        //     GAIN.gain.setTargetAtTime(0,t0,r);
+        // }
+      });
+    </script>
+  </body>
+</html>

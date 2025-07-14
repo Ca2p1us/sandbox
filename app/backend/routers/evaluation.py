@@ -1,6 +1,7 @@
 import os
 import json
 from typing import Optional
+from typing import Dict, Any
 from schemas.chromosome import  ChromosomesParams
 from utils.create_fit_chromosome_json import create_fit_chromosome_json
 from utils.validation.validation import validation
@@ -47,7 +48,7 @@ async def log_chromosomes_fitness(chromosomes_params: dict, giongo: Optional[str
     return {"greeting":"実験へのご協力ありがとうございます。"}
 
 @router.get("/evaluation/{gion}/initialize")
-async def initialize_chromosomes(gion:str) -> json:
+async def initialize_chromosomes(gion:str) -> Dict[str, Any]:
     evaluation_chromosomes_file_path :str= f"./best_fit_chromosomes/{gion}/best_fit.json"
     with open(evaluation_chromosomes_file_path, 'r') as f:
         read_data = json.load(f)
