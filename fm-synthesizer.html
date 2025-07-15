@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽpFM�ｿｽ�ｿｽ�ｿｽ�ｿｽ</h1>
+    <br />
+    <table>
+      <tr>
+        <th>Algorithm</th>
+        <td>
+          <input id="alg" type="range" min="1" max="8" step="1" value="1" />
+        </td>
+        <td id="algval">1</td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <th>switch</th>
+        <td>
+          <input id="swt" type="range" min="1" max="2" step="1" value="1" />
+        </td>
+        <td id="swtval">1</td>
+      </tr>
+    </table>
+
+    <br />
+    <button id="key">Press and Hold this button</button>
+    or Press and Hold "SPACE"key
+    <br />
+    <canvas id="canvas" width="500" height="256"></canvas>
+    <table border="1" cellspacing="0">
+      <tr>
+        <td></td>
+        <td>ratio</td>
+        <td>atack</td>
+        <td>decay</td>
+        <td>sustain</td>
+        <td>release</td>
+      </tr>
+      <tr>
+        <td>op1</td>
+        <td id="ratio1"></td>
+        <td id="atack1"></td>
+        <td id="decay1"></td>
+        <td id="sustain1"></td>
+        <td id="release1"></td>
+      </tr>
+      <tr>
+        <td>op2</td>
+        <td id="ratio2"></td>
+        <td id="atack2"></td>
+        <td id="decay2"></td>
+        <td id="sustain2"></td>
+        <td id="release2"></td>
+      </tr>
+      <tr>
+        <td>op3</td>
+        <td id="ratio3"></td>
+        <td id="atack3"></td>
+        <td id="decay3"></td>
+        <td id="sustain3"></td>
+        <td id="release3"></td>
+      </tr>
+      <tr>
+        <td>op4</td>
+        <td id="ratio4"></td>
+        <td id="atack4"></td>
+        <td id="decay4"></td>
+        <td id="sustain4"></td>
+        <td id="release4"></td>
+      </tr>
+    </table>
+    <script>
+      window.addEventListener("load", () => {
+        const audioctx1 = new AudioContext();
+        const audioctx2 = new AudioContext();
+        const audioctx3 = new AudioContext();
+        const audioctx4 = new AudioContext();
+        const audioctx5 = new AudioContext();
+        const audioctx6 = new AudioContext();
+        const audioctx7 = new AudioContext();
+        const audioctx8 = new AudioContext();
+        const ana1 = new AnalyserNode(audioctx1);
+        const ana2 = new AnalyserNode(audioctx2);
+        const ana3 = new AnalyserNode(audioctx3);
+        const ana4 = new AnalyserNode(audioctx4);
+        const ana5 = new AnalyserNode(audioctx5);
+        const ana6 = new AnalyserNode(audioctx6);
+        const ana7 = new AnalyserNode(audioctx7);
+        const ana8 = new AnalyserNode(audioctx8);
+        const OP = new Array(5);
+        const op1 = new Array(5);
+        const op2 = new Array(5);
+        const op3 = new Array(5);
+        const op4 = new Array(5);
+        const op5 = new Array(5);
+        const op6 = new Array(5);
+        const op7 = new Array(5);
+        const op8 = new Array(5);
+        const gain1 = new Array(5);
+        const gain2 = new Array(5);
+        const gain3 = new Array(5);
+        const gain4 = new Array(5);
+        const gain5 = new Array(5);
+        const gain6 = new Array(5);
+        const gain7 = new Array(5);
+        const gain8 = new Array(5);
+        let x = 0;
+        let keyBuffer = false;
+        let al = 1;
+        const canvasctx = document.getElementById("canvas").getContext("2d");
+        const graphdata = new Uint8Array(128);
+        canvasctx.fillStyle = "#222222";
+        canvasctx.fillRect(0, 0, 500, 256);
+        class operator {
+          constructor() {
+            this.level = 1;
+            this.ratio = getRandom(1, 10);
+            this.atack = 1 / Math.tan(getRandom_f(Math.atan(2), Math.PI / 2));
+            this.decay = getRandom_f(0, 1);
+            this.sustain = getRandom_f(0, 1);
+            this.release = getRandom_f(0, 0.5);
+          }
+        }
+        for (let i = 1; i < 5; i++) {
+          OP[i] = new operator();
+          op1[i] = new OscillatorNode(audioctx1);
+          gain1[i] = new GainNode(audioctx1);
+        }
+        for (let i = 1; i < 5; i++) {
+          op2[i] = new OscillatorNode(audioctx2);
+          gain2[i] = new GainNode(audioctx2);
+        }
+        for (let i = 1; i < 5; i++) {
+          op3[i] = new OscillatorNode(audioctx3);
+          gain3[i] = new GainNode(audioctx3);
+        }
+        for (let i = 1; i < 5; i++) {
+          op4[i] = new OscillatorNode(audioctx4);
+          gain4[i] = new GainNode(audioctx4);
+        }
+        for (let i = 1; i < 5; i++) {
+          op5[i] = new OscillatorNode(audioctx5);
+          gain5[i] = new GainNode(audioctx5);
+        }
+        for (let i = 1; i < 5; i++) {
+          op6[i] = new OscillatorNode(audioctx6);
+          gain6[i] = new GainNode(audioctx6);
+        }
+        for (let i = 1; i < 5; i++) {
+          op7[i] = new OscillatorNode(audioctx7);
+          gain7[i] = new GainNode(audioctx7);
+        }
+        for (let i = 1; i < 5; i++) {
+          op8[i] = new OscillatorNode(audioctx8);
+          gain8[i] = new GainNode(audioctx8);
+        }
+        ///////�ｿｽA�ｿｽ�ｿｽ�ｿｽS�ｿｽ�ｿｽ�ｿｽY�ｿｽ�ｿｽ�ｿｽP
+        op1[4].connect(gain1[4]).connect(op1[1].frequency);
+        op1[3].connect(gain1[3]).connect(op1[1].frequency);
+        op1[2].connect(gain1[2]).connect(op1[1].frequency);
+        op1[1].connect(gain1[1]).connect(audioctx1.destination);
+        gain1[1].connect(ana1);
+        audioctx1.suspend();
+        ///////�ｿｽA�ｿｽ�ｿｽ�ｿｽS�ｿｽ�ｿｽ�ｿｽY�ｿｽ�ｿｽ�ｿｽQ
+        op2[4].connect(gain2[4]).connect(op2[2].frequency);
+        op2[3].connect(gain2[3]).connect(op2[2].frequency);
+        op2[2].connect(gain2[2]).connect(op2[1].frequency);
+        op2[1].connect(gain2[1]).connect(audioctx2.destination);
+        gain2[1].connect(ana2);
+        audioctx2.suspend();
+        ///////�ｿｽA�ｿｽ�ｿｽ�ｿｽS�ｿｽ�ｿｽ�ｿｽY�ｿｽ�ｿｽ�ｿｽR
+        op3[3].connect(gain3[3]).connect(op3[2].frequency);
+        op3[4].connect(gain3[4]).connect(op3[1].frequency);
+        op3[2].connect(gain3[2]).connect(op3[1].frequency);
+        op3[1].connect(gain3[1]).connect(audioctx3.destination);
+        gain3[1].connect(ana3);
+        audioctx3.suspend();
+        ///////�ｿｽA�ｿｽ�ｿｽ�ｿｽS�ｿｽ�ｿｽ�ｿｽY�ｿｽ�ｿｽ�ｿｽS
+        op4[4].connect(gain4[4]).connect(op4[3].frequency);
+        op4[3].connect(gain4[3]).connect(op4[1].frequency);
+        op4[2].connect(gain4[2]).connect(op4[1].frequency);
+        op4[1].connect(gain4[1]).connect(audioctx4.destination);
+        gain4[1].connect(ana4);
+        audioctx4.suspend();
+        ///////�ｿｽA�ｿｽ�ｿｽ�ｿｽS�ｿｽ�ｿｽ�ｿｽY�ｿｽ�ｿｽ�ｿｽT
+        op5[4].connect(gain5[4]).connect(op5[3].frequency);
+        op5[2].connect(gain5[2]).connect(op5[1].frequency);
+        op5[3].connect(gain5[1]);
+        op5[1].connect(gain5[1]);
+        gain5[1].connect(audioctx5.destination);
+        gain5[1].connect(ana5);
+        audioctx5.suspend();
+        ///////�ｿｽA�ｿｽ�ｿｽ�ｿｽS�ｿｽ�ｿｽ�ｿｽY�ｿｽ�ｿｽ�ｿｽU
+        op6[4].connect(gain6[3]).connect(op6[3].frequency);
+        op6[4].connect(gain6[2]).connect(op6[2].frequency);
+        op6[4].connect(gain6[1]).connect(op6[1].frequency);
+        op6[3].connect(gain6[4]);
+        op6[2].connect(gain6[4]);
+        op6[1].connect(gain6[4]).connect(audioctx6.destination);
+        gain6[4].connect(ana6);
+        audioctx6.suspend();
+        ///////�ｿｽA�ｿｽ�ｿｽ�ｿｽS�ｿｽ�ｿｽ�ｿｽY�ｿｽ�ｿｽ�ｿｽV
+        op7[4].connect(gain7[4]).connect(op7[3].frequency);
+        op7[3].connect(gain7[1]);
+        op7[2].connect(gain7[1]);
+        op7[1].connect(gain7[1]);
+        gain7[1].connect(audioctx7.destination);
+        gain7[1].connect(ana7);
+        audioctx7.suspend();
+        ///////�ｿｽA�ｿｽ�ｿｽ�ｿｽS�ｿｽ�ｿｽ�ｿｽY�ｿｽ�ｿｽ�ｿｽW
+        op8[4].connect(gain8[4]).connect(audioctx8.destination);
+        op8[3].connect(gain8[3]).connect(audioctx8.destination);
+        op8[2].connect(gain8[2]).connect(audioctx8.destination);
+        op8[1].connect(gain8[1]).connect(audioctx8.destination);
+        gain8[4].connect(ana8);
+        gain8[3].connect(ana8);
+        gain8[2].connect(ana8);
+        gain8[1].connect(ana8);
+        audioctx8.suspend();
+
+        for (let j = 1; j < 5; j++) {
+          op1[j].start();
+        }
+        for (let j = 1; j < 5; j++) {
+          op2[j].start();
+        }
+        for (let j = 1; j < 5; j++) {
+          op3[j].start();
+        }
+        for (let j = 1; j < 5; j++) {
+          op4[j].start();
+        }
+        for (let j = 1; j < 5; j++) {
+          op5[j].start();
+        }
+        for (let j = 1; j < 5; j++) {
+          op6[j].start();
+        }
+        for (let j = 1; j < 5; j++) {
+          op7[j].start();
+        }
+        for (let j = 1; j < 5; j++) {
+          op8[j].start();
+        }
+        Setup();
+
+        document.getElementById("ratio1").innerHTML = 1;
+        document.getElementById("atack1").innerHTML = OP[1].atack;
+        document.getElementById("decay1").innerHTML = OP[1].decay;
+        document.getElementById("sustain1").innerHTML = OP[1].sustain;
+        document.getElementById("release1").innerHTML = OP[1].release;
+        document.getElementById("ratio2").innerHTML = OP[2].ratio;
+        document.getElementById("atack2").innerHTML = OP[2].atack;
+        document.getElementById("decay2").innerHTML = OP[2].decay;
+        document.getElementById("sustain2").innerHTML = OP[2].sustain;
+        document.getElementById("release2").innerHTML = OP[2].release;
+        document.getElementById("ratio3").innerHTML = OP[3].ratio;
+        document.getElementById("atack3").innerHTML = OP[3].atack;
+        document.getElementById("decay3").innerHTML = OP[3].decay;
+        document.getElementById("sustain3").innerHTML = OP[3].sustain;
+        document.getElementById("release3").innerHTML = OP[3].release;
+        document.getElementById("ratio4").innerHTML = OP[4].ratio;
+        document.getElementById("atack4").innerHTML = OP[4].atack;
+        document.getElementById("decay4").innerHTML = OP[4].decay;
+        document.getElementById("sustain4").innerHTML = OP[4].sustain;
+        document.getElementById("release4").innerHTML = OP[4].release;
+
+        document.getElementById("alg").addEventListener("input", (ev) => {
+          document.getElementById("algval").innerHTML = ev.target.value;
+          al = parseFloat(document.getElementById("alg").value);
+        });
+
+        document.getElementById("key").addEventListener("mousedown", () => {
+          if (parseFloat(document.getElementById("alg").value) == 1) {
+            audioctx1.resume();
+            const t0 = audioctx1.currentTime;
+            Enverope_up(t0, gain1[1], OP[1], 0.5);
+            Enverope_up(t0, gain1[2], OP[2], op1[1].frequency.value);
+            Enverope_up(t0, gain1[3], OP[3], op1[1].frequency.value);
+            Enverope_up(t0, gain1[4], OP[4], op1[1].frequency.value);
+          } else if (parseFloat(document.getElementById("alg").value) == 2) {
+            audioctx2.resume();
+            const t0 = audioctx2.currentTime;
+            Enverope_up(t0, gain2[1], OP[1], 0.5);
+            Enverope_up(t0, gain2[2], OP[2], op2[1].frequency.value);
+            Enverope_up(t0, gain2[3], OP[3], op2[2].frequency.value);
+            Enverope_up(t0, gain2[4], OP[4], op2[2].frequency.value);
+          } else if (parseFloat(document.getElementById("alg").value) == 3) {
+            audioctx3.resume();
+            const t0 = audioctx3.currentTime;
+            Enverope_up(t0, gain3[1], OP[1], 0.5);
+            Enverope_up(t0, gain3[2], OP[2], op2[1].frequency.value);
+            Enverope_up(t0, gain3[3], OP[3], op2[2].frequency.value);
+            Enverope_up(t0, gain3[4], OP[4], op2[1].frequency.value);
+          } else if (parseFloat(document.getElementById("alg").value) == 4) {
+            audioctx4.resume();
+            const t0 = audioctx4.currentTime;
+            Enverope_up(t0, gain4[1], OP[1], 0.5);
+            Enverope_up(t0, gain4[2], OP[2], op2[1].frequency.value);
+            Enverope_up(t0, gain4[3], OP[3], op2[1].frequency.value);
+            Enverope_up(t0, gain4[4], OP[4], op2[3].frequency.value);
+          } else if (parseFloat(document.getElementById("alg").value) == 5) {
+            audioctx5.resume();
+            const t0 = audioctx5.currentTime;
+            Enverope_up(t0, gain5[1], OP[1], 0.25);
+            Enverope_up(t0, gain5[2], OP[2], op2[1].frequency.value);
+            Enverope_up(t0, gain5[4], OP[4], op2[3].frequency.value);
+          } else if (parseFloat(document.getElementById("alg").value) == 6) {
+            audioctx6.resume();
+            const t0 = audioctx6.currentTime;
+            Enverope_up(t0, gain6[1], OP[1], op6[1].frequency.value);
+            Enverope_up(t0, gain6[2], OP[2], op6[2].frequency.value);
+            Enverope_up(t0, gain6[3], OP[3], op6[3].frequency.value);
+            Enverope_up(t0, gain6[4], OP[4], 0.166);
+          } else if (parseFloat(document.getElementById("alg").value) == 7) {
+            audioctx7.resume();
+            const t0 = audioctx7.currentTime;
+            Enverope_up(t0, gain7[1], OP[1], 0.166);
+            Enverope_up(t0, gain7[4], OP[4], op7[3].frequency.value);
+          } else if (parseFloat(document.getElementById("alg").value) == 8) {
+            audioctx8.resume();
+            const t0 = audioctx8.currentTime;
+            Enverope_up(t0, gain8[1], OP[1], 0.125);
+            Enverope_up(t0, gain8[2], OP[2], 0.125);
+            Enverope_up(t0, gain8[3], OP[3], 0.125);
+            Enverope_up(t0, gain8[4], OP[4], 0.125);
+          }
+          x = 0;
+          canvasctx.fillStyle = "#222222";
+          canvasctx.fillRect(0, 0, 500, 256);
+        });
+        document.getElementById("key").addEventListener("mouseup", () => {
+          if (parseFloat(document.getElementById("alg").value) == 1) {
+            const t0 = audioctx1.currentTime;
+            Enverope_down(t0, gain1[1], OP[1]);
+            Enverope_down(t0, gain1[2], OP[2]);
+            Enverope_down(t0, gain1[3], OP[3]);
+            Enverope_down(t0, gain1[4], OP[4]);
+          } else if (parseFloat(document.getElementById("alg").value) == 2) {
+            const t0 = audioctx2.currentTime;
+            Enverope_down(t0, gain2[1], OP[1]);
+            Enverope_down(t0, gain2[2], OP[2]);
+            Enverope_down(t0, gain2[3], OP[3]);
+            Enverope_down(t0, gain2[4], OP[4]);
+          } else if (parseFloat(document.getElementById("alg").value) == 3) {
+            const t0 = audioctx3.currentTime;
+            Enverope_down(t0, gain3[1], OP[1]);
+            Enverope_down(t0, gain3[2], OP[2]);
+            Enverope_down(t0, gain3[3], OP[3]);
+            Enverope_down(t0, gain3[4], OP[4]);
+          } else if (parseFloat(document.getElementById("alg").value) == 4) {
+            const t0 = audioctx4.currentTime;
+            Enverope_down(t0, gain4[1], OP[1]);
+            Enverope_down(t0, gain4[2], OP[2]);
+            Enverope_down(t0, gain4[3], OP[3]);
+            Enverope_down(t0, gain4[4], OP[4]);
+          } else if (parseFloat(document.getElementById("alg").value) == 5) {
+            const t0 = audioctx5.currentTime;
+            Enverope_down(t0, gain5[1], OP[1]);
+            Enverope_down(t0, gain5[2], OP[2]);
+            Enverope_down(t0, gain5[4], OP[4]);
+          } else if (parseFloat(document.getElementById("alg").value) == 6) {
+            const t0 = audioctx6.currentTime;
+            Enverope_down(t0, gain6[1], OP[1]);
+            Enverope_down(t0, gain6[2], OP[2]);
+            Enverope_down(t0, gain6[3], OP[3]);
+            Enverope_down(t0, gain6[4], OP[4]);
+          } else if (parseFloat(document.getElementById("alg").value) == 7) {
+            const t0 = audioctx7.currentTime;
+            Enverope_down(t0, gain7[1], OP[1]);
+            Enverope_down(t0, gain7[4], OP[4]);
+          } else if (parseFloat(document.getElementById("alg").value) == 8) {
+            const t0 = audioctx8.currentTime;
+            Enverope_down(t0, gain8[1], OP[1]);
+            Enverope_down(t0, gain8[2], OP[2]);
+            Enverope_down(t0, gain8[3], OP[3]);
+            Enverope_down(t0, gain8[4], OP[4]);
+          }
+        });
+
+        function Enverope_up(t0, GAIN, OP, AtkLevel) {
+          const t1 = t0 + OP.atack;
+          const d = OP.decay;
+          const s = AtkLevel * OP.sustain;
+          GAIN.gain.setValueAtTime(0, t0);
+          GAIN.gain.linearRampToValueAtTime(AtkLevel, t1);
+          GAIN.gain.linearRampToValueAtTime(s, t1 + d);
+          GAIN.gain.setValueAtTime(s, t1 + d);
+        }
+        function Enverope_down(t0, GAIN, OP) {
+          const r = OP.release;
+          if (GAIN.gain.cancelAndHoldAtTime) GAIN.gain.cancelAndHoldAtTime(t0);
+          GAIN.gain.setTargetAtTime(0, t0, r);
+        }
+
+        function getRandom(min, max) {
+          var random = Math.floor(Math.random() * (max + 1 - min)) + min;
+          return random;
+        }
+        function getRandom_f(min, max) {
+          var random = Math.random() * (max - min) + min;
+          return random;
+        }
+        function Setup() {
+          op1[1].frequency.value = 440;
+          op1[2].frequency.value = op1[1].frequency.value * OP[2].ratio;
+          op1[3].frequency.value = op1[1].frequency.value * OP[3].ratio;
+          op1[4].frequency.value = op1[1].frequency.value * OP[4].ratio;
+          op2[1].frequency.value = 440;
+          op2[2].frequency.value = op2[1].frequency.value * OP[2].ratio;
+          op2[3].frequency.value = op2[1].frequency.value * OP[3].ratio;
+          op2[4].frequency.value = op2[1].frequency.value * OP[4].ratio;
+          op3[1].frequency.value = 440;
+          op3[2].frequency.value = op3[1].frequency.value * OP[2].ratio;
+          op3[3].frequency.value = op3[1].frequency.value * OP[3].ratio;
+          op3[4].frequency.value = op3[1].frequency.value * OP[4].ratio;
+          op4[1].frequency.value = 440;
+          op4[2].frequency.value = op4[1].frequency.value * OP[2].ratio;
+          op4[3].frequency.value = op4[1].frequency.value * OP[3].ratio;
+          op4[4].frequency.value = op4[1].frequency.value * OP[4].ratio;
+          op5[1].frequency.value = 440;
+          op5[2].frequency.value = op5[1].frequency.value * OP[2].ratio;
+          op5[3].frequency.value = op5[1].frequency.value * OP[3].ratio;
+          op5[4].frequency.value = op5[1].frequency.value * OP[4].ratio;
+          op6[1].frequency.value = 440;
+          op6[2].frequency.value = op6[1].frequency.value * OP[2].ratio;
+          op6[3].frequency.value = op6[1].frequency.value * OP[3].ratio;
+          op6[4].frequency.value = op6[1].frequency.value * OP[4].ratio;
+          op7[1].frequency.value = 440;
+          op7[2].frequency.value = op7[1].frequency.value * OP[2].ratio;
+          op7[3].frequency.value = op7[1].frequency.value * OP[3].ratio;
+          op7[4].frequency.value = op7[1].frequency.value * OP[4].ratio;
+          op8[1].frequency.value = 440;
+          op8[2].frequency.value = op8[1].frequency.value * OP[2].ratio;
+          op8[3].frequency.value = op8[1].frequency.value * OP[3].ratio;
+          op8[4].frequency.value = op8[1].frequency.value * OP[4].ratio;
+        }
+
+        setInterval(() => {
+          if (x < 500 && al == 1) {
+            ana1.getByteTimeDomainData(graphdata);
+            let y = 0;
+            for (let i = 0; i < 128; ++i) {
+              const d = Math.abs(graphdata[i] - 128);
+              if (Math.abs(d > y)) y = d;
+            }
+            canvasctx.fillStyle = "#222222";
+            canvasctx.fillRect(x, 0, 2, 256);
+            canvasctx.fillStyle = "#00ff00";
+            canvasctx.fillRect(x, 256 - 2 * y, 2, 2 * y);
+          } else if (x < 500 && al == 2) {
+            ana2.getByteTimeDomainData(graphdata);
+            let y = 0;
+            for (let i = 0; i < 128; ++i) {
+              const d = Math.abs(graphdata[i] - 128);
+              if (Math.abs(d > y)) y = d;
+            }
+            canvasctx.fillStyle = "#222222";
+            canvasctx.fillRect(x, 0, 2, 256);
+            canvasctx.fillStyle = "#00ff00";
+            canvasctx.fillRect(x, 256 - 2 * y, 2, 2 * y);
+          } else if (x < 500 && al == 3) {
+            ana3.getByteTimeDomainData(graphdata);
+            let y = 0;
+            for (let i = 0; i < 128; ++i) {
+              const d = Math.abs(graphdata[i] - 128);
+              if (Math.abs(d > y)) y = d;
+            }
+            canvasctx.fillStyle = "#222222";
+            canvasctx.fillRect(x, 0, 2, 256);
+            canvasctx.fillStyle = "#00ff00";
+            canvasctx.fillRect(x, 256 - 2 * y, 2, 2 * y);
+          } else if (x < 500 && al == 4) {
+            ana4.getByteTimeDomainData(graphdata);
+            let y = 0;
+            for (let i = 0; i < 128; ++i) {
+              const d = Math.abs(graphdata[i] - 128);
+              if (Math.abs(d > y)) y = d;
+            }
+            canvasctx.fillStyle = "#222222";
+            canvasctx.fillRect(x, 0, 2, 256);
+            canvasctx.fillStyle = "#00ff00";
+            canvasctx.fillRect(x, 256 - 2 * y, 2, 2 * y);
+          } else if (x < 500 && al == 5) {
+            ana5.getByteTimeDomainData(graphdata);
+            let y = 0;
+            for (let i = 0; i < 128; ++i) {
+              const d = Math.abs(graphdata[i] - 128);
+              if (Math.abs(d > y)) y = d;
+            }
+            canvasctx.fillStyle = "#222222";
+            canvasctx.fillRect(x, 0, 2, 256);
+            canvasctx.fillStyle = "#00ff00";
+            canvasctx.fillRect(x, 256 - 2 * y, 2, 2 * y);
+          } else if (x < 500 && al == 6) {
+            ana6.getByteTimeDomainData(graphdata);
+            let y = 0;
+            for (let i = 0; i < 128; ++i) {
+              const d = Math.abs(graphdata[i] - 128);
+              if (Math.abs(d > y)) y = d;
+            }
+            canvasctx.fillStyle = "#222222";
+            canvasctx.fillRect(x, 0, 2, 256);
+            canvasctx.fillStyle = "#00ff00";
+            canvasctx.fillRect(x, 256 - 2 * y, 2, 2 * y);
+          } else if (x < 500 && al == 7) {
+            ana7.getByteTimeDomainData(graphdata);
+            let y = 0;
+            for (let i = 0; i < 128; ++i) {
+              const d = Math.abs(graphdata[i] - 128);
+              if (Math.abs(d > y)) y = d;
+            }
+            canvasctx.fillStyle = "#222222";
+            canvasctx.fillRect(x, 0, 2, 256);
+            canvasctx.fillStyle = "#00ff00";
+            canvasctx.fillRect(x, 256 - 2 * y, 2, 2 * y);
+          } else if (x < 500 && al == 8) {
+            ana8.getByteTimeDomainData(graphdata);
+            let y = 0;
+            for (let i = 0; i < 128; ++i) {
+              const d = Math.abs(graphdata[i] - 128);
+              if (Math.abs(d > y)) y = d;
+            }
+            canvasctx.fillStyle = "#222222";
+            canvasctx.fillRect(x, 0, 2, 256);
+            canvasctx.fillStyle = "#00ff00";
+            canvasctx.fillRect(x, 256 - 2 * y, 2, 2 * y);
+          }
+          x += 2;
+        }, 50);
+      });
+    </script>
+    <br />
+  </body>
+</html>

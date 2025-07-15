@@ -1,0 +1,566 @@
+{
+  "./results/bu-/haruna-22-female-0-HS2Q7I0.json": {
+    "fmParamsList": {
+      "operator1": {
+        "attack": 0.03571374175074383,
+        "decay": 0.1693581643861428,
+        "sustain": 0.8924668339808153,
+        "sustainTime": 0.29143130406919976,
+        "release": 0.06397776069547464,
+        "frequency": 316.9088802804968,
+        "ratioToFundamentalFrequency": 3.237077293286343,
+        "modulationIndex": 72.82403546585026
+      },
+      "operator2": {
+        "attack": 0.21879585780878757,
+        "decay": 0.08068565072927866,
+        "sustain": 0.9450059059193511,
+        "sustainTime": 0.13686160489468063,
+        "release": 0.35,
+        "frequency": 513.0482925444796,
+        "ratioToFundamentalFrequency": 0.75,
+        "modulationIndex": 243.06913075090674
+      },
+      "operator3": {
+        "attack": 0.16378740993169674,
+        "decay": 0.1420849593509056,
+        "sustain": 0.26654987833396854,
+        "sustainTime": 0.14812601706558726,
+        "release": 0.2722036364944946,
+        "frequency": 446.304993175982,
+        "ratioToFundamentalFrequency": 3.876624894505946,
+        "modulationIndex": 103.47282108386278
+      },
+      "operator4": {
+        "attack": 0.09771683367004584,
+        "decay": 0.15134449303090763,
+        "sustain": 0.36257490434126793,
+        "sustainTime": 0.04519708711066653,
+        "release": 0.34177499396572775,
+        "frequency": 367.998508816101,
+        "ratioToFundamentalFrequency": 5.4171012808268,
+        "modulationIndex": 244.09217975971148
+      }
+    },
+    "fitness": "4",
+    "chromosomeId": "349cc816-8891-427e-be2e-2870d942e11d",
+    "algorithmNum": 1
+  },
+  "./results/bu-/esaki-23-male-0-ZMcEqCy.json": {
+    "fmParamsList": {
+      "operator1": {
+        "attack": 0.25,
+        "decay": 0.19691470546043782,
+        "sustain": 0.7584236184886375,
+        "sustainTime": 0.23345289440857475,
+        "release": 0.08620507647744449,
+        "frequency": 245.4364779031908,
+        "ratioToFundamentalFrequency": 5.9711362998562185,
+        "modulationIndex": 9.125561124902909
+      },
+      "operator2": {
+        "attack": 0.1894075315091605,
+        "decay": 0.18202980868482746,
+        "sustain": 0.9450804182717749,
+        "sustainTime": 0.23298530313642601,
+        "release": 0,
+        "frequency": 479.9818231202936,
+        "ratioToFundamentalFrequency": 3.3333917343588775,
+        "modulationIndex": 232.6493198727745
+      },
+      "operator3": {
+        "attack": 0.17175077547937506,
+        "decay": 0.045931812729205185,
+        "sustain": 0.6875397999624961,
+        "sustainTime": 0.09166692642837096,
+        "release": 0.2569170953800858,
+        "frequency": 823.8879558611013,
+        "ratioToFundamentalFrequency": 5.08178127702644,
+        "modulationIndex": 300
+      },
+      "operator4": {
+        "attack": 0.11407812656931718,
+        "decay": 0.06441408902002217,
+        "sustain": 0.24392015020453256,
+        "sustainTime": 0.1801943251759084,
+        "release": 0.24491816182989337,
+        "frequency": 768.8113836232681,
+        "ratioToFundamentalFrequency": 5.878890390784664,
+        "modulationIndex": 243.49716326904132
+      }
+    },
+    "fitness": "3",
+    "chromosomeId": "e4b734e9-3f6d-47cf-9417-9a25bdeffb9f",
+    "algorithmNum": 1
+  },
+  "./results/bu-/sakamoto-23-male-0-ImNUFnB.json": {
+    "fmParamsList": {
+      "operator1": {
+        "attack": 0.06620781203083338,
+        "decay": 0.12327493165944364,
+        "sustain": 0.3811518896075174,
+        "sustainTime": 0.3,
+        "release": 0.03889673091955204,
+        "frequency": 200,
+        "ratioToFundamentalFrequency": 3.1824559761002162,
+        "modulationIndex": 54.906282443609605
+      },
+      "operator2": {
+        "attack": 0.002644536387139428,
+        "decay": 0.19720597067674378,
+        "sustain": 0.49461988426147757,
+        "sustainTime": 0.0968781372136729,
+        "release": 0.14774820798656796,
+        "frequency": 256.8640037245085,
+        "ratioToFundamentalFrequency": 3.37375402746472,
+        "modulationIndex": 300
+      },
+      "operator3": {
+        "attack": 0.2347662598720174,
+        "decay": 0,
+        "sustain": 0.7859065848047639,
+        "sustainTime": 0.13872012820584304,
+        "release": 0.17132603719151301,
+        "frequency": 767.8356426761088,
+        "ratioToFundamentalFrequency": 1.3762860972203312,
+        "modulationIndex": 156.4628369185113
+      },
+      "operator4": {
+        "attack": 0.25,
+        "decay": 0.016262866835437984,
+        "sustain": 0.20695322819939166,
+        "sustainTime": 0.06324332760108055,
+        "release": 0.09271962287019361,
+        "frequency": 725.1881024679061,
+        "ratioToFundamentalFrequency": 1.580051649211104,
+        "modulationIndex": 300
+      }
+    },
+    "fitness": "5",
+    "chromosomeId": "969d7323-1584-441e-8f4f-b19b5cfb3ad5",
+    "algorithmNum": 1
+  },
+  "./results/bu-/hirai-25-male-0-Blb7iPF.json": {
+    "fmParamsList": {
+      "operator1": {
+        "attack": 0.1528424682145351,
+        "decay": 0.04529066629830794,
+        "sustain": 0.8969173312826173,
+        "sustainTime": 0.10118115305393835,
+        "release": 0.21533073821842816,
+        "frequency": 520.0143108206602,
+        "ratioToFundamentalFrequency": 3.3274382736096833,
+        "modulationIndex": 1.1054440345023782
+      },
+      "operator2": {
+        "attack": 0.07981627947652072,
+        "decay": 0.0630892204350143,
+        "sustain": 0.6574080273483871,
+        "sustainTime": 0.17891158847167632,
+        "release": 0.057803832141338496,
+        "frequency": 200,
+        "ratioToFundamentalFrequency": 0.75,
+        "modulationIndex": 261.99596622631094
+      },
+      "operator3": {
+        "attack": 0.13690122985892486,
+        "decay": 0.06209365797883279,
+        "sustain": 0.4156504357294289,
+        "sustainTime": 0.21663680189306547,
+        "release": 0.12840236072563085,
+        "frequency": 477.612999881648,
+        "ratioToFundamentalFrequency": 2.608656986706517,
+        "modulationIndex": 162.11899469144694
+      },
+      "operator4": {
+        "attack": 0.1463294486142726,
+        "decay": 0.007550162382754494,
+        "sustain": 0.8784693944766039,
+        "sustainTime": 0.0643269263417195,
+        "release": 0.15460403379118867,
+        "frequency": 1272.937775652728,
+        "ratioToFundamentalFrequency": 1.5104276357396094,
+        "modulationIndex": 134.36215906601416
+      }
+    },
+    "fitness": "4",
+    "chromosomeId": "a4cbdbac-e257-412f-ac26-131697d590a4",
+    "algorithmNum": 1
+  },
+  "./results/bu-/sawada-22-male-0-l8dbOpM.json": {
+    "fmParamsList": {
+      "operator1": {
+        "attack": 0,
+        "decay": 0.10327918331695812,
+        "sustain": 0.9712645907960766,
+        "sustainTime": 0.3,
+        "release": 0.02627908138405037,
+        "frequency": 200,
+        "ratioToFundamentalFrequency": 5.339778782459308,
+        "modulationIndex": 231.85233819422976
+      },
+      "operator2": {
+        "attack": 0.14451393923935502,
+        "decay": 0.25,
+        "sustain": 0.39510028030132055,
+        "sustainTime": 0.2649967441616447,
+        "release": 0.24030967914797832,
+        "frequency": 1147.139572574635,
+        "ratioToFundamentalFrequency": 1.1689295755851972,
+        "modulationIndex": 127.09170517353536
+      },
+      "operator3": {
+        "attack": 0.17891324055878127,
+        "decay": 0.10190972966907375,
+        "sustain": 0.4796233540024892,
+        "sustainTime": 0.19351413689047833,
+        "release": 0.21935102169113213,
+        "frequency": 978.0129398133099,
+        "ratioToFundamentalFrequency": 3.0447878823092647,
+        "modulationIndex": 78.06526521306475
+      },
+      "operator4": {
+        "attack": 0.15733619233901636,
+        "decay": 0.07943321116706745,
+        "sustain": 0.6420521959572093,
+        "sustainTime": 0.020036759479732207,
+        "release": 0.13977141021924536,
+        "frequency": 1300,
+        "ratioToFundamentalFrequency": 4.911121551114353,
+        "modulationIndex": 130.04921661690176
+      }
+    },
+    "fitness": "5",
+    "chromosomeId": "4bd65467-2f3e-475d-b887-ed24e7bd8e0f",
+    "algorithmNum": 1
+  },
+  "./results/bu-/kento-22-male-0-oCpeKui.json": {
+    "fmParamsList": {
+      "operator1": {
+        "attack": 0.008474602189928737,
+        "decay": 0.1968828730444538,
+        "sustain": 0.339978638642185,
+        "sustainTime": 0.21988655607110014,
+        "release": 0.07916277581373833,
+        "frequency": 234.93147356511767,
+        "ratioToFundamentalFrequency": 1.5692761966142736,
+        "modulationIndex": 78.218647650331
+      },
+      "operator2": {
+        "attack": 0.19207703315128088,
+        "decay": 0.07751181216611752,
+        "sustain": 0.4620661075626572,
+        "sustainTime": 0.24392599330951154,
+        "release": 0.19253223889100574,
+        "frequency": 200,
+        "ratioToFundamentalFrequency": 0.75,
+        "modulationIndex": 107.5152841707617
+      },
+      "operator3": {
+        "attack": 0.14944169186087564,
+        "decay": 0.10339925364347892,
+        "sustain": 0.2628667028096449,
+        "sustainTime": 0.17323158156799312,
+        "release": 0.16726797976794266,
+        "frequency": 703.2927182836436,
+        "ratioToFundamentalFrequency": 2.358014347342662,
+        "modulationIndex": 183.4222995078185
+      },
+      "operator4": {
+        "attack": 0.16686787984727686,
+        "decay": 0.04071154532329033,
+        "sustain": 0.5112581368853465,
+        "sustainTime": 0.28880721683741284,
+        "release": 0.11029647591234291,
+        "frequency": 968.8714356467243,
+        "ratioToFundamentalFrequency": 3.5642222293080437,
+        "modulationIndex": 170.72426903224658
+      }
+    },
+    "fitness": "5",
+    "chromosomeId": "cc60752c-9483-47ff-86cf-572d0621542c",
+    "algorithmNum": 1
+  },
+  "./results/bu-/Yoshikawa-22-female-0-AiAIPGc.json": {
+    "fmParamsList": {
+      "operator1": {
+        "attack": 0.19194811502396597,
+        "decay": 0.16318856450369193,
+        "sustain": 0.47412231528591475,
+        "sustainTime": 0.22417822475307325,
+        "release": 0.04814119699990124,
+        "frequency": 347.6875440600322,
+        "ratioToFundamentalFrequency": 4.409621693587833,
+        "modulationIndex": 192.78757844678057
+      },
+      "operator2": {
+        "attack": 0.11984830778327503,
+        "decay": 0.09004305914793409,
+        "sustain": 0.6407279581011458,
+        "sustainTime": 0.06081518550250012,
+        "release": 0.194151135486144,
+        "frequency": 543.2878727833628,
+        "ratioToFundamentalFrequency": 0.8339823673402412,
+        "modulationIndex": 193.2200475025114
+      },
+      "operator3": {
+        "attack": 0.20140514817521188,
+        "decay": 0.12583812272460682,
+        "sustain": 0.13452157944866722,
+        "sustainTime": 0.1268830373154118,
+        "release": 0.0043739077328846096,
+        "frequency": 665.6991333501629,
+        "ratioToFundamentalFrequency": 1.492828714790407,
+        "modulationIndex": 300
+      },
+      "operator4": {
+        "attack": 0.1562710420934576,
+        "decay": 0.1354968467991012,
+        "sustain": 0.20215200069188394,
+        "sustainTime": 0.1145963990660119,
+        "release": 0.20612849548240092,
+        "frequency": 821.4075923788573,
+        "ratioToFundamentalFrequency": 3.0869444259333854,
+        "modulationIndex": 154.89163638479675
+      }
+    },
+    "fitness": "3",
+    "chromosomeId": "45886382-78b2-4385-9524-99de9cb01df4",
+    "algorithmNum": 1
+  },
+  "./results/bu-/yoshihito-23-male-0-vXdqNPt.json": {
+    "fmParamsList": {
+      "operator1": {
+        "attack": 0.11278932954516797,
+        "decay": 0.21920226204725415,
+        "sustain": 0.6085646756216135,
+        "sustainTime": 0,
+        "release": 7.537946383320206e-5,
+        "frequency": 243.99297731643546,
+        "ratioToFundamentalFrequency": 3.5252014151741817,
+        "modulationIndex": 137.21907042885744
+      },
+      "operator2": {
+        "attack": 0,
+        "decay": 0.03912173090486187,
+        "sustain": 0.5199792428536691,
+        "sustainTime": 0.20853986550041032,
+        "release": 0.3063954993142782,
+        "frequency": 416.7931580887599,
+        "ratioToFundamentalFrequency": 6,
+        "modulationIndex": 293.43843179603005
+      },
+      "operator3": {
+        "attack": 0.12982436278540022,
+        "decay": 0.174196265025418,
+        "sustain": 0.44305152658973546,
+        "sustainTime": 0.042035072705072514,
+        "release": 0.10879201985469404,
+        "frequency": 1057.480317808252,
+        "ratioToFundamentalFrequency": 3.7448399795872884,
+        "modulationIndex": 210.62036529132249
+      },
+      "operator4": {
+        "attack": 0.09648725777403333,
+        "decay": 0.11675945509735267,
+        "sustain": 0.43492933333037115,
+        "sustainTime": 0.17583691807926674,
+        "release": 0.10268507204101905,
+        "frequency": 1034.3934028431931,
+        "ratioToFundamentalFrequency": 5.017010357723515,
+        "modulationIndex": 212.19174504205313
+      }
+    },
+    "fitness": "5",
+    "chromosomeId": "e024a8e2-3097-4918-86ef-97b044887f85",
+    "algorithmNum": 1
+  },
+  "./results/bu-/WTNB-24-male-0-o83gHz7.json": {
+    "fmParamsList": {
+      "operator1": {
+        "attack": 0.1606124758531203,
+        "decay": 0.17500542537416564,
+        "sustain": 0.8824861885846068,
+        "sustainTime": 0.20481165901674336,
+        "release": 0.09749234422847337,
+        "frequency": 200,
+        "ratioToFundamentalFrequency": 3.986577476111691,
+        "modulationIndex": 277.33628682672304
+      },
+      "operator2": {
+        "attack": 0.2461584320225021,
+        "decay": 0.025051597075701038,
+        "sustain": 0,
+        "sustainTime": 0.04829189298710582,
+        "release": 0.28581932623357653,
+        "frequency": 380.11740790850405,
+        "ratioToFundamentalFrequency": 2.735104217004056,
+        "modulationIndex": 125.64082815267304
+      },
+      "operator3": {
+        "attack": 0.24747535932257042,
+        "decay": 0.25,
+        "sustain": 0.4748405129852301,
+        "sustainTime": 0.14191832351997122,
+        "release": 0.32413191827966314,
+        "frequency": 632.3209056931571,
+        "ratioToFundamentalFrequency": 2.929945690731453,
+        "modulationIndex": 239.4243524188955
+      },
+      "operator4": {
+        "attack": 0.25,
+        "decay": 0.2338389118250378,
+        "sustain": 0.5454874478686463,
+        "sustainTime": 0.25070955911122755,
+        "release": 0.1857736272377431,
+        "frequency": 1093.8902539749135,
+        "ratioToFundamentalFrequency": 4.090547344253074,
+        "modulationIndex": 133.15945454090257
+      }
+    },
+    "fitness": "2",
+    "chromosomeId": "cd4a5929-0876-4c02-b8c1-7d13363e3d02",
+    "algorithmNum": 1
+  },
+  "./results/bu-/Nagahashi Ayumu-22-male-0-tnE2xu3.json": {
+    "fmParamsList": {
+      "operator1": {
+        "attack": 0.05325971522988439,
+        "decay": 0.19046924432107706,
+        "sustain": 0.6406504656803518,
+        "sustainTime": 0.18378619857721362,
+        "release": 0,
+        "frequency": 200,
+        "ratioToFundamentalFrequency": 3.7840515419521954,
+        "modulationIndex": 59.41068200559242
+      },
+      "operator2": {
+        "attack": 0,
+        "decay": 0.07336436883625697,
+        "sustain": 0.13989247066402477,
+        "sustainTime": 0.08747358773118094,
+        "release": 0.22010766576920643,
+        "frequency": 204.69284486565132,
+        "ratioToFundamentalFrequency": 1.413351391175181,
+        "modulationIndex": 244.81656782643702
+      },
+      "operator3": {
+        "attack": 0.18196119057888635,
+        "decay": 0,
+        "sustain": 1,
+        "sustainTime": 0,
+        "release": 0.08066183226540685,
+        "frequency": 618.6911598340225,
+        "ratioToFundamentalFrequency": 3.8597758911706634,
+        "modulationIndex": 163.8672535535772
+      },
+      "operator4": {
+        "attack": 0.11576730209624547,
+        "decay": 0.1672033235659821,
+        "sustain": 0.16251176587028454,
+        "sustainTime": 0.03209372414418868,
+        "release": 0.1309696192888867,
+        "frequency": 781.2524946390171,
+        "ratioToFundamentalFrequency": 3.319263557677382,
+        "modulationIndex": 203.44767855707403
+      }
+    },
+    "fitness": "5",
+    "chromosomeId": "7e276486-3108-4977-8bed-465ac5c984d3",
+    "algorithmNum": 1
+  },
+  "./results/bu-/Mori-23-female-0-royfxe9.json": {
+    "fmParamsList": {
+      "operator1": {
+        "attack": 0.15245340794166318,
+        "decay": 0.08289227325302946,
+        "sustain": 0.7616599918276117,
+        "sustainTime": 0.2402738774137794,
+        "release": 0,
+        "frequency": 292.8148964243076,
+        "ratioToFundamentalFrequency": 4.262041364278125,
+        "modulationIndex": 153.49227481804283
+      },
+      "operator2": {
+        "attack": 0.2466589746115948,
+        "decay": 0.06983972551280807,
+        "sustain": 0.4590479253264855,
+        "sustainTime": 0.022038455878725893,
+        "release": 0.0121142662948793,
+        "frequency": 204.09369394071405,
+        "ratioToFundamentalFrequency": 0.75,
+        "modulationIndex": 300
+      },
+      "operator3": {
+        "attack": 0.16812563143864784,
+        "decay": 0.03365853721517523,
+        "sustain": 0.2736603567181256,
+        "sustainTime": 0.08292566414480046,
+        "release": 0.2221346976038784,
+        "frequency": 386.97337658608416,
+        "ratioToFundamentalFrequency": 0.75,
+        "modulationIndex": 96.27443844546642
+      },
+      "operator4": {
+        "attack": 0.07550575430134354,
+        "decay": 0.03266864060087916,
+        "sustain": 0,
+        "sustainTime": 0.16129282065079115,
+        "release": 0.08552696604127943,
+        "frequency": 844.5546339409257,
+        "ratioToFundamentalFrequency": 3.3116188881654347,
+        "modulationIndex": 232.09533254040286
+      }
+    },
+    "fitness": "5",
+    "chromosomeId": "bac63bf9-7b8a-47c4-8ea3-83bae4fa286d",
+    "algorithmNum": 1
+  },
+  "./results/bu-/sa-25-female-0-iLFiLXf.json": {
+    "fmParamsList": {
+      "operator1": {
+        "attack": 0.1142619669666845,
+        "decay": 0.21694011300996635,
+        "sustain": 0.4008123015163664,
+        "sustainTime": 0.1737056148545408,
+        "release": 0.1816114393739417,
+        "frequency": 357.83280614018497,
+        "ratioToFundamentalFrequency": 4.844964127484616,
+        "modulationIndex": 240.23896864497527
+      },
+      "operator2": {
+        "attack": 0.25,
+        "decay": 0.0889941437696745,
+        "sustain": 0.7813813241666948,
+        "sustainTime": 0.20522450880606458,
+        "release": 0.04197276984600597,
+        "frequency": 360.8580638048146,
+        "ratioToFundamentalFrequency": 1.2370977101951262,
+        "modulationIndex": 234.72867168418986
+      },
+      "operator3": {
+        "attack": 0.21954284435023275,
+        "decay": 0.06371496924147065,
+        "sustain": 1,
+        "sustainTime": 0.17154244905207924,
+        "release": 0.11818981661757819,
+        "frequency": 727.6710889083231,
+        "ratioToFundamentalFrequency": 0.75,
+        "modulationIndex": 247.1683272104645
+      },
+      "operator4": {
+        "attack": 0.13393456341944363,
+        "decay": 0.16609267535329145,
+        "sustain": 0.7506049917653541,
+        "sustainTime": 0.05400412767072157,
+        "release": 0.2249621538385985,
+        "frequency": 496.88981071022573,
+        "ratioToFundamentalFrequency": 5.726956948861814,
+        "modulationIndex": 73.3470921976663
+      }
+    },
+    "fitness": "5",
+    "chromosomeId": "975a221e-46b1-4936-b6d3-97fcc28a0358",
+    "algorithmNum": 1
+  }
+}
