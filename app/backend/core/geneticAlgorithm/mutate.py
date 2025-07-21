@@ -1,5 +1,5 @@
 import random
-from ...config import *
+from ..geneticAlgorithm.config import *
 
 def mutate(param_name: str):
     if param_name == "attack":
