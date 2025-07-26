@@ -10,8 +10,8 @@ def exec_blx_alpha(parents_chromosomes: list, func_repair_gene, mutate) -> dict:
         # return operator1,operator2 ...
         operator_num: str = chromosome1_operator[0]
         offspring_operators_params = {}
+        offspring_operators_params.setdefault(operator_num, {})
         for chromosome1_operator_params, chromosome2_operator_params in zip(chromosome1_operator[1].items(), chromosome2_operator[1].items()):
-            offspring_operators_params.setdefault(operator_num, {})
             # attack,decayなどのパラメータ
             param_name = chromosome1_operator_params[0]
             chromosome1_operator_param_value = chromosome1_operator_params[1]
