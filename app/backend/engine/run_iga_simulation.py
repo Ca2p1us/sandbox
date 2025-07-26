@@ -1,10 +1,13 @@
-
+from typing import List
 from ..core.geneticAlgorithm.selection import tournament
 from ..core.geneticAlgorithm.make_chromosome_params import *
 from ..core.geneticAlgorithm import BLX_alpha
 from ..engine import population_utils
 from ..core.geneticAlgorithm import make_chromosome_params
 from ..engine import evaluate
+
+
+Chromosomes = List[dict]
 
 NUM_GENERATIONS = 10
 POPULATION_SIZE = 10
@@ -20,18 +23,21 @@ def run_simulation():
         # 2. 評価
         fitnesses = evaluate(population)
 
-        # 3. 選択
-        selected = tournament.exec_tournament_selection(population)
+        next_generation:List[Chromosomes]  = []
+        for _ in range(POPULATION_SIZE):
+            # 3. 選択
+            selected = tournament.exec_tournament_selection(population)
 
-        # 4-1. 交叉
-        offspring = BLX_alpha.exec_blx_alpha(
-            parents_chromosomes=selected,
-            func_repair_gene=population_utils.repair_gene,
-            mutate=population_utils.mutate
-        )
+            # 4-1. 交叉
+            offspring = BLX_alpha.exec_blx_alpha(
+                parents_chromosomes=selected,
+                func_repair_gene=population_utils.repair_gene,
+                mutate=population_utils.mutate
+            )
+            next_generation.append(offspring)
 
         # 5. 次世代への更新
-        population = offspring
+        population = next_generation
 
     # 6. 最終結果の出力
     return population
