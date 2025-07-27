@@ -38,12 +38,20 @@ def run_simulation():
             )
             # offspringがリストの場合
             if isinstance(offspring, list):
-                next_generation.extend(offspring)
-            else:
+                for ind in offspring:
+                    if isinstance(ind, dict):
+                        next_generation.append(ind)
+                    else:
+                        print("警告: offspring内にdict以外が含まれています:", ind)
+            elif isinstance(offspring, dict):
                 next_generation.append(offspring)
+            else:
+                print("警告: offspringがdictまたはlist[dict]ではありません:", offspring)
 
         # 5. 次世代への更新
         population = next_generation
+        #評価
+        evaluate.evaluate_fitness_by_param(population)
 
     # 6. 最終結果の出力
     return population
