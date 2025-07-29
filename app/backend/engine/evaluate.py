@@ -20,3 +20,14 @@ def evaluate_fitness_by_param(population: List[dict]):
         # 例えば frequency を使って評価（220Hz ～ 880Hz を1～10にマッピング）
         normalized = max(1, min(10, int((frequency - 220) / (880 - 220) * 9 + 1)))
         individual["fitness"] = str(normalized)
+
+# 最も適応度の高い個体と最も低い個体を取得
+def get_best_and_worst_individuals(population: List[dict]):
+    # fitnessが未設定の場合は除外
+    valid_population = [ind for ind in population if "fitness" in ind]
+    if not valid_population:
+        return None, None
+    # fitnessはstrなのでintに変換して比較
+    best = max(valid_population, key=lambda x: int(x["fitness"]))
+    worst = min(valid_population, key=lambda x: int(x["fitness"]))
+    return best, worst

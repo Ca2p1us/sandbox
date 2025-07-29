@@ -25,6 +25,8 @@ def run_simulation():
     for generation in range(NUM_GENERATIONS):
         # 2. 評価
         fitnesses = evaluate.evaluate_fitness_random(population)
+        best, worst = evaluate.get_best_and_worst_individuals(population)
+        print(f"Generation {generation + 1}\n \t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
 
         next_generation:List[Chromosomes]  = []
         for _ in range(POPULATION_SIZE):
