@@ -4,9 +4,10 @@ from ..core.geneticAlgorithm.make_chromosome_params import make_chromosome_param
 from ..core.geneticAlgorithm import BLX_alpha
 from ..core.geneticAlgorithm.repair import repair_fm_params as repair_gene
 from ..core.geneticAlgorithm.mutate import mutate 
-from ..engine import population_utils
+from ..core.log import log
 from ..core.geneticAlgorithm import make_chromosome_params
 from ..engine import evaluate
+import uuid
 
 
 Chromosomes = List[dict]
@@ -24,6 +25,8 @@ def run_simulation():
     for generation in range(NUM_GENERATIONS):
         # 2. 評価
         fitnesses = evaluate.evaluate_fitness_random(population)
+        best, worst = evaluate.get_best_and_worst_individuals(population)
+        print(f"Generation {generation + 1}\n \t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
 
         next_generation:List[Chromosomes]  = []
         for _ in range(POPULATION_SIZE):
@@ -40,10 +43,16 @@ def run_simulation():
             if isinstance(offspring, list):
                 for ind in offspring:
                     if isinstance(ind, dict):
+                        # algorithmNumを親からコピー（selected[0]を例とする）
+                        ind["algorithmNum"] = selected[0].get("algorithmNum", None)
+                        # 新しいchromosomeIdを付与
+                        ind["chromosomeId"] = str(uuid.uuid4())
                         next_generation.append(ind)
                     else:
                         print("警告: offspring内にdict以外が含まれています:", ind)
             elif isinstance(offspring, dict):
+                offspring["algorithmNum"] = selected[0].get("algorithmNum", None)
+                offspring["chromosomeId"] = str(uuid.uuid4())
                 next_generation.append(offspring)
             else:
                 print("警告: offspringがdictまたはlist[dict]ではありません:", offspring)
@@ -54,5 +63,6 @@ def run_simulation():
         evaluate.evaluate_fitness_by_param(population)
 
     # 6. 最終結果の出力
+    log("result/random/simulation_random_results.json", population)
     return population
-print(run_simulation())
+run_simulation()
