@@ -22,6 +22,7 @@ def make_chromosome_params():
         },
         "algorithmNum": ALGORITHM_NUM,
         "fitness": "",
+        "pre_evaluation": 0,  # 事前評価値（デフォルト0、型や初期値は用途に応じて変更）
         "chromosomeId": uuid.uuid4()
     }
 # def make_chromosome_params():
