@@ -31,3 +31,13 @@ def get_best_and_worst_individuals(population: List[dict]):
     best = max(valid_population, key=lambda x: int(x["fitness"]))
     worst = min(valid_population, key=lambda x: int(x["fitness"]))
     return best, worst
+
+def proposal_evaluate_random(id_list: List[str], population: List[dict]):
+    """
+    id_listに含まれるID（chromosomeId）を持つ個体のみ、fitnessにランダムな値（1〜10）を与える
+    """
+    for individual in population:
+        if not isinstance(individual, dict):
+            continue
+        if "chromosomeId" in individual and individual["chromosomeId"] in id_list:
+            individual["fitness"] = str(random.randint(1, 10))
