@@ -5,8 +5,8 @@ from ..core.geneticAlgorithm import BLX_alpha
 from ..core.geneticAlgorithm.repair import repair_fm_params as repair_gene
 from ..core.geneticAlgorithm.mutate import mutate 
 from ..core.geneticAlgorithm import make_chromosome_params
-from ..core.geneticAlgorithm.interpolation import interpolate_fitness_by_distance
-from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_fitness
+from ..core.geneticAlgorithm.interpolation import interpolate_by_distance
+from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_pre_evaluation
 from ..core.log import log
 from ..engine import evaluate
 import uuid
@@ -73,16 +73,18 @@ EVALUATE_SIZE = 10
 def run_simulation_proposal_IGA():
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
-    # 初期個体の事前評価
-    interpolate_fitness_by_distance(population)
+    # 初期個体の事前評価(補間)
+    interpolate_by_distance(population,target_key="pre_evaluation")
     # 評価個体の選択
-    evaluate_population = select_top_individuals_by_fitness(population, top_n=EVALUATE_SIZE)
+    evaluate_population = select_top_individuals_by_pre_evaluation(population, top_n=EVALUATE_SIZE)
 
     for generation in range(NUM_GENERATIONS):
         # 2. 評価
-        fitnesses = evaluate.evaluate_fitness_random(population)
+        evaluate.proposal_evaluate_random(evaluate_population,population)
         best, worst = evaluate.get_best_and_worst_individuals(population)
         print(f"Generation {generation + 1}\n \t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
+        # ほかの個体の評価を補間
+        interpolate_by_distance(population, best, worst, target_key="fitness")
 
         next_generation:List[Chromosomes]  = []
         for _ in range(POPULATION_SIZE):
@@ -118,9 +120,9 @@ def run_simulation_proposal_IGA():
         #評価
         evaluate.evaluate_fitness_by_param(population)
         # 事前評価の補間
-        interpolate_fitness_by_distance(population, best, worst)
+        interpolate_by_distance(population, best, worst, target_key="pre_evaluation")
         # 評価個体の選択
-        evaluate_population = select_top_individuals_by_fitness(population, top_n=EVALUATE_SIZE)
+        evaluate_population = select_top_individuals_by_pre_evaluation(population, top_n=EVALUATE_SIZE)
 
     # 6. 最終結果の出力
     log("result/random/simulation_proposal_results.json", population)
