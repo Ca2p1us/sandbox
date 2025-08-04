@@ -1,4 +1,5 @@
 import random
+import uuid
 from typing import List
 
 # 完全ランダムな評価（1〜10）
@@ -41,3 +42,32 @@ def proposal_evaluate_random(id_list: List[str], population: List[dict]):
             continue
         if "chromosomeId" in individual and individual["chromosomeId"] in id_list:
             individual["fitness"] = str(random.randint(1, 10))
+
+def get_best_and_worst_individuals_by_id(id_list: List[str], population: List[dict]):
+    """
+    id_listに含まれるchromosomeIdを持つ個体群から、最もfitnessが高い個体と低い個体を返す
+    """
+    # id_listをUUID型に変換
+    id_set = set()
+    for cid in id_list:
+        try:
+            id_set.add(uuid.UUID(str(cid)))
+        except Exception:
+            continue
+
+    valid_population = [
+        ind for ind in population
+        if "fitness" in ind and "chromosomeId" in ind
+        and (
+            (isinstance(ind["chromosomeId"], uuid.UUID) and ind["chromosomeId"] in id_set)
+            or
+            (isinstance(ind["chromosomeId"], str) and uuid.UUID(ind["chromosomeId"]) in id_set)
+        )
+        and str(ind["fitness"]).strip() not in ("", "None")
+        and str(ind["fitness"]).replace('.', '', 1).isdigit()
+    ]
+    if not valid_population:
+        return None, None
+    best = max(valid_population, key=lambda x: float(x["fitness"]))
+    worst = min(valid_population, key=lambda x: float(x["fitness"]))
+    return best, worst

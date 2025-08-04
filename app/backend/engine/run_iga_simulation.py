@@ -81,12 +81,13 @@ def run_simulation_proposal_IGA():
     for generation in range(NUM_GENERATIONS):
         # 2. 評価
         evaluate.proposal_evaluate_random(evaluate_population,population)
-        best, worst = evaluate.get_best_and_worst_individuals(population)
-        print(f"Generation {generation + 1}\n \t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
+        # ベスト・ワースト個体の取得
+        best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
         # ほかの個体の評価を補間
         interpolate_by_distance(population, best, worst, target_key="fitness")
 
         next_generation:List[Chromosomes]  = []
+        print(f"Generation {generation + 1}\n \t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
         for _ in range(POPULATION_SIZE):
             # 3. 選択
             selected = tournament.exec_tournament_selection(population)
@@ -117,7 +118,7 @@ def run_simulation_proposal_IGA():
 
         # 5. 次世代への更新
         population = next_generation
-        #評価
+        #事前評価
         evaluate.evaluate_fitness_by_param(population)
         # 事前評価の補間
         interpolate_by_distance(population, best, worst, target_key="pre_evaluation")
