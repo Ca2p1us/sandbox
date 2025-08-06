@@ -1,4 +1,5 @@
 import random
+import math
 import uuid
 from typing import List
 
@@ -71,3 +72,34 @@ def get_best_and_worst_individuals_by_id(id_list: List[str], population: List[di
     best = max(valid_population, key=lambda x: float(x["fitness"]))
     worst = min(valid_population, key=lambda x: float(x["fitness"]))
     return best, worst
+
+def get_average_fitness(population: List[dict]) -> float:
+    """
+    population内のfitnessの平均値を返す（fitnessが未設定・不正な個体は除外）
+    """
+    fitness_values = [
+        float(ind["fitness"])
+        for ind in population
+        if "fitness" in ind
+        and str(ind["fitness"]).strip() not in ("", "None")
+        and str(ind["fitness"]).replace('.', '', 1).isdigit()
+    ]
+    if not fitness_values:
+        return 0.0
+    return sum(fitness_values) / len(fitness_values)
+
+def evaluate_fitness_by_distribution(population: List[dict], target_freq: float = 440, sigma: float = 100):
+    """
+    operator1のfrequencyがtarget_freqに近いほど高評価（正規分布に基づく）
+    sigmaは分布の幅（標準偏差）
+    """
+    for individual in population:
+        if not isinstance(individual, dict):
+            print("警告: individualがdict型ではありません:", individual)
+            continue
+        op1 = individual["fmParamsList"]["operator1"]
+        frequency = op1.get("frequency", 0)
+        # 正規分布の確率密度関数（最大値を10にスケール）
+        score = math.exp(-((frequency - target_freq) ** 2) / (2 * sigma ** 2))
+        normalized = int(round(score * 10))  # 0～10に丸める
+        individual["fitness"] = str(normalized)

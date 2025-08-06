@@ -29,7 +29,8 @@ def run_simulation_normal_IGA():
         evaluate.evaluate_fitness_random(population)
         best, worst = evaluate.get_best_and_worst_individuals(population)
         print(f"Generation {generation + 1}\n \t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
-
+        # 評価の平均値を表示
+        print(f"average fitness:", evaluate.get_average_fitness(population))
         next_generation:List[Chromosomes]  = []
         for _ in range(POPULATION_SIZE):
             # 3. 選択
@@ -85,6 +86,8 @@ def run_simulation_proposal_IGA():
         best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
         # ほかの個体の評価を補間
         interpolate_by_distance(population, best, worst, target_key="fitness")
+        # 評価の平均値を表示
+        print(f"average fitness:", evaluate.get_average_fitness(population))
 
         next_generation:List[Chromosomes]  = []
         print(f"Generation {generation + 1}\n \t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
