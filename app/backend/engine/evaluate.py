@@ -12,15 +12,67 @@ def evaluate_fitness_random(population: List[dict]):
         individual["fitness"] = str(random.randint(1, 10))
 
 # FMパラメータに基づいた評価（例：operator1のfrequencyに基づく）
-def evaluate_fitness_by_param(population: List[dict]):
+def evaluate_fitness_by_param(
+    population: List[dict],
+    target_params: List[float],
+    sigma: float = 100.0,
+    param_keys: List[str] = None,
+    method: str = "product"  # "product", "mean", "max", "min", "median"
+):
+    """
+    param_keysで指定した各パラメータがtarget_paramsの値に近いほど高評価（正規分布に基づく）
+    methodで統合手法を選択可能
+    """
+    if param_keys is None:
+        param_keys = ["fmParamsList.operator1.frequency"]
+
     for individual in population:
         if not isinstance(individual, dict):
             print("警告: individualがdict型ではありません:", individual)
             continue
-        op1 = individual["fmParamsList"]["operator1"]
-        frequency = op1.get("frequency", 0)
-        # 例えば frequency を使って評価（220Hz ～ 880Hz を1～10にマッピング）
-        normalized = max(1, min(10, int((frequency - 220) / (880 - 220) * 9 + 1)))
+
+        scores = []
+        for key, target in zip(param_keys, target_params):
+            # ドット区切りでアクセス
+            val = individual
+            for k in key.split('.'):
+                val = val.get(k, None)
+                if val is None:
+                    break
+            if val is None:
+                scores.append(0)
+            else:
+                # 正規分布の確率密度関数（最大値1）
+                score = math.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
+                scores.append(score)
+
+        # 統合手法の選択
+        if method == "product":
+            total_score = 1.0
+            for s in scores:
+                total_score *= s
+        elif method == "mean":
+            total_score = sum(scores) / len(scores) if scores else 0
+        elif method == "max":
+            total_score = max(scores) if scores else 0
+        elif method == "min":
+            total_score = min(scores) if scores else 0
+        elif method == "median":
+            sorted_scores = sorted(scores)
+            n = len(sorted_scores)
+            if n == 0:
+                total_score = 0
+            elif n % 2 == 1:
+                total_score = sorted_scores[n // 2]
+            else:
+                total_score = (sorted_scores[n // 2 - 1] + sorted_scores[n // 2]) / 2
+        else:
+            print(f"未知のmethod: {method}。productを使用します。")
+            total_score = 1.0
+            for s in scores:
+                total_score *= s
+
+        normalized = int(round(total_score * 10))  # 0～10に丸める
         individual["fitness"] = str(normalized)
 
 # 最も適応度の高い個体と最も低い個体を取得
@@ -102,4 +154,4 @@ def evaluate_fitness_by_distribution(population: List[dict], target_freq: float 
         # 正規分布の確率密度関数（最大値を10にスケール）
         score = math.exp(-((frequency - target_freq) ** 2) / (2 * sigma ** 2))
         normalized = int(round(score * 10))  # 0～10に丸める
-        individual["fitness"] = str(normalized)
+        individual["fitness"] = str(normalized")
