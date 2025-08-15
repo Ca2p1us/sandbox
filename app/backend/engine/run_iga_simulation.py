@@ -122,7 +122,7 @@ def run_simulation_proposal_IGA():
         # 5. 次世代への更新
         population = next_generation
         #事前評価
-        evaluate.evaluate_fitness_by_param(population)
+        evaluate.evaluate_fitness_by_param(population, target_params=[440,2200],sigma=1.0, param_keys=["fmParamsList.operator1.frequency", "fmParamsList.operator2.frequency"], method="product")
         # 事前評価の補間
         interpolate_by_distance(population, best, worst, target_key="pre_evaluation")
         # 評価個体の選択

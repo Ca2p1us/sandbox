@@ -3,6 +3,10 @@ import math
 import uuid
 from typing import List
 
+def add_noise(value: float, noise_sigma: float = 1.0) -> float:
+    # 平均0、標準偏差noise_sigmaの正規分布ノイズを加算
+    return value + random.gauss(0, noise_sigma)
+
 # 完全ランダムな評価（1〜10）
 def evaluate_fitness_random(population: List[dict]):
     for individual in population:
@@ -72,8 +76,9 @@ def evaluate_fitness_by_param(
             for s in scores:
                 total_score *= s
 
-        normalized = int(round(total_score * 10))  # 0～10に丸める
-        individual["fitness"] = str(normalized)
+        # ノイズを加えて
+        normalized = int(round(add_noise(total_score * 10, noise_sigma=1.0)))  # 0～10に丸める
+        individual["fitness"] = str(max(0, min(10, normalized)))  # 範囲外は補正
 
 # 最も適応度の高い個体と最も低い個体を取得
 def get_best_and_worst_individuals(population: List[dict]):
@@ -154,4 +159,4 @@ def evaluate_fitness_by_distribution(population: List[dict], target_freq: float 
         # 正規分布の確率密度関数（最大値を10にスケール）
         score = math.exp(-((frequency - target_freq) ** 2) / (2 * sigma ** 2))
         normalized = int(round(score * 10))  # 0～10に丸める
-        individual["fitness"] = str(normalized")
+        individual["fitness"] = str(normalized)
