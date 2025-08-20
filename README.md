@@ -16,3 +16,12 @@ python -m backend.engine.run_iga_simulation
 | **機械学習予測モデル（Machine learning surrogate model）** | 初期評価データを使い回帰・分類モデル（SVM, NN等）で未評価個体の適応度を推定 | 高速だが学習誤差が影響 | Ishibuchi et al. (2003) など |
 | **ユーザ特性模倣モデル（User profile mimic model）** | 過去のユーザ評価履歴を模倣して評価関数を構築 | 個人差や嗜好再現が可能 | Lee et al. (2012) など |
 | **疲労進行モデル（Fatigue progression model）** | 評価回数が増えるにつれてノイズや評価変動幅を増加させる | 長期実験シミュレーションに有効 | Takagi (2001) 派生研究 |
+
+# 使っている論文
+- [先輩の修論(GithubのURL)](https://github.com/mocoatsu/Research)
+- ["Reducing user fatigue in interactive genetic algorithms by evaluation of population subsets." ](https://www.cse.unr.edu/~quiroz/inc/docs/trans2009.pdf)
+# 読むだけ読んだ論文
+- [自己組織化マップを用いた遺伝的アルゴリズムについて](https://doi.org/10.1299/jsmeoptis.2008.8.93)
+- [擬音的発話のニュアンスを反映するインタラクティブ効果音合成](https://www.interaction-ipsj.org/proceedings/2024/data/pdf/1B-34.pdf)
+- ["Voice Recognition based on vote-SOM."](https://www.researchgate.net/publication/281284888_Voice_Recognition_based_on_vote-SOM)
+- ["A spiking neural network framework for robust sound classification."](https://www.frontiersin.org/journals/neuroscience/articles/10.3389/fnins.2018.00836/full)
