@@ -70,7 +70,7 @@ def run_simulation_normal_IGA():
     return population
 
 PROPOSAL_POPULATION_SIZE = 100
-EVALUATE_SIZE = 10
+EVALUATE_SIZE = 9
 def run_simulation_proposal_IGA():
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
@@ -91,7 +91,7 @@ def run_simulation_proposal_IGA():
 
         next_generation:List[Chromosomes]  = []
         print(f"Generation {generation + 1}\n \t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
-        for _ in range(POPULATION_SIZE):
+        for _ in range(PROPOSAL_POPULATION_SIZE):
             # 3. 選択
             selected = tournament.exec_tournament_selection(population)
 
