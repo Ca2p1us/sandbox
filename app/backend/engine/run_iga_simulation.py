@@ -81,16 +81,24 @@ def run_simulation_proposal_IGA():
 
     for generation in range(NUM_GENERATIONS):
         # 2. 評価
-        evaluate.proposal_evaluate_random(evaluate_population,population)
+        # evaluate.proposal_evaluate_random(evaluate_population,population)
+        evaluate.evaluate_fitness_by_param(
+            population,
+            target_params=[440, 2200],
+            sigma=1.0,
+            param_keys=["fmParamsList.operator1.frequency", "fmParamsList.operator2.frequency"],
+            method="product",
+            id_list=evaluate_population
+        )
         # ベスト・ワースト個体の取得
         best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
         # ほかの個体の評価を補間
         interpolate_by_distance(population, best, worst, target_key="fitness")
         # 評価の平均値を表示
-        print(f"average fitness:", evaluate.get_average_fitness(population))
+        print(f"Generation {generation + 1}\n average fitness:", evaluate.get_average_fitness(population))
 
         next_generation:List[Chromosomes]  = []
-        print(f"Generation {generation + 1}\n \t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
+        print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
         for _ in range(PROPOSAL_POPULATION_SIZE):
             # 3. 選択
             selected = tournament.exec_tournament_selection(population)
@@ -122,7 +130,13 @@ def run_simulation_proposal_IGA():
         # 5. 次世代への更新
         population = next_generation
         #事前評価
-        evaluate.evaluate_fitness_by_param(population, target_params=[440,2200],sigma=1.0, param_keys=["fmParamsList.operator1.frequency", "fmParamsList.operator2.frequency"], method="product")
+        # evaluate.evaluate_fitness_by_param(
+        #     population,
+        #     target_params=[440, 2200],
+        #     sigma=1.0,
+        #     param_keys=["fmParamsList.operator1.frequency", "fmParamsList.operator2.frequency"],
+        #     method="product"
+        # )
         # 事前評価の補間
         interpolate_by_distance(population, best, worst, target_key="pre_evaluation")
         # 評価個体の選択

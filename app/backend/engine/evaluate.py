@@ -21,18 +21,34 @@ def evaluate_fitness_by_param(
     target_params: List[float],
     sigma: float = 100.0,
     param_keys: List[str] = None,
-    method: str = "product"  # "product", "mean", "max", "min", "median"
+    method: str = "product",# "product", "mean", "max", "min", "median"
+    id_list: List[str] = None
 ):
     """
     param_keysで指定した各パラメータがtarget_paramsの値に近いほど高評価（正規分布に基づく）
+    id_listが指定された場合は、そのID（chromosomeId）を持つ個体のみfitnessを付与
     methodで統合手法を選択可能
     """
     if param_keys is None:
         param_keys = ["fmParamsList.operator1.frequency"]
 
+    # id_listが指定されていれば、そのIDのみ評価
+    def should_evaluate(ind):
+        if id_list is None:
+            return True
+        if "chromosomeId" not in ind:
+            return False
+        # UUID型にも対応
+        try:
+            return str(ind["chromosomeId"]) in [str(i) for i in id_list]
+        except Exception:
+            return False
+
     for individual in population:
         if not isinstance(individual, dict):
             print("警告: individualがdict型ではありません:", individual)
+            continue
+        if not should_evaluate(individual):
             continue
 
         scores = []
