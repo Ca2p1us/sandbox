@@ -83,11 +83,17 @@ def run_simulation_proposal_IGA():
         # 2. 評価
         # evaluate.proposal_evaluate_random(evaluate_population,population)
         evaluate.evaluate_fitness_by_param(
+            #評価対象集団
             population,
+            #目標値
             target_params=[440, 2200],
+            #標準偏差
             sigma=1.0,
+            #評価対象パラメータ
             param_keys=["fmParamsList.operator1.frequency", "fmParamsList.operator2.frequency"],
-            method="product",
+            #評価方法"product", "mean", "max", "min", "median"
+            method="mean",
+            #評価個体のIDリスト
             id_list=evaluate_population
         )
         # ベスト・ワースト個体の取得
@@ -129,15 +135,7 @@ def run_simulation_proposal_IGA():
 
         # 5. 次世代への更新
         population = next_generation
-        #事前評価
-        # evaluate.evaluate_fitness_by_param(
-        #     population,
-        #     target_params=[440, 2200],
-        #     sigma=1.0,
-        #     param_keys=["fmParamsList.operator1.frequency", "fmParamsList.operator2.frequency"],
-        #     method="product"
-        # )
-        # 事前評価の補間
+        #事前評価(補間)
         interpolate_by_distance(population, best, worst, target_key="pre_evaluation")
         # 評価個体の選択
         evaluate_population = select_top_individuals_by_pre_evaluation(population, top_n=EVALUATE_SIZE)
