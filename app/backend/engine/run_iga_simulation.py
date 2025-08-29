@@ -102,6 +102,8 @@ def run_simulation_proposal_IGA():
         interpolate_by_distance(population, best, worst, target_key="fitness")
         # 評価の平均値を表示
         print(f"Generation {generation + 1}\n average fitness:", evaluate.get_average_fitness(population))
+        # 上位9個体の平均評価値を表示
+        print(f" average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
 
         next_generation:List[Chromosomes]  = []
         print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
