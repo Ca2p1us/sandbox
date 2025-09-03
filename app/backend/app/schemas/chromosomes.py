@@ -10,7 +10,7 @@ from pydantic import BaseModel
 class ChromosomeParams(BaseModel):
     algorithmNum: int
     fitness: int
-    pre_evaluation: int = 0  # 事前評価値（デフォルト0、型や初期値は用途に応じて変更）
+    pre_evaluation: int
     chromosomeId: str
     operator1: dict
     operator2: dict
