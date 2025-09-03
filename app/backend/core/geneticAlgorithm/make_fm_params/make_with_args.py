@@ -1,14 +1,12 @@
 ALGORITHM_NUM = 0
 
 def make_fm_params_with_args(
-        attack:float,
-        decay:float,
-        sustain:float,
-        sustain_time:float,
-        release:float,
-        frequency:float,
-        ratio_to_fundamental_frequency:int,
-        modulation_index:float
+        attack:float, #アタックの時間
+        decay:float, #ディケイの時間
+        sustain:float, #サステインのレベル
+        sustain_time:float, #サステインの時間
+        release:float, #リリースの時間
+        frequency:float, #周波数(Hz)
         ):
 
     """FMのパラメータを返す
@@ -22,7 +20,5 @@ def make_fm_params_with_args(
         "sustain": sustain,
         "sustainTime": sustain_time,
         "release": release,
-        "frequency": frequency,
-        "ratioToFundamentalFrequency": ratio_to_fundamental_frequency,
-        "modulationIndex": modulation_index
+        "frequency": frequency
     }
