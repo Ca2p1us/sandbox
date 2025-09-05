@@ -13,8 +13,8 @@ def make_chromosome_params():
     """
     return {
         "fmParamsList": {
-            "operator1": make_fm_params_with_args(0,0,1,3,0,440,1,300),
-            "operator2": make_fm_params_with_args(0,0,1,3,0,2200,1,1500)
+            "operator1": make_fm_params_with_args(0,0,1,3,0,440)
+            # "operator2": make_fm_params_with_args(0,0,1,3,0,2200)
         },
         "algorithmNum": ALGORITHM_NUM,
         "fitness": "",
