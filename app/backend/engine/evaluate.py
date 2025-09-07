@@ -19,7 +19,7 @@ def evaluate_fitness_random(population: List[dict]):
 def evaluate_fitness_by_param(
     population: List[dict],
     target_params: List[float],
-    sigma: float = 100.0,
+    sigma: float = 500.0,
     param_keys: List[str] = None,
     method: str = "product",# "product", "mean", "max", "min", "median"
     id_list: List[str] = None

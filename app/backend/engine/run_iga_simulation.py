@@ -18,7 +18,7 @@ NUM_GENERATIONS = 10
 POPULATION_SIZE = 10
 
 def make_initial_population(num_individuals=10):
-    return [make_chromosome_params.make_chromosome_params() for _ in range(num_individuals)]
+    return [make_chromosome_params.make_chromosome_random() for _ in range(num_individuals)]
 
 def run_simulation_normal_IGA():
     # 1. 初期個体生成
@@ -75,7 +75,11 @@ def run_simulation_proposal_IGA():
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
     # 初期個体の事前評価(補間)
-    interpolate_by_distance(population,target_key="pre_evaluation")
+    interpolate_by_distance(
+        population,
+        param_keys=["fmParamsList.operator1.frequency", "fmParamsList.operator2.frequency"],
+        target_key="pre_evaluation"
+        )
     # 評価個体の選択
     evaluate_population = select_top_individuals_by_pre_evaluation(population, top_n=EVALUATE_SIZE)
 
@@ -88,7 +92,7 @@ def run_simulation_proposal_IGA():
             #目標値
             target_params=[440, 2200],
             #標準偏差
-            sigma=1.0,
+            sigma=500.0,
             #評価対象パラメータ
             param_keys=["fmParamsList.operator1.frequency", "fmParamsList.operator2.frequency"],
             #評価方法"product", "mean", "max", "min", "median"
@@ -138,7 +142,13 @@ def run_simulation_proposal_IGA():
         # 5. 次世代への更新
         population = next_generation
         #事前評価(補間)
-        interpolate_by_distance(population, best, worst, target_key="pre_evaluation")
+        interpolate_by_distance(
+            population,
+            best,
+            worst,
+            param_keys=["fmParamsList.operator1.frequency", "fmParamsList.operator2.frequency"],
+            target_key="pre_evaluation"
+            )
         # 評価個体の選択
         evaluate_population = select_top_individuals_by_pre_evaluation(population, top_n=EVALUATE_SIZE)
 
