@@ -83,18 +83,18 @@ def run_simulation_proposal_IGA():
     # 評価個体の選択
     evaluate_population = select_top_individuals_by_pre_evaluation(population, top_n=EVALUATE_SIZE)
 
-    for generation in range(NUM_GENERATIONS):
+    for generation in range(NUM_GENERATIONS - 1):
         # 2. 評価
         # evaluate.proposal_evaluate_random(evaluate_population,population)
         evaluate.evaluate_fitness_by_param(
             #評価対象集団
             population,
             #目標値
-            target_params=[440, 2200],
+            target_params=[0.03, 0.16],
             #標準偏差
             sigma=500.0,
             #評価対象パラメータ
-            param_keys=["fmParamsList.operator1.frequency", "fmParamsList.operator2.frequency"],
+            param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay"],
             #評価方法"product", "mean", "max", "min", "median"
             method="mean",
             #評価個体のIDリスト
@@ -152,6 +152,23 @@ def run_simulation_proposal_IGA():
         # 評価個体の選択
         evaluate_population = select_top_individuals_by_pre_evaluation(population, top_n=EVALUATE_SIZE)
 
+    # --- ここで最終世代の評価値を再計算 ---
+    evaluate.evaluate_fitness_by_param(
+        population,
+        target_params=[0.03, 0.16],
+        sigma=1.0,
+        param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay"],
+        method="mean",
+        id_list=evaluate_population
+    )
+    # ベスト・ワースト個体の取得
+    best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
+    interpolate_by_distance(population, best, worst, target_key="fitness")
+    # 評価の平均値を表示
+    print(f"Generation {NUM_GENERATIONS}\n average fitness:", evaluate.get_average_fitness(population))
+    # 上位9個体の平均評価値を表示
+    print(f" average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
+    print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
     # 6. 最終結果の出力
     log("result/random/simulation_proposal_results.json", population)
     return population
