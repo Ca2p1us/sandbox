@@ -30,5 +30,10 @@ python -m backend.engine.run_iga_simulation
 # IGAの評価指標
 - 最良個体の評価値の推移を見る
     - 収束の早さ?
+    - 使っていた論文
+        - ["対話履歴からの獲得知識に基づく模擬評価関数を用いた対話型進化計算"](https://www.jstage.jst.go.jp/article/jjske/14/4/14_TJSKE-D-15-00069/_pdf)
+        - ["対話型進化計算における YUKI アルゴリズムの適用"](https://www.jstage.jst.go.jp/article/jsoft/37/1/37_553/_pdf/-char/ja)
 - 収束特性
     - よくわからん
+    - 使っていた論文
+        - ["推定収束点を用いた対話型進化計算高速化の可能性"](https://api.lib.kyushu-u.ac.jp/opac_download_md/1810697/FSS2017.pdf)
