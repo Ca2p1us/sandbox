@@ -3,6 +3,8 @@
 ```tarminal
 python -m backend.engine.run_iga_simulation
 ```
+# パラメータの検討
+- [Chatgptによる回答](https://chatgpt.com/s/t_68be5ddb84a08191a54ae9eadee2b8c5)
 
 # 疑似ユーザモデルの代表的分類
 
