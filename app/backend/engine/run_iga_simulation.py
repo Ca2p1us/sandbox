@@ -77,7 +77,7 @@ def run_simulation_proposal_IGA():
     # 初期個体の事前評価(補間)
     interpolate_by_distance(
         population,
-        param_keys=["fmParamsList.operator1.frequency", "fmParamsList.operator2.frequency"],
+        param_keys=["fmParamsList.operator1.frequency", "fmParamsList.operator2.frequency", "fmParamsList.operator3.frequency", "fmParamsList.operator4.frequency"],
         target_key="pre_evaluation"
         )
     # 評価個体の選択
@@ -90,11 +90,11 @@ def run_simulation_proposal_IGA():
             #評価対象集団
             population,
             #目標値
-            target_params=[0.03, 0.16],
+            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90],
             #標準偏差
             sigma=500.0,
             #評価対象パラメータ
-            param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay"],
+            param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmparamlist.operator1.sustain", "fmparamlist.operator1.sustainTime", "fmparamlist.operator1.release", "fmparamlist.operator1.frequency"],
             #評価方法"product", "mean", "max", "min", "median"
             method="mean",
             #評価個体のIDリスト
@@ -146,7 +146,7 @@ def run_simulation_proposal_IGA():
             population,
             best,
             worst,
-            param_keys=["fmParamsList.operator1.frequency", "fmParamsList.operator2.frequency"],
+            param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmparamlist.operator1.sustain", "fmparamlist.operator1.sustainTime", "fmparamlist.operator1.release", "fmparamlist.operator1.frequency"],
             target_key="pre_evaluation"
             )
         # 評価個体の選択
@@ -155,9 +155,9 @@ def run_simulation_proposal_IGA():
     # --- ここで最終世代の評価値を再計算 ---
     evaluate.evaluate_fitness_by_param(
         population,
-        target_params=[0.03, 0.16],
-        sigma=1.0,
-        param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay"],
+        target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90],
+        sigma=500.0,
+        param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmparamlist.operator1.sustain", "fmparamlist.operator1.sustainTime", "fmparamlist.operator1.release", "fmparamlist.operator1.frequency"],
         method="mean",
         id_list=evaluate_population
     )
