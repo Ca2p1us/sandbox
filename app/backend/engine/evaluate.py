@@ -97,6 +97,54 @@ def evaluate_fitness_by_param(
         normalized = int(round(total_score))  # 0～10の整数に丸める
         individual["fitness"] = str(max(0, min(10, normalized)))  # 範囲外は補正
 
+
+def evaluate_fitness_like_GA(
+    population: List[dict],
+    weights: List[float],
+    param_keys: List[str],
+    id_list: List[str] = None
+):
+    """
+    各個体について、指定したパラメータ値に重みをかけて線形結合し、その合計をfitnessとする。
+    weights: 各パラメータに対応する重みのリスト
+    param_keys: 評価対象パラメータ名リスト（例: ["fmParamsList.operator1.frequency", ...]）
+    id_list: 評価対象のchromosomeIdリスト（Noneなら全個体）
+    """
+    def should_evaluate(ind):
+        if id_list is None:
+            return True
+        if "chromosomeId" not in ind:
+            return False
+        try:
+            return str(ind["chromosomeId"]) in [str(i) for i in id_list]
+        except Exception:
+            return False
+
+    for individual in population:
+        if not isinstance(individual, dict):
+            print("警告: individualがdict型ではありません:", individual)
+            continue
+        if not should_evaluate(individual):
+            continue
+
+        values = []
+        for key in param_keys:
+            val = individual
+            for k in key.split('.'):
+                val = val.get(k, None)
+                if val is None:
+                    break
+            if val is None:
+                values.append(0)
+            else:
+                values.append(float(val))
+
+        # 線形結合
+        fitness = sum(w * v for w, v in zip(weights, values))
+        # 必要に応じてスケーリングやノイズ付与も可能
+        individual["fitness"] = str(int(round(fitness)))
+
+
 # 最も適応度の高い個体と最も低い個体を取得
 def get_best_and_worst_individuals(population: List[dict]):
     # fitnessが未設定の場合は除外

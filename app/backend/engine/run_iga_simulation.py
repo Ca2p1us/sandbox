@@ -18,7 +18,7 @@ NUM_GENERATIONS = 10
 POPULATION_SIZE = 10
 
 def make_initial_population(num_individuals=10):
-    return [make_chromosome_params.make_chromosome_random() for _ in range(num_individuals)]
+    return [make_chromosome_params.make_chromosome_params() for _ in range(num_individuals)]
 
 def run_simulation_normal_IGA():
     # 1. 初期個体生成
@@ -71,6 +71,7 @@ def run_simulation_normal_IGA():
 
 PROPOSAL_POPULATION_SIZE = 100
 EVALUATE_SIZE = 9
+OMOMI = [5.2, -8.9, 1.1, 3.7, -6.5, 0.03]
 def run_simulation_proposal_IGA():
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
@@ -85,19 +86,24 @@ def run_simulation_proposal_IGA():
 
     for generation in range(NUM_GENERATIONS - 1):
         # 2. 評価
-        # evaluate.proposal_evaluate_random(evaluate_population,population)
-        evaluate.evaluate_fitness_by_param(
-            #評価対象集団
+        # evaluate.evaluate_fitness_by_param(
+        #     #評価対象集団
+        #     population,
+        #     #目標値
+        #     target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90],
+        #     #標準偏差
+        #     sigma=500.0,
+        #     #評価対象パラメータ
+        #     param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmparamlist.operator1.sustain", "fmparamlist.operator1.sustainTime", "fmparamlist.operator1.release", "fmparamlist.operator1.frequency"],
+        #     #評価方法"product", "mean", "max", "min", "median"
+        #     method="mean",
+        #     #評価個体のIDリスト
+        #     id_list=evaluate_population
+        # )
+        evaluate.evaluate_fitness_like_GA(
             population,
-            #目標値
-            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90],
-            #標準偏差
-            sigma=500.0,
-            #評価対象パラメータ
+            weights=OMOMI,
             param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmparamlist.operator1.sustain", "fmparamlist.operator1.sustainTime", "fmparamlist.operator1.release", "fmparamlist.operator1.frequency"],
-            #評価方法"product", "mean", "max", "min", "median"
-            method="mean",
-            #評価個体のIDリスト
             id_list=evaluate_population
         )
         # ベスト・ワースト個体の取得
@@ -153,12 +159,18 @@ def run_simulation_proposal_IGA():
         evaluate_population = select_top_individuals_by_pre_evaluation(population, top_n=EVALUATE_SIZE)
 
     # --- ここで最終世代の評価値を再計算 ---
-    evaluate.evaluate_fitness_by_param(
+    # evaluate.evaluate_fitness_by_param(
+    #     population,
+    #     target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90],
+    #     sigma=500.0,
+    #     param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmparamlist.operator1.sustain", "fmparamlist.operator1.sustainTime", "fmparamlist.operator1.release", "fmparamlist.operator1.frequency"],
+    #     method="mean",
+    #     id_list=evaluate_population
+    # )
+    evaluate.evaluate_fitness_like_GA(
         population,
-        target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90],
-        sigma=500.0,
+        weights=OMOMI,
         param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmparamlist.operator1.sustain", "fmparamlist.operator1.sustainTime", "fmparamlist.operator1.release", "fmparamlist.operator1.frequency"],
-        method="mean",
         id_list=evaluate_population
     )
     # ベスト・ワースト個体の取得
