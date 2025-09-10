@@ -5,6 +5,13 @@ python -m backend.engine.run_iga_simulation
 ```
 # パラメータの検討
 - [Chatgptによる回答](https://chatgpt.com/s/t_68be5ddb84a08191a54ae9eadee2b8c5)
+- 各パラメータの定義域
+    - アタック 0～0.25sec
+    - ディケイ 0～0.25sec
+    - サスティン 0～1
+    - 持続時間 0～0.3sec
+    - リリース 0～0.35sec
+    - 周波数 200～1300Hz
 
 # 疑似ユーザモデルの代表的分類
 
