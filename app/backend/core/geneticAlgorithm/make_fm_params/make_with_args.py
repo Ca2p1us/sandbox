@@ -6,7 +6,7 @@ def make_fm_params_with_args(
         sustain:float, #サステインのレベル
         sustain_time:float, #サステインの時間
         release:float, #リリースの時間
-        frequency:float, #周波数(Hz)
+        frequency:float, #周波数(kHz)
         ):
 
     """FMのパラメータを返す

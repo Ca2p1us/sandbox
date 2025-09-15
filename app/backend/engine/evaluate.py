@@ -1,6 +1,7 @@
 import random
 import math
 import uuid
+import numpy as np
 from typing import List
 
 def add_noise(value: float, noise_sigma: float = 1.0) -> float:
@@ -21,13 +22,12 @@ def evaluate_fitness_by_param(
     target_params: List[float],
     sigma: float = 500.0,
     param_keys: List[str] = None,
-    method: str = "product",# "product", "mean", "max", "min", "median"
     id_list: List[str] = None
 ):
     """
     param_keysで指定した各パラメータがtarget_paramsの値に近いほど高評価（正規分布に基づく）
     id_listが指定された場合は、そのID（chromosomeId）を持つ個体のみfitnessを付与
-    methodで統合手法を選択可能
+    統合手法は平均値
     """
     if param_keys is None:
         param_keys = ["fmParamsList.operator1.frequency"]
@@ -66,31 +66,8 @@ def evaluate_fitness_by_param(
                 score = math.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
                 scores.append(score)
 
-        # 統合手法の選択
-        if method == "product":
-            total_score = 1.0
-            for s in scores:
-                total_score *= s
-        elif method == "mean":
-            total_score = sum(scores) / len(scores) if scores else 0
-        elif method == "max":
-            total_score = max(scores) if scores else 0
-        elif method == "min":
-            total_score = min(scores) if scores else 0
-        elif method == "median":
-            sorted_scores = sorted(scores)
-            n = len(sorted_scores)
-            if n == 0:
-                total_score = 0
-            elif n % 2 == 1:
-                total_score = sorted_scores[n // 2]
-            else:
-                total_score = (sorted_scores[n // 2 - 1] + sorted_scores[n // 2]) / 2
-        else:
-            print(f"未知のmethod: {method}。productを使用します。")
-            total_score = 1.0
-            for s in scores:
-                total_score *= s
+        # 統合
+        total_score = sum(scores) / len(scores) if scores else 0
 
         # ノイズを加えて
         total_score = add_noise(total_score * 10, noise_sigma=1.0)  # 0～10にスケール
@@ -98,15 +75,13 @@ def evaluate_fitness_by_param(
         individual["fitness"] = str(max(0, min(10, normalized)))  # 範囲外は補正
 
 
-def evaluate_fitness_like_GA(
+def evaluate_fitness_sphere(
     population: List[dict],
-    weights: List[float],
     param_keys: List[str],
     id_list: List[str] = None
 ):
     """
-    各個体について、指定したパラメータ値に重みをかけて線形結合し、その合計をfitnessとする。
-    weights: 各パラメータに対応する重みのリスト
+    各個体の二乗和を取ることで評価
     param_keys: 評価対象パラメータ名リスト（例: ["fmParamsList.operator1.frequency", ...]）
     id_list: 評価対象のchromosomeIdリスト（Noneなら全個体）
     """
@@ -140,9 +115,103 @@ def evaluate_fitness_like_GA(
                 values.append(float(val))
 
         # 線形結合
-        fitness = sum(w * v for w, v in zip(weights, values))
+        fitness = sum(v**2 for v in values)
         # 必要に応じてスケーリングやノイズ付与も可能
-        individual["fitness"] = str(int(round(fitness)))
+        individual["fitness"] = str(fitness)
+
+
+def evaluate_fitness_noise(
+        population: List[dict],
+        id_list: List[str] = None,
+        param_keys: List[str] = None,
+        noise_sigma: float = 1.0,
+        noise_mean: float = 0.0
+):
+    """
+    各個体の(四乗＋ノイズ)の和を取ることで評価
+    param_keys: 評価対象パラメータ名リスト（例: ["fmParamsList.operator1.frequency", ...]）
+    id_list: 評価対象のchromosomeIdリスト（Noneなら全個体）
+    """
+    def should_evaluate(ind):
+        if id_list is None:
+            return True
+        if "chromosomeId" not in ind:
+            return False
+        try:
+            return str(ind["chromosomeId"]) in [str(i) for i in id_list]
+        except Exception:
+            return False
+
+    for individual in population:
+        if not isinstance(individual, dict):
+            print("警告: individualがdict型ではありません:", individual)
+            continue
+        if not should_evaluate(individual):
+            continue
+
+        values = []
+        for key in param_keys:
+            val = individual
+            for k in key.split('.'):
+                val = val.get(k, None)
+                if val is None:
+                    break
+            if val is None:
+                values.append(0)
+            else:
+                values.append(float(val))
+
+        # 統合
+        fitness = sum(i*(values[i]**4) - np.random.normal(loc=noise_mean, scale=noise_sigma) for i in range(len(values)))
+        # 必要に応じてスケーリングやノイズ付与も可能
+        individual["fitness"] = str(fitness)
+
+
+def evaluate_fitness_cos(
+        population: List[dict],
+        id_list: List[str] = None,
+        param_keys: List[str] = None,
+        A = 10.0
+):
+    """
+    各個体の(四乗＋ノイズ)の和を取ることで評価
+    param_keys: 評価対象パラメータ名リスト（例: ["fmParamsList.operator1.frequency", ...]）
+    id_list: 評価対象のchromosomeIdリスト（Noneなら全個体）
+    """
+    def should_evaluate(ind):
+        if id_list is None:
+            return True
+        if "chromosomeId" not in ind:
+            return False
+        try:
+            return str(ind["chromosomeId"]) in [str(i) for i in id_list]
+        except Exception:
+            return False
+
+    for individual in population:
+        if not isinstance(individual, dict):
+            print("警告: individualがdict型ではありません:", individual)
+            continue
+        if not should_evaluate(individual):
+            continue
+
+        values = []
+        for key in param_keys:
+            val = individual
+            for k in key.split('.'):
+                val = val.get(k, None)
+                if val is None:
+                    break
+            if val is None:
+                values.append(0)
+            else:
+                values.append(float(val))
+
+        # 統合
+        fitness = 20 * A + sum(v**2 - 10 *np.cos(2*np.pi*v) for v in values)
+        # 必要に応じてスケーリングやノイズ付与も可能
+        individual["fitness"] = str(fitness)
+
 
 
 # 最も適応度の高い個体と最も低い個体を取得

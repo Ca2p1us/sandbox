@@ -14,7 +14,7 @@ def make_chromosome_params():
     """
     return {
         "fmParamsList": {
-            "operator1": make_fm_params_with_args(0,0,1,3,0,440)
+            "operator1": make_fm_params_with_args(0.1,0.1,0.5,0.2,0.1,0.440)
             # "operator2": make_fm_params_with_args(0,0,1,3,0,2200)
         },
         "algorithmNum": ALGORITHM_NUM,
@@ -47,9 +47,7 @@ OPERATOR_PARAM_RANGES = {
     "sustain": (0.0, 1.0),
     "sustainTime": (0.0, 0.3),
     "release": (0.0, 0.35),
-    "frequency": (200, 1300.0),
-    "ratioToFundamentalFrequency": (0.75, 6.0),
-    "modulationIndex": (0.0, 300.0)
+    "frequency": (0.200, 1.300),  # kHz単位
 }
 
 def make_operator_random():
