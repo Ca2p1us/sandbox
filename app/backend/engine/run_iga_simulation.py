@@ -99,21 +99,21 @@ def run_simulation_proposal_IGA():
         #     #評価個体のIDリスト
         #     id_list=evaluate_population
         # )
-        # evaluate.evaluate_fitness_sphere(
-        #     population,
-        #     param_keys=PARAMS,
-        #     id_list=evaluate_population
-        # )
-        # evaluate.evaluate_fitness_noise(
-        #     population =population,
-        #     param_keys=PARAMS,
-        #     id_list=evaluate_population
-        # )
-        evaluate.evaluate_fitness_cos(
+        evaluate.evaluate_fitness_sphere(
             population=population,
             param_keys=PARAMS,
             id_list=evaluate_population
         )
+        # evaluate.evaluate_fitness_noise(
+        #     population=population,
+        #     param_keys=PARAMS,
+        #     id_list=evaluate_population
+        # )
+        # evaluate.evaluate_fitness_cos(
+        #     population=population,
+        #     param_keys=PARAMS,
+        #     id_list=evaluate_population
+        # )
         # ベスト・ワースト個体の取得
         best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
         # ほかの個体の評価を補間
@@ -121,10 +121,11 @@ def run_simulation_proposal_IGA():
         # 評価の平均値を表示
         print(f"Generation {generation + 1}\n average fitness:", evaluate.get_average_fitness(population))
         # 上位9個体の平均評価値を表示
+        print(f"best:{best}")
         print(f" average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
+        print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
 
         next_generation:List[Chromosomes]  = []
-        print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
         for _ in range(PROPOSAL_POPULATION_SIZE):
             # 3. 選択
             selected = tournament.exec_tournament_selection(population)
@@ -143,12 +144,16 @@ def run_simulation_proposal_IGA():
                         ind["algorithmNum"] = selected[0].get("algorithmNum", None)
                         # 新しいchromosomeIdを付与
                         ind["chromosomeId"] = str(uuid.uuid4())
+                        ind["fitness"] = "0.0"
+                        ind["pre_evaluation"] = 0
                         next_generation.append(ind)
                     else:
                         print("警告: offspring内にdict以外が含まれています:", ind)
             elif isinstance(offspring, dict):
                 offspring["algorithmNum"] = selected[0].get("algorithmNum", None)
                 offspring["chromosomeId"] = str(uuid.uuid4())
+                offspring["fitness"] = "0.0"
+                offspring["pre_evaluation"] = 0
                 next_generation.append(offspring)
             else:
                 print("警告: offspringがdictまたはlist[dict]ではありません:", offspring)
@@ -174,31 +179,31 @@ def run_simulation_proposal_IGA():
     #     param_keys=PARAMS,
     #     id_list=evaluate_population
     # )
-    # evaluate.evaluate_fitness_sphere(
-    #     population =population,
-    #     param_keys=PARAMS,
-    #     id_list=evaluate_population
-    # )
+    evaluate.evaluate_fitness_sphere(
+        population =population,
+        param_keys=PARAMS,
+        id_list=evaluate_population
+    )
     # evaluate.evaluate_fitness_noise(
     #     population=population,
     #     param_keys=PARAMS,
     #     id_list=evaluate_population
     # )
-    evaluate.evaluate_fitness_cos(
-        population=population,
-        param_keys=PARAMS,
-        id_list=evaluate_population
-    )
+    # evaluate.evaluate_fitness_cos(
+    #     population=population,
+    #     param_keys=PARAMS,
+    #     id_list=evaluate_population
+    # )
     # ベスト・ワースト個体の取得
     best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
-    interpolate_by_distance(population, best, worst, target_key="fitness")
+    interpolate_by_distance(population, best, worst, target_key='fitness')
     # 評価の平均値を表示
     print(f"Generation {NUM_GENERATIONS}\n average fitness:", evaluate.get_average_fitness(population))
     # 上位9個体の平均評価値を表示
     print(f" average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
     print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
     # 6. 最終結果の出力
-    log("result/random/simulation_cos.json", population)
+    log("result/random/simulation_sphere.json", population)
     return population
 
 print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション")

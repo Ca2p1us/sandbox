@@ -117,7 +117,7 @@ def evaluate_fitness_sphere(
         # 線形結合
         fitness = sum(v**2 for v in values)
         # 必要に応じてスケーリングやノイズ付与も可能
-        individual["fitness"] = str(fitness)
+        individual["fitness"] = str(0+fitness)
 
 
 def evaluate_fitness_noise(
@@ -174,7 +174,7 @@ def evaluate_fitness_cos(
         A = 10.0
 ):
     """
-    各個体の(四乗＋ノイズ)の和を取ることで評価
+    各個体の(コサイン)の和を取ることで評価
     param_keys: 評価対象パラメータ名リスト（例: ["fmParamsList.operator1.frequency", ...]）
     id_list: 評価対象のchromosomeIdリスト（Noneなら全個体）
     """
@@ -238,6 +238,7 @@ def proposal_evaluate_random(id_list: List[str], population: List[dict]):
 def get_best_and_worst_individuals_by_id(id_list: List[str], population: List[dict]):
     """
     id_listに含まれるchromosomeIdを持つ個体群から、最もfitnessが高い個体と低い個体を返す
+    fitnessが小数値でも取得できるようにfloat変換で判定
     """
     # id_listをUUID型に変換
     id_set = set()
@@ -247,6 +248,13 @@ def get_best_and_worst_individuals_by_id(id_list: List[str], population: List[di
         except Exception:
             continue
 
+    def is_number(s):
+        try:
+            float(s)
+            return True
+        except Exception:
+            return False
+
     valid_population = [
         ind for ind in population
         if "fitness" in ind and "chromosomeId" in ind
@@ -255,8 +263,7 @@ def get_best_and_worst_individuals_by_id(id_list: List[str], population: List[di
             or
             (isinstance(ind["chromosomeId"], str) and uuid.UUID(ind["chromosomeId"]) in id_set)
         )
-        and str(ind["fitness"]).strip() not in ("", "None")
-        and str(ind["fitness"]).replace('.', '', 1).isdigit()
+        and is_number(ind["fitness"])
     ]
     if not valid_population:
         return None, None
