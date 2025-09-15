@@ -14,9 +14,9 @@ python -m backend.engine.run_iga_simulation
     - 周波数 200～1300Hz
 
 # 評価関数
-1. ```math
-f(x) = \sum_{i}x_i^2 \quad -5.12<x_i<5.12
-```
+1. $f(x) = \sum_{i}x_i^2 \quad -5.12<x_i<5.12$
+2. $f(x) = \sum_{i}(ix_i^4 - Gauss(0,1)) \quad -1.28<x_i<1.28$
+3. $f(x) = 20A + \sum_{i}(x_i^2 - 10cos(2\pi x_i)) \quad A = 10,-5.12<x_i<5.12$
 
 # 疑似ユーザモデルの代表的分類
 
