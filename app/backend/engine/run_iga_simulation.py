@@ -71,14 +71,14 @@ def run_simulation_normal_IGA():
 
 PROPOSAL_POPULATION_SIZE = 100
 EVALUATE_SIZE = 9
-OMOMI = [5.2, -8.9, 1.1, 3.7, -6.5, 0.03]
+PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustainTime", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
 def run_simulation_proposal_IGA():
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
     # 初期個体の事前評価(補間)
     interpolate_by_distance(
         population,
-        param_keys=["fmParamsList.operator1.frequency", "fmParamsList.operator2.frequency", "fmParamsList.operator3.frequency", "fmParamsList.operator4.frequency"],
+        param_keys=PARAMS,
         target_key="pre_evaluation"
         )
     # 評価個体の選択
@@ -94,22 +94,30 @@ def run_simulation_proposal_IGA():
         #     #標準偏差
         #     sigma=500.0,
         #     #評価対象パラメータ
-        #     param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmparamlist.operator1.sustain", "fmparamlist.operator1.sustainTime", "fmparamlist.operator1.release", "fmparamlist.operator1.frequency"],
+        #     param_keys=PARAMS,
         #     #評価方法"product", "mean", "max", "min", "median"
-        #     method="mean",
         #     #評価個体のIDリスト
         #     id_list=evaluate_population
         # )
-        evaluate.evaluate_fitness_like_GA(
-            population,
-            weights=OMOMI,
-            param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmparamlist.operator1.sustain", "fmparamlist.operator1.sustainTime", "fmparamlist.operator1.release", "fmparamlist.operator1.frequency"],
+        # evaluate.evaluate_fitness_sphere(
+        #     population,
+        #     param_keys=PARAMS,
+        #     id_list=evaluate_population
+        # )
+        # evaluate.evaluate_fitness_noise(
+        #     population =population,
+        #     param_keys=PARAMS,
+        #     id_list=evaluate_population
+        # )
+        evaluate.evaluate_fitness_cos(
+            population=population,
+            param_keys=PARAMS,
             id_list=evaluate_population
         )
         # ベスト・ワースト個体の取得
         best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
         # ほかの個体の評価を補間
-        interpolate_by_distance(population, best, worst, target_key="fitness")
+        interpolate_by_distance(population, best, worst,param_keys=PARAMS, target_key="fitness")
         # 評価の平均値を表示
         print(f"Generation {generation + 1}\n average fitness:", evaluate.get_average_fitness(population))
         # 上位9個体の平均評価値を表示
@@ -152,7 +160,7 @@ def run_simulation_proposal_IGA():
             population,
             best,
             worst,
-            param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmparamlist.operator1.sustain", "fmparamlist.operator1.sustainTime", "fmparamlist.operator1.release", "fmparamlist.operator1.frequency"],
+            param_keys=PARAMS,
             target_key="pre_evaluation"
             )
         # 評価個体の選択
@@ -163,14 +171,22 @@ def run_simulation_proposal_IGA():
     #     population,
     #     target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90],
     #     sigma=500.0,
-    #     param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmparamlist.operator1.sustain", "fmparamlist.operator1.sustainTime", "fmparamlist.operator1.release", "fmparamlist.operator1.frequency"],
-    #     method="mean",
+    #     param_keys=PARAMS,
     #     id_list=evaluate_population
     # )
-    evaluate.evaluate_fitness_like_GA(
-        population,
-        weights=OMOMI,
-        param_keys=["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmparamlist.operator1.sustain", "fmparamlist.operator1.sustainTime", "fmparamlist.operator1.release", "fmparamlist.operator1.frequency"],
+    # evaluate.evaluate_fitness_sphere(
+    #     population =population,
+    #     param_keys=PARAMS,
+    #     id_list=evaluate_population
+    # )
+    # evaluate.evaluate_fitness_noise(
+    #     population=population,
+    #     param_keys=PARAMS,
+    #     id_list=evaluate_population
+    # )
+    evaluate.evaluate_fitness_cos(
+        population=population,
+        param_keys=PARAMS,
         id_list=evaluate_population
     )
     # ベスト・ワースト個体の取得
@@ -182,7 +198,7 @@ def run_simulation_proposal_IGA():
     print(f" average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
     print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
     # 6. 最終結果の出力
-    log("result/random/simulation_proposal_results.json", population)
+    log("result/random/simulation_cos.json", population)
     return population
 
 print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション")
