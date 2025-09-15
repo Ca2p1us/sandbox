@@ -64,4 +64,4 @@ def interpolate_by_distance(
         # 距離が近いほどbest_valに近づく
         ratio = dist_best / max_dist
         value = best_val * (1 - ratio) + worst_val * ratio
-        ind[target_key] = int(round(value))
+        ind[target_key] = str(value)
