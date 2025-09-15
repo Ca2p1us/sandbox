@@ -52,7 +52,7 @@ def interpolate_by_distance(
         # 全員同じ場合
         for ind in population:
             value = best.get(target_key, best.get("fitness", 1))
-            ind[target_key] = int(float(value))
+            ind[target_key] = float(value)
         return
 
     best_val = float(best.get(target_key, best.get("fitness", 1)))
@@ -64,4 +64,4 @@ def interpolate_by_distance(
         # 距離が近いほどbest_valに近づく
         ratio = dist_best / max_dist
         value = best_val * (1 - ratio) + worst_val * ratio
-        ind[target_key] = str(value)
+        ind[target_key] = value

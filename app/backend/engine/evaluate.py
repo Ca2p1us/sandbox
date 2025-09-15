@@ -14,7 +14,7 @@ def evaluate_fitness_random(population: List[dict]):
         if not isinstance(individual, dict):
             print("警告: individualがdict型ではありません:", individual)
             continue  # またはraise Exceptionで止めてもOK
-        individual["fitness"] = str(round(add_noise(random.randint(1, 10))))
+        individual["fitness"] = (round(add_noise(random.randint(1, 10))))
 
 # FMパラメータに基づいた評価（例：operator1のfrequencyに基づく）
 def evaluate_fitness_by_param(
@@ -72,7 +72,7 @@ def evaluate_fitness_by_param(
         # ノイズを加えて
         total_score = add_noise(total_score * 10, noise_sigma=1.0)  # 0～10にスケール
         normalized = int(round(total_score))  # 0～10の整数に丸める
-        individual["fitness"] = str(max(0, min(10, normalized)))  # 範囲外は補正
+        individual["fitness"] = (max(0, min(10, normalized)))  # 範囲外は補正
 
 
 def evaluate_fitness_sphere(
@@ -117,7 +117,7 @@ def evaluate_fitness_sphere(
         # 線形結合
         fitness = sum(v**2 for v in values)
         # 必要に応じてスケーリングやノイズ付与も可能
-        individual["fitness"] = str(0+fitness)
+        individual['fitness'] = float(fitness)
 
 
 def evaluate_fitness_noise(
@@ -164,7 +164,7 @@ def evaluate_fitness_noise(
         # 統合
         fitness = sum(i*(values[i]**4) - np.random.normal(loc=noise_mean, scale=noise_sigma) for i in range(len(values)))
         # 必要に応じてスケーリングやノイズ付与も可能
-        individual["fitness"] = str(fitness)
+        individual["fitness"] = fitness
 
 
 def evaluate_fitness_cos(
@@ -210,7 +210,7 @@ def evaluate_fitness_cos(
         # 統合
         fitness = 20 * A + sum(v**2 - 10 *np.cos(2*np.pi*v) for v in values)
         # 必要に応じてスケーリングやノイズ付与も可能
-        individual["fitness"] = str(fitness)
+        individual["fitness"] = fitness
 
 
 
@@ -233,7 +233,7 @@ def proposal_evaluate_random(id_list: List[str], population: List[dict]):
         if not isinstance(individual, dict):
             continue
         if "chromosomeId" in individual and individual["chromosomeId"] in id_list:
-            individual["fitness"] = str(round(add_noise(random.randint(1, 10))))
+            individual["fitness"] = (round(add_noise(random.randint(1, 10))))
 
 def get_best_and_worst_individuals_by_id(id_list: List[str], population: List[dict]):
     """
@@ -319,4 +319,4 @@ def evaluate_fitness_by_distribution(population: List[dict], target_freq: float 
         # 正規分布の確率密度関数（最大値を10にスケール）
         score = math.exp(-((frequency - target_freq) ** 2) / (2 * sigma ** 2))
         normalized = int(round(score * 10))  # 0～10に丸める
-        individual["fitness"] = str(normalized)
+        individual["fitness"] = (normalized)
