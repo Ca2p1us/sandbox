@@ -17,6 +17,7 @@ def interpolate_by_distance(
     param_keys: 距離計算に使うパラメータ名リスト（Noneならoperator1のfrequencyのみ）
     target_key: 補間して格納するキー名（"pre_evaluation"または"fitness"など）
     """
+    print(f"補間を開始します。")
     if not best or not worst:
         print(f"bestまたはworstがNoneです。ランダムな{target_key}を付与します。")
         for ind in population:
@@ -53,6 +54,7 @@ def interpolate_by_distance(
         for ind in population:
             value = best.get(target_key, best.get("fitness", 1))
             ind[target_key] = float(value)
+        print(f"距離が同一です。\nbest {best[target_key]}, worst {worst[target_key]}")
         return
 
     best_val = float(best.get(target_key, best.get("fitness", 1)))
@@ -65,3 +67,4 @@ def interpolate_by_distance(
         ratio = dist_best / max_dist
         value = best_val * (1 - ratio) + worst_val * ratio
         ind[target_key] = value
+    print(f"{target_key}を補間しました。\nbest {best[target_key]}, worst {worst[target_key]}")

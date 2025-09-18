@@ -71,7 +71,7 @@ def run_simulation_normal_IGA():
 
 PROPOSAL_POPULATION_SIZE = 100
 EVALUATE_SIZE = 9
-PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustainTime", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
+PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustain_time", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
 def run_simulation_proposal_IGA():
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
@@ -86,6 +86,8 @@ def run_simulation_proposal_IGA():
 
     for generation in range(NUM_GENERATIONS - 1):
         # 2. 評価
+        print(f"\n--- Generation {generation + 1} の評価を行います ---")
+        # 2-1. ガウス関数
         # evaluate.evaluate_fitness_by_param(
         #     #評価対象集団
         #     population,
@@ -99,16 +101,19 @@ def run_simulation_proposal_IGA():
         #     #評価個体のIDリスト
         #     id_list=evaluate_population
         # )
+        # 2-2. スフィア関数
         evaluate.evaluate_fitness_sphere(
             population=population,
             param_keys=PARAMS,
             id_list=evaluate_population
         )
+        # 2-3. ノイズ関数
         # evaluate.evaluate_fitness_noise(
         #     population=population,
         #     param_keys=PARAMS,
         #     id_list=evaluate_population
         # )
+        # 2-4. コサイン関数
         # evaluate.evaluate_fitness_cos(
         #     population=population,
         #     param_keys=PARAMS,
@@ -116,12 +121,13 @@ def run_simulation_proposal_IGA():
         # )
         # ベスト・ワースト個体の取得
         best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
+        print(f"best {best}\nworst {worst}")
         # ほかの個体の評価を補間
         interpolate_by_distance(population, best, worst,param_keys=PARAMS, target_key="fitness")
         # 評価の平均値を表示
-        print(f"Generation {generation + 1}\n average fitness:", evaluate.get_average_fitness(population))
+        print(f"average fitness:", evaluate.get_average_fitness(population))
         # 上位9個体の平均評価値を表示
-        print(f" average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
+        print(f"average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
         print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
 
         next_generation:List[Chromosomes]  = []
@@ -158,6 +164,7 @@ def run_simulation_proposal_IGA():
                 print("警告: offspringがdictまたはlist[dict]ではありません:", offspring)
 
         # 5. 次世代への更新
+        print(f"--- Generation {generation + 1} の次世代を生成しました ---")
         population = next_generation
         #事前評価(補間)
         interpolate_by_distance(
