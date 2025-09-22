@@ -7,7 +7,7 @@ from ..core.geneticAlgorithm.mutate import mutate
 from ..core.geneticAlgorithm import make_chromosome_params
 from ..core.geneticAlgorithm.interpolation import interpolate_by_distance
 from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_pre_evaluation
-from ..core.log import log
+from ..core.log import log, log_fitness
 from ..engine import evaluate
 import uuid
 
@@ -72,6 +72,7 @@ def run_simulation_normal_IGA():
 PROPOSAL_POPULATION_SIZE = 100
 EVALUATE_SIZE = 9
 PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustain_time", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
+best_fitness_history = []
 def run_simulation_proposal_IGA():
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
@@ -129,6 +130,9 @@ def run_simulation_proposal_IGA():
         # 上位9個体の平均評価値を表示
         print(f"average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
         print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
+        # --- ここで履歴に追加 ---
+        if best is not None and "fitness" in best:
+            best_fitness_history.append((generation + 1, float(best["fitness"])))
 
         next_generation:List[Chromosomes]  = []
         for _ in range(PROPOSAL_POPULATION_SIZE):
@@ -210,6 +214,7 @@ def run_simulation_proposal_IGA():
     print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
     # 6. 最終結果の出力
     log("result/random/simulation_sphere.json", population)
+    log_fitness(best_fitness_history)
     return population
 
 print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション")
