@@ -50,3 +50,7 @@ python -m backend.engine.run_iga_simulation
     - よくわからん
     - 使っていた論文
         - ["推定収束点を用いた対話型進化計算高速化の可能性"](https://api.lib.kyushu-u.ac.jp/opac_download_md/1810697/FSS2017.pdf)
+
+# 作成中のメモ
+ - 個体の選択
+    - pre_evaluationが小数になる場合を考えてなかった。
