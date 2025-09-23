@@ -7,7 +7,7 @@ from ..core.geneticAlgorithm.mutate import mutate
 from ..core.geneticAlgorithm import make_chromosome_params
 from ..core.geneticAlgorithm.interpolation import interpolate_by_distance
 from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_pre_evaluation
-from ..core.log import log, log_fitness
+from ..core.log import log, log_fitness, sound_check, load_params_from_json
 from ..engine import evaluate
 import uuid
 
@@ -73,7 +73,7 @@ PROPOSAL_POPULATION_SIZE = 100
 EVALUATE_SIZE = 9
 PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustain_time", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
 best_fitness_history = []
-def run_simulation_proposal_IGA():
+def run_simulation_proposal_IGA(evaluate_num=0):
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
     # 初期個体の事前評価(補間)
@@ -88,38 +88,42 @@ def run_simulation_proposal_IGA():
     for generation in range(NUM_GENERATIONS - 1):
         # 2. 評価
         print(f"\n--- Generation {generation + 1} の評価を行います ---")
+        if evaluate_num == 0:
         # 2-1. ガウス関数
-        # evaluate.evaluate_fitness_by_param(
-        #     #評価対象集団
-        #     population,
-        #     #目標値
-        #     target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90],
-        #     #標準偏差
-        #     sigma=500.0,
-        #     #評価対象パラメータ
-        #     param_keys=PARAMS,
-        #     #評価方法"product", "mean", "max", "min", "median"
-        #     #評価個体のIDリスト
-        #     id_list=evaluate_population
-        # )
+            evaluate.evaluate_fitness_by_param(
+                #評価対象集団
+                population,
+                #目標値
+                target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90],
+                #標準偏差
+                sigma=500.0,
+                #評価対象パラメータ
+                param_keys=PARAMS,
+                #評価方法"product", "mean", "max", "min", "median"
+                #評価個体のIDリスト
+                id_list=evaluate_population
+            )
+        elif evaluate_num == 1:
         # 2-2. スフィア関数
-        evaluate.evaluate_fitness_sphere(
-            population=population,
-            param_keys=PARAMS,
-            id_list=evaluate_population
-        )
+            evaluate.evaluate_fitness_sphere(
+                population=population,
+                param_keys=PARAMS,
+                id_list=evaluate_population
+            )
+        elif evaluate_num == 2:
         # 2-3. ノイズ関数
-        # evaluate.evaluate_fitness_noise(
-        #     population=population,
-        #     param_keys=PARAMS,
-        #     id_list=evaluate_population
-        # )
+            evaluate.evaluate_fitness_noise(
+                population=population,
+                param_keys=PARAMS,
+                id_list=evaluate_population
+            )
+        elif evaluate_num == 3:
         # 2-4. コサイン関数
-        # evaluate.evaluate_fitness_cos(
-        #     population=population,
-        #     param_keys=PARAMS,
-        #     id_list=evaluate_population
-        # )
+            evaluate.evaluate_fitness_cos(
+                population=population,
+                param_keys=PARAMS,
+                id_list=evaluate_population
+            )
         # ベスト・ワースト個体の取得
         best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
         print(f"best {best}\nworst {worst}")
@@ -182,28 +186,32 @@ def run_simulation_proposal_IGA():
         evaluate_population = select_top_individuals_by_pre_evaluation(population, top_n=EVALUATE_SIZE)
 
     # --- ここで最終世代の評価値を再計算 ---
-    # evaluate.evaluate_fitness_by_param(
-    #     population,
-    #     target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90],
-    #     sigma=500.0,
-    #     param_keys=PARAMS,
-    #     id_list=evaluate_population
-    # )
-    evaluate.evaluate_fitness_sphere(
-        population =population,
-        param_keys=PARAMS,
-        id_list=evaluate_population
-    )
-    # evaluate.evaluate_fitness_noise(
-    #     population=population,
-    #     param_keys=PARAMS,
-    #     id_list=evaluate_population
-    # )
-    # evaluate.evaluate_fitness_cos(
-    #     population=population,
-    #     param_keys=PARAMS,
-    #     id_list=evaluate_population
-    # )
+    if evaluate_num == 0:
+        evaluate.evaluate_fitness_by_param(
+            population,
+            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90],
+            sigma=500.0,
+            param_keys=PARAMS,
+            id_list=evaluate_population
+        )
+    elif evaluate_num == 1:
+        evaluate.evaluate_fitness_sphere(
+            population =population,
+            param_keys=PARAMS,
+            id_list=evaluate_population
+        )
+    elif evaluate_num == 2:
+        evaluate.evaluate_fitness_noise(
+            population=population,
+            param_keys=PARAMS,
+            id_list=evaluate_population
+        )
+    elif evaluate_num == 3:
+        evaluate.evaluate_fitness_cos(
+            population=population,
+            param_keys=PARAMS,
+            id_list=evaluate_population
+        )
     # ベスト・ワースト個体の取得
     best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
     interpolate_by_distance(population, best, worst, target_key='fitness')
@@ -217,13 +225,28 @@ def run_simulation_proposal_IGA():
     log_fitness(best_fitness_history)
     return population
 
-print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション")
-choice = input("実行するシミュレーションを選択 (1/2): ")
+print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション\n3: 音の確認")
+choice = input("実行するシミュレーションを選択 (1/3): ")
 if choice == "2":
+    print(f"提案型IGAシミュレーションの評価関数を選択\n0: ガウス関数\n1: スフィア関数\n2: ノイズ関数\n3: コサイン関数")
+    evaluate_num = input("評価関数の番号を入力してください: ")
     print("提案型IGAシミュレーションを実行")
-    run_simulation_proposal_IGA()
+    run_simulation_proposal_IGA(evaluate_num = int(evaluate_num))
     print("提案型IGAシミュレーションが完了")
-else:
+elif choice == "1":
     print("普通のIGAシミュレーションを実行")
     run_simulation_normal_IGA()
     print("普通のIGAシミュレーションが完了")
+elif choice == "3":
+    print("音の確認を実行")
+    json_file_path = input("音の確認を行う評価関数を選択\n0: ガウス関数\n1: スフィア関数\n2: ノイズ関数\n3: コサイン関数\n番号を入力してください: ")
+    if json_file_path == "0":
+        json_file_path = "result/random/simulation_proposal_results.json"
+    elif json_file_path == "1":
+        json_file_path = "result/random/simulation_sphere.json"
+    elif json_file_path == "2":
+        json_file_path = "result/random/simulation_noise.json"
+    elif json_file_path == "3":
+        json_file_path = "result/random/simulation_cos.json"
+    sound_check(file_path=json_file_path)
+    print("音の確認が完了")
