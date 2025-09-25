@@ -65,7 +65,7 @@ def run_simulation_normal_IGA():
         #評価
         evaluate.evaluate_fitness_by_param(
             population = population,
-            target_params=PARAMS
+            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90]
             )
 
     # 6. 最終結果の出力
