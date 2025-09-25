@@ -63,10 +63,13 @@ def run_simulation_normal_IGA():
         # 5. 次世代への更新
         population = next_generation
         #評価
-        evaluate.evaluate_fitness_by_param(population)
+        evaluate.evaluate_fitness_by_param(
+            population = population,
+            target_params=PARAMS
+            )
 
     # 6. 最終結果の出力
-    log("result/random/simulation_random_results.json", population)
+    log("result/simulation_random_results.json", population)
     return population
 
 PROPOSAL_POPULATION_SIZE = 100
@@ -90,6 +93,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
         print(f"\n--- Generation {generation + 1} の評価を行います ---")
         if evaluate_num == 0:
         # 2-1. ガウス関数
+            evaluate_method = "gaussian"
             evaluate.evaluate_fitness_by_param(
                 #評価対象集団
                 population,
@@ -105,6 +109,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
             )
         elif evaluate_num == 1:
         # 2-2. スフィア関数
+            evaluate_method = "sphere"
             evaluate.evaluate_fitness_sphere(
                 population=population,
                 param_keys=PARAMS,
@@ -112,6 +117,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
             )
         elif evaluate_num == 2:
         # 2-3. ノイズ関数
+            evaluate_method = "noise"
             evaluate.evaluate_fitness_noise(
                 population=population,
                 param_keys=PARAMS,
@@ -119,6 +125,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
             )
         elif evaluate_num == 3:
         # 2-4. コサイン関数
+            evaluate_method = "cos"
             evaluate.evaluate_fitness_cos(
                 population=population,
                 param_keys=PARAMS,
@@ -221,32 +228,32 @@ def run_simulation_proposal_IGA(evaluate_num=0):
     print(f" average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
     print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
     # 6. 最終結果の出力
-    log("result/random/simulation_sphere.json", population)
+    log("result/simulation_"+evaluate_method+".json", population)
     log_fitness(best_fitness_history)
     return population
 
-print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション\n3: 音の確認")
-choice = input("実行するシミュレーションを選択 (1/3): ")
-if choice == "2":
-    print(f"提案型IGAシミュレーションの評価関数を選択\n0: ガウス関数\n1: スフィア関数\n2: ノイズ関数\n3: コサイン関数")
-    evaluate_num = input("評価関数の番号を入力してください: ")
-    print("提案型IGAシミュレーションを実行")
-    run_simulation_proposal_IGA(evaluate_num = int(evaluate_num))
-    print("提案型IGAシミュレーションが完了")
-elif choice == "1":
-    print("普通のIGAシミュレーションを実行")
-    run_simulation_normal_IGA()
-    print("普通のIGAシミュレーションが完了")
-elif choice == "3":
-    print("音の確認を実行")
-    json_file_path = input("音の確認を行う評価関数を選択\n0: ガウス関数\n1: スフィア関数\n2: ノイズ関数\n3: コサイン関数\n番号を入力してください: ")
-    if json_file_path == "0":
-        json_file_path = "result/random/simulation_proposal_results.json"
-    elif json_file_path == "1":
-        json_file_path = "result/random/simulation_sphere.json"
-    elif json_file_path == "2":
-        json_file_path = "result/random/simulation_noise.json"
-    elif json_file_path == "3":
-        json_file_path = "result/random/simulation_cos.json"
-    sound_check(file_path=json_file_path)
-    print("音の確認が完了")
+# print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション\n3: 音の確認")
+# choice = input("実行するシミュレーションを選択 (1/3): ")
+# if choice == "2":
+#     print(f"提案型IGAシミュレーションの評価関数を選択\n0: ガウス関数\n1: スフィア関数\n2: ノイズ関数\n3: コサイン関数")
+#     evaluate_num = input("評価関数の番号を入力してください: ")
+#     print("提案型IGAシミュレーションを実行")
+#     run_simulation_proposal_IGA(evaluate_num = int(evaluate_num))
+#     print("提案型IGAシミュレーションが完了")
+# elif choice == "1":
+#     print("普通のIGAシミュレーションを実行")
+#     run_simulation_normal_IGA()
+#     print("普通のIGAシミュレーションが完了")
+# elif choice == "3":
+#     print("音の確認を実行")
+#     json_file_path = input("音の確認を行う評価関数を選択\n0: ガウス関数\n1: スフィア関数\n2: ノイズ関数\n3: コサイン関数\n番号を入力してください: ")
+#     if json_file_path == "0":
+#         json_file_path = "result/simulation_gaussian.json"
+#     elif json_file_path == "1":
+#         json_file_path = "result/simulation_sphere.json"
+#     elif json_file_path == "2":
+#         json_file_path = "result/simulation_noise.json"
+#     elif json_file_path == "3":
+#         json_file_path = "result/simulation_cos.json"
+#     sound_check(file_path=json_file_path)
+#     print("音の確認が完了")
