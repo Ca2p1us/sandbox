@@ -1,7 +1,7 @@
 # シミュレータの動かし方
 ## appディレクトリに移動して下記のコマンドで実行
 ```tarminal
-python -m backend.engine.run_iga_simulation
+python -m backend.app.main
 ```
 # パラメータの検討
 - [Chatgptによる回答](https://chatgpt.com/s/t_68be5ddb84a08191a54ae9eadee2b8c5)

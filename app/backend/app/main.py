@@ -1,5 +1,5 @@
 from ..engine import run_iga_simulation as iga
-from ..core import sound_check
+from ..core.log import sound_check
 
 print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション\n3: 音の確認")
 choice = input("実行するシミュレーションを選択 (1/3): ")
