@@ -21,14 +21,21 @@ def make_initial_population(num_individuals=10):
     return [make_chromosome_params.make_chromosome_params() for _ in range(num_individuals)]
 
 def run_simulation_normal_IGA():
+    best_fitness_history = []
     # 1. 初期個体生成
     population = make_initial_population(POPULATION_SIZE)
     
     for generation in range(NUM_GENERATIONS):
         # 2. 評価
-        evaluate.evaluate_fitness_random(population)
+        evaluate.evaluate_fitness_by_param(
+            population = population,
+            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690]
+            )
         best, worst = evaluate.get_best_and_worst_individuals(population)
         print(f"Generation {generation + 1}\n \t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
+        # --- ここで履歴に追加 ---
+        if best is not None and "fitness" in best:
+            best_fitness_history.append((generation + 1, float(best["fitness"])))
         # 評価の平均値を表示
         print(f"average fitness:", evaluate.get_average_fitness(population))
         next_generation:List[Chromosomes]  = []
@@ -65,18 +72,19 @@ def run_simulation_normal_IGA():
         #評価
         evaluate.evaluate_fitness_by_param(
             population = population,
-            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90]
+            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690]
             )
 
     # 6. 最終結果の出力
     log("result/simulation_random.json", population)
+    log_fitness(best_fitness_history)
     return population
 
 PROPOSAL_POPULATION_SIZE = 100
 EVALUATE_SIZE = 9
 PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustain_time", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
-best_fitness_history = []
 def run_simulation_proposal_IGA(evaluate_num=0):
+    best_fitness_history = []
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
     # 初期個体の事前評価(補間)
@@ -98,7 +106,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
                 #評価対象集団
                 population,
                 #目標値
-                target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90],
+                target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690],
                 #標準偏差
                 sigma=500.0,
                 #評価対象パラメータ
@@ -196,7 +204,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
     if evaluate_num == 0:
         evaluate.evaluate_fitness_by_param(
             population,
-            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 316.90],
+            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690],
             sigma=500.0,
             param_keys=PARAMS,
             id_list=evaluate_population

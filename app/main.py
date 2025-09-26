@@ -15,7 +15,7 @@ elif choice == "1":
     print("普通のIGAシミュレーションが完了")
 elif choice == "3":
     print("音の確認を実行")
-    json_file_path = input("音の確認を行う評価関数を選択\n0: ガウス関数\n1: スフィア関数\n2: ノイズ関数\n3: コサイン関数\n4: ランダム評価\n番号を入力してください: ")
+    json_file_path = input("音の確認を行う評価関数を選択\n0: ガウス関数\n1: スフィア関数\n2: ノイズ関数\n3: コサイン関数\n4: ランダム評価\n5: テスト音声\n番号を入力してください: ")
     if json_file_path == "0":
         json_file_path = "result/simulation_gaussian.json"
     elif json_file_path == "1":
@@ -26,5 +26,7 @@ elif choice == "3":
         json_file_path = "result/simulation_cos.json"
     elif json_file_path == "4":
         json_file_path = "result/simulation_random.json"
+    elif json_file_path == "5":
+        json_file_path = "result/simulation_test.json"
     sound_check(file_path=json_file_path)
     print("音の確認が完了")

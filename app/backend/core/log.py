@@ -3,6 +3,7 @@ import os
 import json
 import numpy as np
 import pyaudio
+import wave
 from scipy.signal import sawtooth
 
 def log(file_path: str, answer):
@@ -114,8 +115,26 @@ def play_sound(waveform, sample_rate):
     stream.close()
     p.terminate()
 
+# WAVファイルに書き出す関数
+def save_sound_as_wave(waveform, sample_rate, filename):
+    """
+    指定された波形をWAVファイルに保存する関数
+    """
+    # 波形データを16ビットPCMに変換
+    waveform_integers = np.int16(waveform * 32767)
+    
+    with wave.open(filename, 'wb') as wf:
+        wf.setnchannels(1)  # モノラル
+        wf.setsampwidth(2)  # 16ビット
+        wf.setframerate(sample_rate)
+        wf.writeframes(waveform_integers.tobytes())
+    
+    print(f"WAVファイルを保存しました: {filename}")
+
 # --- メイン処理 ---
 def sound_check(file_path=None):
+    method = file_path[18:]
+    method = method[:-5]
     # 1. JSONファイルからデータを読み込む
     fm_data = load_params_from_json(file_path)
 
@@ -140,6 +159,9 @@ def sound_check(file_path=None):
         print("JSONファイルからパラメータを読み込み、音声を再生します...")
         play_sound(modulated_wave, SAMPLE_RATE)
         print("再生が終了しました。")
+        # 5. WAVファイルに保存
+        save_sound_as_wave(modulated_wave, SAMPLE_RATE, f"./result/sound/{method}.wav")
+        print(f"WAVファイルに保存しました: app/result/sound/{method}.wav")
     else:
         print("音声の再生をスキップします。")
 
