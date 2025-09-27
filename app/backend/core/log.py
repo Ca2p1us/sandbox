@@ -30,11 +30,12 @@ def log(file_path: str, answer):
     return
 
 
-def log_fitness(best_fitness_history):
+def log_fitness(best_fitness_history,method):
     """
     世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_history: [(世代番号, fitness値), ...] のリスト
     """
+    
     if not best_fitness_history:
         print("履歴データがありません。")
         return
@@ -49,6 +50,7 @@ def log_fitness(best_fitness_history):
     plt.title('Best Fitness History')
     plt.grid(True)
     plt.tight_layout()
+    plt.savefig(f'./result/graph/{method}_fitness_history.png')
     plt.show()
 
 
@@ -139,6 +141,7 @@ def sound_check(file_path=None):
     fm_data = load_params_from_json(file_path)
 
     if fm_data:
+        #最も評価値の高い個体を取得、複数いた場合は最初の個体を選択
         best_individual = max(
             fm_data["results"][-1],
             key=lambda ind: float(ind.get("fitness", 0))
