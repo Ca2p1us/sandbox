@@ -77,7 +77,7 @@ def run_simulation_normal_IGA():
 
     # 6. 最終結果の出力
     log("result/simulation_random.json", population)
-    log_fitness(best_fitness_history)
+    log_fitness(best_fitness_history,"random")
     return population
 
 PROPOSAL_POPULATION_SIZE = 100
@@ -120,6 +120,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
             evaluate_method = "sphere"
             evaluate.evaluate_fitness_sphere(
                 population=population,
+                target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690],
                 param_keys=PARAMS,
                 id_list=evaluate_population
             )
@@ -212,6 +213,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
     elif evaluate_num == 1:
         evaluate.evaluate_fitness_sphere(
             population =population,
+            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690],
             param_keys=PARAMS,
             id_list=evaluate_population
         )
@@ -237,5 +239,5 @@ def run_simulation_proposal_IGA(evaluate_num=0):
     print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
     # 6. 最終結果の出力
     log("result/simulation_"+evaluate_method+".json", population)
-    log_fitness(best_fitness_history)
+    log_fitness(best_fitness_history,evaluate_method)
     return population

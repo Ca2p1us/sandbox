@@ -14,7 +14,7 @@ def evaluate_fitness_random(population: List[dict]):
         if not isinstance(individual, dict):
             print("警告: individualがdict型ではありません:", individual)
             continue  # またはraise Exceptionで止めてもOK
-        individual["fitness"] = (round(add_noise(random.randint(1, 10))))
+        individual["fitness"] = random.randint(1, 10)
 
 # FMパラメータに基づいた評価（例：operator1のfrequencyに基づく）
 def evaluate_fitness_by_param(
@@ -77,6 +77,7 @@ def evaluate_fitness_by_param(
 
 def evaluate_fitness_sphere(
     population: List[dict],
+    target_params: List[float],
     param_keys: List[str],
     id_list: List[str] = None
 ):
@@ -115,7 +116,9 @@ def evaluate_fitness_sphere(
                 values.append(float(val))
 
         # 線形結合
-        fitness = sum(v**2 for v in values)
+        fitness = 0
+        for i in range(len(values)):
+            fitness += (values[i] - target_params[i]) ** 2
         # 必要に応じてスケーリングやノイズ付与も可能
         individual['fitness'] = float(fitness)
 
@@ -304,19 +307,3 @@ def get_average_fitness(population: List[dict], id_list: List[str] = None) -> fl
     if not fitness_values:
         return 0.0
     return sum(fitness_values) / len(fitness_values)
-
-def evaluate_fitness_by_distribution(population: List[dict], target_freq: float = 440, sigma: float = 100):
-    """
-    operator1のfrequencyがtarget_freqに近いほど高評価（正規分布に基づく）
-    sigmaは分布の幅（標準偏差）
-    """
-    for individual in population:
-        if not isinstance(individual, dict):
-            print("警告: individualがdict型ではありません:", individual)
-            continue
-        op1 = individual["fmParamsList"]["operator1"]
-        frequency = op1.get("frequency", 0)
-        # 正規分布の確率密度関数（最大値を10にスケール）
-        score = math.exp(-((frequency - target_freq) ** 2) / (2 * sigma ** 2))
-        normalized = int(round(score * 10))  # 0～10に丸める
-        individual["fitness"] = (normalized)
