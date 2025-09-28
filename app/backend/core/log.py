@@ -6,6 +6,7 @@ import pyaudio
 import wave
 from scipy.signal import sawtooth
 
+
 def log(file_path: str, answer):
     save_data = [answer]
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
@@ -30,12 +31,12 @@ def log(file_path: str, answer):
     return
 
 
-def log_fitness(best_fitness_history,method):
+def log_fitness(best_fitness_history, method):
     """
     世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_history: [(世代番号, fitness値), ...] のリスト
     """
-    
+
     if not best_fitness_history:
         print("履歴データがありません。")
         return
@@ -44,7 +45,8 @@ def log_fitness(best_fitness_history,method):
     fitness_values = [item[1] for item in best_fitness_history]
 
     plt.figure(figsize=(8, 5))
-    plt.plot(generations, fitness_values, marker='o', linestyle='-', color='blue')
+    plt.plot(generations, fitness_values,
+             marker='o', linestyle='-', color='blue')
     plt.xlabel('Generation')
     plt.ylabel('Best Fitness')
     plt.title('Best Fitness History')
@@ -58,6 +60,7 @@ def log_fitness(best_fitness_history,method):
 SAMPLE_RATE = 44100  # CD品質のサンプリングレート
 CARRIER_FREQ_BASE = 440.0  # 基本となるキャリア周波数（A4音）
 
+
 def load_params_from_json(file_path):
     """
     JSONファイルからパラメータを読み込む関数
@@ -65,10 +68,11 @@ def load_params_from_json(file_path):
     if not os.path.exists(file_path):
         print(f"エラー: ファイルが見つかりません -> {file_path}")
         return None
-    
+
     with open(file_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
     return data
+
 
 def generate_adsr_envelope(params, duration, sample_rate):
     """
@@ -87,18 +91,22 @@ def generate_adsr_envelope(params, duration, sample_rate):
     total_samples = int(duration * sample_rate)
 
     envelope = np.zeros(total_samples)
-    
+
     # Attack, Decay, Sustain, Releaseの各セクションの処理
     if attack_samples > 0:
         envelope[:attack_samples] = np.linspace(0, 1, attack_samples)
     if decay_samples > 0:
-        envelope[attack_samples:attack_samples + decay_samples] = np.linspace(1, sustain_level, decay_samples)
-    envelope[attack_samples + decay_samples:attack_samples + decay_samples + sustain_samples] = sustain_level
+        envelope[attack_samples:attack_samples +
+                 decay_samples] = np.linspace(1, sustain_level, decay_samples)
+    envelope[attack_samples + decay_samples:attack_samples +
+             decay_samples + sustain_samples] = sustain_level
     release_start_idx = attack_samples + decay_samples + sustain_samples
     if release_samples > 0:
-        envelope[release_start_idx:release_start_idx + release_samples] = np.linspace(sustain_level, 0, release_samples)
+        envelope[release_start_idx:release_start_idx +
+                 release_samples] = np.linspace(sustain_level, 0, release_samples)
 
     return envelope[:total_samples]
+
 
 def play_sound(waveform, sample_rate):
     """
@@ -109,31 +117,35 @@ def play_sound(waveform, sample_rate):
                     channels=1,
                     rate=sample_rate,
                     output=True)
-    
+
     audio_data = (waveform * 0.5).astype(np.float32).tobytes()
     stream.write(audio_data)
-    
+
     stream.stop_stream()
     stream.close()
     p.terminate()
 
 # WAVファイルに書き出す関数
+
+
 def save_sound_as_wave(waveform, sample_rate, filename):
     """
     指定された波形をWAVファイルに保存する関数
     """
     # 波形データを16ビットPCMに変換
     waveform_integers = np.int16(waveform * 32767)
-    
+
     with wave.open(filename, 'wb') as wf:
         wf.setnchannels(1)  # モノラル
         wf.setsampwidth(2)  # 16ビット
         wf.setframerate(sample_rate)
         wf.writeframes(waveform_integers.tobytes())
-    
+
     print(f"WAVファイルを保存しました: {filename}")
 
 # --- メイン処理 ---
+
+
 def sound_check(file_path=None):
     method = file_path[18:]
     method = method[:-5]
@@ -141,7 +153,7 @@ def sound_check(file_path=None):
     fm_data = load_params_from_json(file_path)
 
     if fm_data:
-        #最も評価値の高い個体を取得、複数いた場合は最初の個体を選択
+        # 最も評価値の高い個体を取得、複数いた場合は最初の個体を選択
         best_individual = max(
             fm_data["results"][-1],
             key=lambda ind: float(ind.get("fitness", 0))
@@ -149,12 +161,14 @@ def sound_check(file_path=None):
         params = best_individual['fmParamsList']['operator1']
 
         # 2. ADSRエンベロープと波形を生成
-        NOTE_DURATION = params['attack'] + params['decay'] + params['sustainTime'] + params['release']
+        NOTE_DURATION = params['attack'] + params['decay'] + \
+            params['sustainTime'] + params['release']
         envelope = generate_adsr_envelope(params, NOTE_DURATION, SAMPLE_RATE)
         t = np.linspace(0, NOTE_DURATION, len(envelope), endpoint=False)
-        frequency = CARRIER_FREQ_BASE * (1 + params['frequency'])
+        frequency = params['frequency'] * 1000  # 周波数をHzに変換
+        # キャリア波形の生成（ここではサイン波を使用）
         carrier_wave = np.sin(2 * np.pi * frequency * t)
-        
+
         # 3. エンベロープを適用
         modulated_wave = carrier_wave * envelope
 
@@ -163,8 +177,8 @@ def sound_check(file_path=None):
         play_sound(modulated_wave, SAMPLE_RATE)
         print("再生が終了しました。")
         # 5. WAVファイルに保存
-        save_sound_as_wave(modulated_wave, SAMPLE_RATE, f"./result/sound/{method}.wav")
+        save_sound_as_wave(modulated_wave, SAMPLE_RATE,
+                           f"./result/sound/{method}.wav")
         print(f"WAVファイルに保存しました: app/result/sound/{method}.wav")
     else:
         print("音声の再生をスキップします。")
-
