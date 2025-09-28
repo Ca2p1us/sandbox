@@ -152,7 +152,8 @@ def sound_check(file_path=None):
         NOTE_DURATION = params['attack'] + params['decay'] + params['sustainTime'] + params['release']
         envelope = generate_adsr_envelope(params, NOTE_DURATION, SAMPLE_RATE)
         t = np.linspace(0, NOTE_DURATION, len(envelope), endpoint=False)
-        frequency = CARRIER_FREQ_BASE * (1 + params['frequency'])
+        frequency = params['frequency'] * 1000  # 周波数をHzに変換
+        # キャリア波形の生成（ここではサイン波を使用）
         carrier_wave = np.sin(2 * np.pi * frequency * t)
         
         # 3. エンベロープを適用
