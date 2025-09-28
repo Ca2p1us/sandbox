@@ -118,7 +118,8 @@ def evaluate_fitness_sphere(
         # 線形結合
         fitness = 0
         for i in range(len(values)):
-            fitness += (values[i] - target_params[i]) ** 2
+            fitness += -1 * (values[i] - target_params[i]) ** 2
+        fitness = 10 + 3.3*fitness
         # 必要に応じてスケーリングやノイズ付与も可能
         individual['fitness'] = float(fitness)
 
@@ -166,6 +167,7 @@ def evaluate_fitness_noise(
 
         # 統合
         fitness = sum(i*(values[i]**4) - np.random.normal(loc=noise_mean, scale=noise_sigma) for i in range(len(values)))
+        fitness = fitness /2
         # 必要に応じてスケーリングやノイズ付与も可能
         individual["fitness"] = fitness
 
@@ -174,7 +176,7 @@ def evaluate_fitness_cos(
         population: List[dict],
         id_list: List[str] = None,
         param_keys: List[str] = None,
-        A = 10.0
+        A = 0.5
 ):
     """
     各個体の(コサイン)の和を取ることで評価
