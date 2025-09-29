@@ -27,6 +27,8 @@ python main.py
 - [先輩の修論(GithubのURL)](https://github.com/mocoatsu/Research)
 - ["Reducing user fatigue in interactive genetic algorithms by evaluation of population subsets." ](https://www.cse.unr.edu/~quiroz/inc/docs/trans2009.pdf)
 - ["An Experimental Study of Benchmarking Functions for Genetic Algorithms"](https://www.researchgate.net/publication/220662178_An_Experimental_Study_of_Benchmarking_Functions_for_Genetic_Algorithms)
+    - F1～F5
+    - ["An analysis of the behaviour of a class of genetic adaptive systems"](https://deepblue.lib.umich.edu/handle/2027.42/4507)
 # 読むだけ読んだ論文
 - [自己組織化マップを用いた遺伝的アルゴリズムについて](https://doi.org/10.1299/jsmeoptis.2008.8.93)
 - [擬音的発話のニュアンスを反映するインタラクティブ効果音合成](https://www.interaction-ipsj.org/proceedings/2024/data/pdf/1B-34.pdf)
@@ -37,6 +39,15 @@ python main.py
     - 過去の好みが似ている別ユーザの評価特性を現在のユーザの特性を学習するまで用いることで収束を早める？
     - 評価特性の学習はパラメータと評価値をセットにしたデータからNNを用いていた、残念
     - 根本的には時間稼ぎ的な手法
+- ["Test Functions for Unconstrained Global Optimization"](http://www-optima.amp.i.kyoto-u.ac.jp/member/student/hedar/Hedar_files/TestGO_files/Page364.htm)
+    - エジプトの教授が作ってた評価関数のまとめサイト
+    - [その教授のサイト](http://www-optima.amp.i.kyoto-u.ac.jp/member/student/hedar/Hedar_files/AboutMe.htm)
+    - [その教授の所属大学のサイト](https://www.aun.edu.eg/fci/abdel-rahman-hedar-abdel-rahman-ahmed)
+
+# NotebookLM等で簡単に読んだもの
+- ["Automated Design of a Genetic Algorithm for Image Segmentation Usingthe Iterated Local Search"](https://www.scitepress.org/Papers/2024/129085/129085.pdf)
+    - エントロピーを使うのは面白そうだけど音声なので自分の研究には使えないかも
+
 
 # IGAの評価指標
 - 最良個体の評価値の推移を見る

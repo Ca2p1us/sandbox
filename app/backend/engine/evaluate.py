@@ -120,7 +120,7 @@ def evaluate_fitness_sphere(
         fitness = 0
         for i in range(len(values)):
             fitness += -1 * (values[i] - target_params[i]) ** 2
-        fitness = 10 + 3.3*fitness
+        fitness = 10 + 3*fitness
         # 必要に応じてスケーリングやノイズ付与も可能
         individual['fitness'] = float(fitness)
 
@@ -168,7 +168,7 @@ def evaluate_fitness_noise(
 
         # 統合
         fitness = sum(i*(values[i]**4) - np.random.normal(loc=noise_mean, scale=noise_sigma) for i in range(len(values)))
-        fitness = fitness /2
+        # fitness = fitness /2
         # 必要に応じてスケーリングやノイズ付与も可能
         individual["fitness"] = fitness
 
@@ -214,7 +214,7 @@ def evaluate_fitness_cos(
                 values.append(float(val))
 
         # 統合
-        fitness = 20 * A + sum(v**2 - 10 *np.cos(2*np.pi*v) for v in values)
+        fitness = 8 * A + sum(v**2 - 10 *np.cos(2*np.pi*v) for v in values)
         # 必要に応じてスケーリングやノイズ付与も可能
         individual["fitness"] = fitness
 
