@@ -80,7 +80,7 @@ def run_simulation_normal_IGA():
     log_fitness(best_fitness_history,"random")
     return population
 
-PROPOSAL_POPULATION_SIZE = 100
+PROPOSAL_POPULATION_SIZE = 200
 EVALUATE_SIZE = 9
 PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustain_time", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
 def run_simulation_proposal_IGA(evaluate_num=0):
@@ -142,7 +142,6 @@ def run_simulation_proposal_IGA(evaluate_num=0):
             )
         # ベスト・ワースト個体の取得
         best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
-        print(f"best {best}\nworst {worst}")
         # ほかの個体の評価を補間
         interpolate_by_distance(population, best, worst,param_keys=PARAMS, target_key="fitness")
         # 評価の平均値を表示

@@ -69,10 +69,11 @@ def evaluate_fitness_by_param(
         # 統合
         total_score = sum(scores) / len(scores) if scores else 0
 
-        # ノイズを加えて
+        # # ノイズを加えて
         total_score = add_noise(total_score * 10, noise_sigma=1.0)  # 0～10にスケール
-        normalized = int(round(total_score))  # 0～10の整数に丸める
-        individual["fitness"] = (max(0, min(10, normalized)))  # 範囲外は補正
+        # total_score = int(round(total_score))  # 0～10の整数に丸める
+        # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
+        individual['fitness'] = total_score
 
 
 def evaluate_fitness_sphere(
