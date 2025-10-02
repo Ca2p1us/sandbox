@@ -29,6 +29,11 @@ python main.py
 - ["An Experimental Study of Benchmarking Functions for Genetic Algorithms"](https://www.researchgate.net/publication/220662178_An_Experimental_Study_of_Benchmarking_Functions_for_Genetic_Algorithms)
     - F1～F5
     - ["An analysis of the behaviour of a class of genetic adaptive systems"](https://deepblue.lib.umich.edu/handle/2027.42/4507)
+- [最適化アルゴリズムを評価するベンチマーク関数まとめ](https://qiita.com/tomitomi3/items/d4318bf7afbc1c835dda)
+- ["Virtual Library of Simulation Experiments:Test Functions and Datasets"](https://www.sfu.ca/~ssurjano/optimization.html)
+- [Test Functions for Unconstrained Global Optimization](http://www-optima.amp.i.kyoto-u.ac.jp/member/student/hedar/Hedar_files/TestGO_files/Page364.htm)
+
+
 # 読むだけ読んだ論文
 - [自己組織化マップを用いた遺伝的アルゴリズムについて](https://doi.org/10.1299/jsmeoptis.2008.8.93)
 - [擬音的発話のニュアンスを反映するインタラクティブ効果音合成](https://www.interaction-ipsj.org/proceedings/2024/data/pdf/1B-34.pdf)
