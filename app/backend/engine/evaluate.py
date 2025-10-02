@@ -219,6 +219,98 @@ def evaluate_fitness_cos(
         individual["fitness"] = fitness
 
 
+def evaluate_fitness_Ackley(
+        population: List[dict],
+        id_list: List[str] = None,
+        param_keys: List[str] = None,
+        A = 20,
+        B = 0.2,
+        C = 2*np.pi
+):
+    """
+    Ackley関数で評価
+    param_keys: 評価対象パラメータ名リスト（例: ["fmParamsList.operator1.frequency", ...]）
+    id_list: 評価対象のchromosomeIdリスト（Noneなら全個体）
+    """
+    def should_evaluate(ind):
+        if id_list is None:
+            return True
+        if "chromosomeId" not in ind:
+            return False
+        try:
+            return str(ind["chromosomeId"]) in [str(i) for i in id_list]
+        except Exception:
+            return False
+
+    for individual in population:
+        if not isinstance(individual, dict):
+            print("警告: individualがdict型ではありません:", individual)
+            continue
+        if not should_evaluate(individual):
+            continue
+
+        values = []
+        for key in param_keys:
+            val = individual
+            for k in key.split('.'):
+                val = val.get(k, None)
+                if val is None:
+                    break
+            if val is None:
+                values.append(0)
+            else:
+                values.append(float(val))
+
+        # 統合
+        fitness += -A * math.exp(-B * math.sqrt(sum(v**2 for v in values)/len(values))) - math.exp(sum(math.cos(C*v) for v in values)/len(values)) + A + math.e
+        # 必要に応じてスケーリングやノイズ付与も可能
+        individual["fitness"] = fitness
+
+
+def evaluate_fitness_Schwefel(
+        population: List[dict],
+        id_list: List[str] = None,
+        param_keys: List[str] = None
+):
+    """
+    Schwefel関数で評価
+    param_keys: 評価対象パラメータ名リスト（例: ["fmParamsList.operator1.frequency", ...]）
+    id_list: 評価対象のchromosomeIdリスト（Noneなら全個体）
+    """
+    def should_evaluate(ind):
+        if id_list is None:
+            return True
+        if "chromosomeId" not in ind:
+            return False
+        try:
+            return str(ind["chromosomeId"]) in [str(i) for i in id_list]
+        except Exception:
+            return False
+
+    for individual in population:
+        if not isinstance(individual, dict):
+            print("警告: individualがdict型ではありません:", individual)
+            continue
+        if not should_evaluate(individual):
+            continue
+
+        values = []
+        for key in param_keys:
+            val = individual
+            for k in key.split('.'):
+                val = val.get(k, None)
+                if val is None:
+                    break
+            if val is None:
+                values.append(0)
+            else:
+                values.append(float(val))
+
+        # 統合
+        fitness += -418.9829 * len(values) + sum(v * math.sin(math.sqrt(abs(v))) for v in values)
+        # 必要に応じてスケーリングやノイズ付与も可能
+        individual["fitness"] = fitness
+
 
 # 最も適応度の高い個体と最も低い個体を取得
 def get_best_and_worst_individuals(population: List[dict]):
