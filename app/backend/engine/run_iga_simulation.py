@@ -14,7 +14,7 @@ import uuid
 
 Chromosomes = List[dict]
 
-NUM_GENERATIONS = 10
+NUM_GENERATIONS = 20
 POPULATION_SIZE = 10
 
 def make_initial_population(num_individuals=10):
@@ -54,14 +54,14 @@ def run_simulation_normal_IGA():
                 for ind in offspring:
                     if isinstance(ind, dict):
                         # algorithmNumを親からコピー（selected[0]を例とする）
-                        ind["algorithmNum"] = selected[0].get("algorithmNum", None)
+                        # ind["algorithmNum"] = selected[0].get("algorithmNum", None)
                         # 新しいchromosomeIdを付与
                         ind["chromosomeId"] = str(uuid.uuid4())
                         next_generation.append(ind)
                     else:
                         print("警告: offspring内にdict以外が含まれています:", ind)
             elif isinstance(offspring, dict):
-                offspring["algorithmNum"] = selected[0].get("algorithmNum", None)
+                # offspring["algorithmNum"] = selected[0].get("algorithmNum", None)
                 offspring["chromosomeId"] = str(uuid.uuid4())
                 next_generation.append(offspring)
             else:
@@ -133,9 +133,25 @@ def run_simulation_proposal_IGA(evaluate_num=0):
                 id_list=evaluate_population
             )
         elif evaluate_num == 3:
-        # 2-4. コサイン関数
-            evaluate_method = "cos"
+        # 2-4. Rastrigin関数
+            evaluate_method = "Rastrigin"
             evaluate.evaluate_fitness_cos(
+                population=population,
+                param_keys=PARAMS,
+                id_list=evaluate_population
+            )
+        elif evaluate_num == 4:
+        # 2-5. Ackley関数
+            evaluate_method = "Ackley"
+            evaluate.evaluate_fitness_Ackley(
+                population=population,
+                param_keys=PARAMS,
+                id_list=evaluate_population
+            )
+        elif evaluate_num == 5:
+        # 2-6. Schwefel関数
+            evaluate_method = "Schwefel"
+            evaluate.evaluate_fitness_Schwefel(
                 population=population,
                 param_keys=PARAMS,
                 id_list=evaluate_population
@@ -169,7 +185,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
                 for ind in offspring:
                     if isinstance(ind, dict):
                         # algorithmNumを親からコピー（selected[0]を例とする）
-                        ind["algorithmNum"] = selected[0].get("algorithmNum", None)
+                        # ind["algorithmNum"] = selected[0].get("algorithmNum", None)
                         # 新しいchromosomeIdを付与
                         ind["chromosomeId"] = str(uuid.uuid4())
                         ind["fitness"] = 0.0
@@ -178,7 +194,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
                     else:
                         print("警告: offspring内にdict以外が含まれています:", ind)
             elif isinstance(offspring, dict):
-                offspring["algorithmNum"] = selected[0].get("algorithmNum", None)
+                # offspring["algorithmNum"] = selected[0].get("algorithmNum", None)
                 offspring["chromosomeId"] = str(uuid.uuid4())
                 offspring["fitness"] = 0.0
                 offspring["pre_evaluation"] = 0
@@ -228,6 +244,18 @@ def run_simulation_proposal_IGA(evaluate_num=0):
             param_keys=PARAMS,
             id_list=evaluate_population
         )
+    elif evaluate_num == 4:
+        evaluate.evaluate_fitness_Ackley(
+            population=population,
+            param_keys=PARAMS,
+            id_list=evaluate_population
+        )
+    elif evaluate_num == 5:
+        evaluate.evaluate_fitness_Schwefel(
+            population=population,
+            param_keys=PARAMS,
+            id_list=evaluate_population
+        )
     # ベスト・ワースト個体の取得
     best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
     interpolate_by_distance(population, best, worst, target_key='fitness')
@@ -238,5 +266,6 @@ def run_simulation_proposal_IGA(evaluate_num=0):
     print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
     # 6. 最終結果の出力
     log("result/simulation_"+evaluate_method+".json", population)
+    log("result/best/best_individual_"+evaluate_method+".json", best)
     log_fitness(best_fitness_history,evaluate_method)
     return population
