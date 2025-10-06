@@ -55,7 +55,7 @@ def make_chromosome_params():
             "operator1": random_fm_params
             # "operator2": make_fm_params_with_args(0,0,1,3,0,2200)
         },
-        "algorithmNum": ALGORITHM_NUM,
+        # "algorithmNum": ALGORITHM_NUM,
         "fitness": 0.0,
         "pre_evaluation": 0.0,  # 事前評価値（デフォルト0、型や初期値は用途に応じて変更）
         "chromosomeId": uuid.uuid4()

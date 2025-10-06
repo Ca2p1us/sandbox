@@ -221,8 +221,8 @@ def evaluate_fitness_cos(
 
 def evaluate_fitness_Ackley(
         population: List[dict],
-        id_list: List[str] = None,
         param_keys: List[str] = None,
+        id_list: List[str] = None,
         A = 20,
         B = 0.2,
         C = 2*np.pi
@@ -262,15 +262,16 @@ def evaluate_fitness_Ackley(
                 values.append(float(val))
 
         # 統合
-        fitness += -A * math.exp(-B * math.sqrt(sum(v**2 for v in values)/len(values))) - math.exp(sum(math.cos(C*v) for v in values)/len(values)) + A + math.e
+        fitness = 0
+        fitness -= -A * math.exp(-B * math.sqrt(sum(v**2 for v in values)/len(values))) - math.exp(sum(math.cos(C*v) for v in values)/len(values)) + A + math.e
         # 必要に応じてスケーリングやノイズ付与も可能
         individual["fitness"] = fitness
 
 
 def evaluate_fitness_Schwefel(
         population: List[dict],
-        id_list: List[str] = None,
-        param_keys: List[str] = None
+        param_keys: List[str] = None,
+        id_list: List[str] = None
 ):
     """
     Schwefel関数で評価
@@ -306,8 +307,9 @@ def evaluate_fitness_Schwefel(
             else:
                 values.append(float(val))
 
-        # 統合
-        fitness += -418.9829 * len(values) + sum(v * math.sin(math.sqrt(abs(v))) for v in values)
+        # 統合,(418.9829,)
+        fitness = 0
+        fitness += 418.9829 * len(values) - sum(v * math.sin(math.sqrt(abs(v))) for v in values)
         # 必要に応じてスケーリングやノイズ付与も可能
         individual["fitness"] = fitness
 
