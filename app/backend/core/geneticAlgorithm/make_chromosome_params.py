@@ -1,6 +1,7 @@
 import uuid
 import random
 import numpy as np
+from ..geneticAlgorithm import config
 
 from ..geneticAlgorithm.config import ALGORITHM_NUM
 from ..geneticAlgorithm.make_fm_params.make_with_config import make_fm_params
@@ -10,12 +11,12 @@ from ..geneticAlgorithm.make_fm_params.make_zero_params import make_zero_params
 
 # 各パラメータの定義域（例: min, max値）
 OPERATOR_PARAM_RANGES = {
-    "attack": (0.0, 0.25),
-    "decay": (0.0, 0.25),
-    "sustain": (0.0, 1.0),
-    "sustainTime": (0.0, 0.3),
-    "release": (0.0, 0.35),
-    "frequency": (0.200, 1.300),  # kHz単位
+    "attack": config.ATTACK_RANGE,
+    "decay": config.DECAY_RANGE,
+    "sustain": config.SUSTAIN_RANGE,
+    "sustainTime": config.SUSTAIN_TIME_RANGE,
+    "release": config.RELEASE_RANGE,
+    "frequency": config.FREQUENCY_RANGE,  # kHz単位
 }
 
 # 1. シード値固定のためのGeneratorオブジェクトを作成

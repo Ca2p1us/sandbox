@@ -83,6 +83,8 @@ def run_simulation_normal_IGA():
 PROPOSAL_POPULATION_SIZE = 200
 EVALUATE_SIZE = 9
 PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustain_time", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
+TARGET_PARAMS = [0.03, 0.16, 0.89, 0.29, 0.06, 0.31690]
+# TARGET_PARAMS = [3, 16, 89, 29, 6, 316.90]
 def run_simulation_proposal_IGA(evaluate_num=0):
     best_fitness_history = []
     # 1. 初期個体生成
@@ -106,7 +108,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
                 #評価対象集団
                 population,
                 #目標値
-                target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690],
+                target_params=TARGET_PARAMS,
                 #標準偏差
                 sigma=500.0,
                 #評価対象パラメータ
@@ -120,7 +122,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
             evaluate_method = "sphere"
             evaluate.evaluate_fitness_sphere(
                 population=population,
-                target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690],
+                target_params=TARGET_PARAMS,
                 param_keys=PARAMS,
                 id_list=evaluate_population
             )
@@ -129,6 +131,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
             evaluate_method = "noise"
             evaluate.evaluate_fitness_noise(
                 population=population,
+                target_params=TARGET_PARAMS,
                 param_keys=PARAMS,
                 id_list=evaluate_population
             )
@@ -203,7 +206,6 @@ def run_simulation_proposal_IGA(evaluate_num=0):
                 print("警告: offspringがdictまたはlist[dict]ではありません:", offspring)
 
         # 5. 次世代への更新
-        print(f"--- Generation {generation + 1} の次世代を生成しました ---")
         population = next_generation
         #事前評価(補間)
         interpolate_by_distance(
@@ -215,6 +217,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
             )
         # 評価個体の選択
         evaluate_population = select_top_individuals_by_pre_evaluation(population, top_n=EVALUATE_SIZE)
+        print(f"------------------------------------")
 
     # --- ここで最終世代の評価値を再計算 ---
     if evaluate_num == 0:
@@ -235,6 +238,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
     elif evaluate_num == 2:
         evaluate.evaluate_fitness_noise(
             population=population,
+            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690],
             param_keys=PARAMS,
             id_list=evaluate_population
         )
