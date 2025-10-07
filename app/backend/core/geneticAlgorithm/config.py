@@ -1,9 +1,16 @@
 # 遺伝子型の最小値、最大値を保持
 # 報知のイメージが強い音の群 での，立ち上がり時間の平均は143ms
+# ATTACK_RANGE = (0, 0.25)
+# DECAY_RANGE = (0, 0.25)
+# SUSTAIN_RANGE = (0, 1)
+# SUSTAIN_TIME_RANGE = (0, 0.3)
+# # 4kHzでは0〜100msがチッ、100〜200msがチン、300ms以上がチーン
+# RELEASE_RANGE = (0, 0.35)
+# FREQUENCY_RANGE = (0.200, 1.300)
 ATTACK_RANGE = (0, 0.25)
 DECAY_RANGE = (0, 0.25)
 SUSTAIN_RANGE = (0, 1)
-SUSTAIN_TIME_RANGE = (0, 0.3)
+SUSTAIN_TIME_RANGE = (0, 0.30)
 # 4kHzでは0〜100msがチッ、100〜200msがチン、300ms以上がチーン
 RELEASE_RANGE = (0, 0.35)
 FREQUENCY_RANGE = (0.200, 1.300)
