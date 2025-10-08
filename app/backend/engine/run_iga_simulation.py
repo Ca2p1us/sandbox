@@ -7,7 +7,7 @@ from ..core.geneticAlgorithm.mutate import mutate
 from ..core.geneticAlgorithm import make_chromosome_params
 from ..core.geneticAlgorithm.interpolation import interpolate_by_distance
 from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_pre_evaluation
-from ..core.log import log, log_fitness, sound_check, load_params_from_json
+from ..core.log import log, log_fitness
 from ..engine import evaluate
 import uuid
 
@@ -270,6 +270,6 @@ def run_simulation_proposal_IGA(evaluate_num=0):
     print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
     # 6. 最終結果の出力
     log("result/simulation_"+evaluate_method+".json", population)
-    log("result/best/best_individual_"+evaluate_method+".json", best)
-    log_fitness(best_fitness_history,evaluate_method)
+    log("result/best/best_individual_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+".json", best)
+    log_fitness(evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE),best_fitness_history)
     return population
