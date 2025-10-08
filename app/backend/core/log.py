@@ -31,7 +31,7 @@ def log(file_path: str, answer):
     return
 
 
-def log_fitness(best_fitness_history, method):
+def log_fitness(file_path: str,best_fitness_history):
     """
     世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_history: [(世代番号, fitness値), ...] のリスト
@@ -52,7 +52,8 @@ def log_fitness(best_fitness_history, method):
     plt.title('Best Fitness History')
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f'./result/graph/{method}_fitness_history.png')
+    # plt.savefig(f'./result/graph/{method}_fitness_history.png')
+    plt.savefig(f'./result/graph/{file_path}_fitness_history.png')
     plt.show()
 
 
