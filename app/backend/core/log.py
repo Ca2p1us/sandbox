@@ -5,27 +5,23 @@ import numpy as np
 import pyaudio
 import wave
 from scipy.signal import sawtooth
+import uuid
 
 
 def log(file_path: str, answer):
-    save_data = [answer]
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    # UUID型をstr型に変換するヘルパー関数
+    def convert_uuid_to_str(obj):
+        if isinstance(obj, dict):
+            return {k: convert_uuid_to_str(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [convert_uuid_to_str(v) for v in obj]
+        elif isinstance(obj, uuid.UUID):
+            return str(obj)
+        else:
+            return obj
 
-    # ファイルが存在しない場合は新規作成
-    if not os.path.exists(file_path):
-        with open(file_path, 'w') as f:
-            json.dump({"results": [answer]}, f, indent=2)
-        return
-
-    # with open(file_path, 'r') as f:
-    #     content = f.read()
-    #     if not content.strip():
-    #         read_data = []
-    #     else:
-    #         read_data = json.loads(content).get("results", [])
-    #     save_data = read_data + [answer]
-
-    with open(file_path, 'w') as f:
+    save_data = convert_uuid_to_str(answer)
+    with open(file_path, "w", encoding="utf-8") as f:
         json.dump({"results": save_data}, f, indent=2)
 
     return

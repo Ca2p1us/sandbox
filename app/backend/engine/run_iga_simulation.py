@@ -14,7 +14,7 @@ import uuid
 
 Chromosomes = List[dict]
 
-NUM_GENERATIONS = 20
+NUM_GENERATIONS = 9
 POPULATION_SIZE = 10
 
 def make_initial_population(num_individuals=10):
@@ -55,6 +55,7 @@ def run_simulation_normal_IGA():
                     if isinstance(ind, dict):
                         # algorithmNumを親からコピー（selected[0]を例とする）
                         # ind["algorithmNum"] = selected[0].get("algorithmNum", None)
+                        ind["generation"] = generation + 1
                         # 新しいchromosomeIdを付与
                         ind["chromosomeId"] = str(uuid.uuid4())
                         next_generation.append(ind)
@@ -62,6 +63,7 @@ def run_simulation_normal_IGA():
                         print("警告: offspring内にdict以外が含まれています:", ind)
             elif isinstance(offspring, dict):
                 # offspring["algorithmNum"] = selected[0].get("algorithmNum", None)
+                offspring["generation"] = generation + 1
                 offspring["chromosomeId"] = str(uuid.uuid4())
                 next_generation.append(offspring)
             else:
@@ -87,6 +89,7 @@ TARGET_PARAMS = [0.03, 0.16, 0.89, 0.29, 0.06, 0.31690]
 # TARGET_PARAMS = [3, 16, 89, 29, 6, 316.90]
 def run_simulation_proposal_IGA(evaluate_num=0):
     best_fitness_history = []
+    bests = []
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
     # 初期個体の事前評価(補間)
@@ -168,9 +171,11 @@ def run_simulation_proposal_IGA(evaluate_num=0):
         # 上位9個体の平均評価値を表示
         print(f"average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
         print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
+
         # --- ここで履歴に追加 ---
         if best is not None and "fitness" in best:
             best_fitness_history.append((generation + 1, float(best["fitness"])))
+            bests.append(best)
 
         next_generation:List[Chromosomes]  = []
         for _ in range(PROPOSAL_POPULATION_SIZE):
@@ -190,17 +195,19 @@ def run_simulation_proposal_IGA(evaluate_num=0):
                         # algorithmNumを親からコピー（selected[0]を例とする）
                         # ind["algorithmNum"] = selected[0].get("algorithmNum", None)
                         # 新しいchromosomeIdを付与
-                        ind["chromosomeId"] = str(uuid.uuid4())
                         ind["fitness"] = 0.0
                         ind["pre_evaluation"] = 0
+                        ind["generation"] = generation + 2
+                        ind["chromosomeId"] = str(uuid.uuid4())
                         next_generation.append(ind)
                     else:
                         print("警告: offspring内にdict以外が含まれています:", ind)
             elif isinstance(offspring, dict):
                 # offspring["algorithmNum"] = selected[0].get("algorithmNum", None)
-                offspring["chromosomeId"] = str(uuid.uuid4())
                 offspring["fitness"] = 0.0
                 offspring["pre_evaluation"] = 0
+                offspring["generation"] = generation + 2
+                offspring["chromosomeId"] = str(uuid.uuid4())
                 next_generation.append(offspring)
             else:
                 print("警告: offspringがdictまたはlist[dict]ではありません:", offspring)
@@ -268,8 +275,10 @@ def run_simulation_proposal_IGA(evaluate_num=0):
     # 上位9個体の平均評価値を表示
     print(f" average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
     print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
+    best_fitness_history.append((NUM_GENERATIONS, float(best["fitness"])))
+    bests.append(best)
     # 6. 最終結果の出力
-    log("result/simulation_"+evaluate_method+".json", population)
-    log("result/best/best_individual_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+".json", best)
-    log_fitness(evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE),best_fitness_history)
+    log("result/simulation_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+".json", population)
+    log("result/best/best_individual_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+".json", bests)
+    log_fitness(evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE),best_fitness_history)
     return population
