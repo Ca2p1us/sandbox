@@ -191,7 +191,7 @@ def evaluate_fitness_cos(
         A = 0.5
 ):
     """
-    各個体の(コサイン)の和を取ることで評価
+    Rastrigin関数で評価
     param_keys: 評価対象パラメータ名リスト（例: ["fmParamsList.operator1.frequency", ...]）
     id_list: 評価対象のchromosomeIdリスト（Noneなら全個体）
     """

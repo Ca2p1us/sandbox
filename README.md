@@ -15,8 +15,14 @@ python main.py
 
 # 評価関数
 1. $f(x) = \sum_{i}x_i^2 \quad -5.12<x_i<5.12$
-2. $f(x) = \sum_{i}(ix_i^4 - Gauss(0,1)) \quad -1.28<x_i<1.28$
+    - Sphere関数
+2. $f(x) = \sum_{i}exp(\frac{x_i^2}{2\sigma^2})$
+    - ガウス関数
 3. $f(x) = 20A + \sum_{i}(x_i^2 - 10cos(2\pi x_i)) \quad A = 10,-5.12<x_i<5.12$
+    - Rastrigin関数
+4. $f(x) = 418.9829 * d - \sum_{i}(x_i sin(\sqrt(|x_i|))) \quad d:次元数,$
+    - Schwefel関数
+5. $f(x) = 20 - 20exp(-0.2\sqrt{}\frac{1}{n}\sum_{i}x_i^2) + e - exp(\frac{1}{n} \sum_{i} cos(2\pi x_i))$
 各$x_i$を理想解の値だけずらせばOKか
 
 # 疑似ユーザモデルの代表的分類
