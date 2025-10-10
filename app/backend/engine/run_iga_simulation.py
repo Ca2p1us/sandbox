@@ -280,5 +280,5 @@ def run_simulation_proposal_IGA(evaluate_num=0):
     # 6. 最終結果の出力
     log("result/simulation_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+".json", population)
     log("result/best/best_individual_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+".json", bests)
-    log_fitness(evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE),best_fitness_history)
+    log_fitness(evaluate_method, str(NUM_GENERATIONS), str(PROPOSAL_POPULATION_SIZE), best_fitness_history)
     return population

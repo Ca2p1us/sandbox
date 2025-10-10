@@ -20,7 +20,7 @@ def evaluate_fitness_random(population: List[dict]):
 def evaluate_fitness_by_param(
     population: List[dict],
     target_params: List[float],
-    sigma: float = 500.0,
+    sigma: float = 10.0,
     param_keys: List[str] = None,
     id_list: List[str] = None
 ):
@@ -63,13 +63,14 @@ def evaluate_fitness_by_param(
                 scores.append(0)
             else:
                 # 正規分布の確率密度関数（最大値1）
-                score = math.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
+                # score = math.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
+                score = math.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
                 scores.append(score)
 
         # 統合
-        total_score = sum(scores) / len(scores) if scores else 0
+        total_score = sum(scores)  if scores else 0
 
-        total_score = total_score * 10  # 0～10にスケール
+        # total_score = total_score * 10  # 0～10にスケール
         # total_score = int(round(total_score))  # 0～10の整数に丸める
         # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
         individual['fitness'] = total_score
@@ -118,8 +119,9 @@ def evaluate_fitness_sphere(
         # 線形結合
         fitness = 0
         for i in range(len(values)):
-            fitness += -1 * (values[i] - target_params[i]) ** 2
-        fitness = 10 + 3*fitness
+            # fitness += -1 * (values[i] - target_params[i]) ** 2
+            fitness += -1 * values[i] ** 2
+        # fitness = 10 + 3*fitness
         # 必要に応じてスケーリングやノイズ付与も可能
         individual['fitness'] = float(fitness)
 
@@ -171,14 +173,15 @@ def evaluate_fitness_noise(
                 scores.append(0)
             else:
                 # 正規分布の確率密度関数（最大値1）
-                score = math.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
+                # score = math.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
+                score = math.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
                 scores.append(score)
 
         # 統合
-        total_score = sum(scores) / len(scores) if scores else 0
+        total_score = sum(scores)  if scores else 0
 
         # # ノイズを加えて
-        total_score = add_noise(total_score * 10, sigma, mean)  # 0～10にスケール
+        total_score = add_noise(total_score, sigma, mean)  # 0～10にスケール
         # total_score = int(round(total_score))  # 0～10の整数に丸める
         # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
         individual['fitness'] = total_score
@@ -188,7 +191,7 @@ def evaluate_fitness_cos(
         population: List[dict],
         id_list: List[str] = None,
         param_keys: List[str] = None,
-        A = 0.5
+        A = 10
 ):
     """
     Rastrigin関数で評価
@@ -225,7 +228,7 @@ def evaluate_fitness_cos(
                 values.append(float(val))
 
         # 統合
-        fitness = 8 * A + sum(v**2 - 10 *np.cos(2*np.pi*v) for v in values)
+        fitness = -(8 * A + sum(v**2 - 10 *np.cos(2*np.pi*v) for v in values))
         # 必要に応じてスケーリングやノイズ付与も可能
         individual["fitness"] = fitness
 
