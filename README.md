@@ -26,7 +26,7 @@ python main.py
     - Schwefel関数
 5. $f(x) = 20 - 20exp(-0.2\sqrt{}\frac{1}{n}\sum_{i}x_i^2) + e - exp(\frac{1}{n} \sum_{i} cos(2\pi x_i))$
 
-各$'x_i'$を理想解の値だけずらせばOKか
+各$`x_i`$を理想解の値だけずらせばOKか
 
 # 疑似ユーザモデルの代表的分類
 
