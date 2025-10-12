@@ -87,7 +87,7 @@ EVALUATE_SIZE = 9
 PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustain_time", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
 TARGET_PARAMS = [0.03, 0.16, 0.89, 0.29, 0.06, 0.31690]
 # TARGET_PARAMS = [3, 16, 89, 29, 6, 316.90]
-def run_simulation_proposal_IGA(evaluate_num=0):
+def run_simulation_proposal_IGA(evaluate_num=0,times:int=1):
     best_fitness_history = []
     bests = []
     # 1. 初期個体生成
@@ -278,7 +278,7 @@ def run_simulation_proposal_IGA(evaluate_num=0):
     best_fitness_history.append((NUM_GENERATIONS, float(best["fitness"])))
     bests.append(best)
     # 6. 最終結果の出力
-    log("result/simulation_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+".json", population)
-    log("result/best/best_individual_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+".json", bests)
-    log_fitness(evaluate_method, str(NUM_GENERATIONS), str(PROPOSAL_POPULATION_SIZE), best_fitness_history)
+    log("result/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", population)
+    log("result/best/"+evaluate_method+"/best_individual_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", bests)
+    log_fitness(evaluate_method, "result/graph/"+evaluate_method+"/"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+"_best_fitness_history.png", best_fitness_history)
     return population
