@@ -1,4 +1,6 @@
 # シミュレータの動かし方
+## パラメータの定義域を変更
+**config.py**には各パラメータの定義域を(最小値,最大値)の形式でタプルとして保存している
 ## appディレクトリに移動して下記のコマンドで実行
 ```tarminal
 python main.py
@@ -23,7 +25,8 @@ python main.py
 4. $f(x) = 418.9829 * d - \sum_{i}(x_i sin(\sqrt(|x_i|))) \quad d:次元数,$
     - Schwefel関数
 5. $f(x) = 20 - 20exp(-0.2\sqrt{}\frac{1}{n}\sum_{i}x_i^2) + e - exp(\frac{1}{n} \sum_{i} cos(2\pi x_i))$
-各$x_i$を理想解の値だけずらせばOKか
+
+各$'x_i'$を理想解の値だけずらせばOKか
 
 # 疑似ユーザモデルの代表的分類
 
