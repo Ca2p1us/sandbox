@@ -21,7 +21,7 @@ def interpolate_by_distance(
     if not best or not worst:
         print(f"bestまたはworstがNoneです。ランダムな{target_key}を付与します。")
         for ind in population:
-            ind[target_key] = random.randint(1, 10)
+            ind[target_key] = random.uniform(1.0, 10.0)
         return
 
     if param_keys is None:
@@ -57,8 +57,8 @@ def interpolate_by_distance(
         print(f"距離が同一です。\nbest {best[target_key]}, worst {worst[target_key]}")
         return
 
-    best_val = float(best.get(target_key, best.get("fitness", 1)))
-    worst_val = float(worst.get(target_key, worst.get("fitness", 1)))
+    best_val = float(best.get("fitness", 1))
+    worst_val = float(worst.get("fitness", 1))
 
     for ind in population:
         ind_vec = to_vec(ind)
@@ -67,4 +67,4 @@ def interpolate_by_distance(
         ratio = dist_best / max_dist
         value = best_val * (1 - ratio) + worst_val * ratio
         ind[target_key] = value
-    print(f"{target_key}を補間しました。\nbest {best[target_key]}, worst {worst[target_key]}")
+    print(f"{target_key}を補間しました。\nbest {best_val}, worst {worst_val}")

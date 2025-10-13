@@ -6,9 +6,11 @@ choice = input("実行するシミュレーションを選択 (1/3): ")
 if choice == "2":
     print(f"提案型IGAシミュレーションの評価関数を選択\n0: ガウス関数\n1: スフィア関数\n2: ノイズ関数\n3: Rastrigin関数\n4: Ackley関数\n5: Schwefel関数")
     evaluate_num = input("評価関数の番号を入力してください: ")
-    print("提案型IGAシミュレーションを実行")
-    iga.run_simulation_proposal_IGA(evaluate_num = int(evaluate_num))
-    print("提案型IGAシミュレーションが完了")
+    for i in range(5):
+        print(f"評価関数 {i}: {evaluate_num}")
+        print("提案型IGAシミュレーション"+str(i+1)+"回目を実行")
+        iga.run_simulation_proposal_IGA(evaluate_num = int(evaluate_num), times = i+1)
+        print("提案型IGAシミュレーション"+str(i+1)+"回目が完了")
 elif choice == "1":
     print("普通のIGAシミュレーションを実行")
     iga.run_simulation_normal_IGA()
