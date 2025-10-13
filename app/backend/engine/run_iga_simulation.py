@@ -14,13 +14,11 @@ import uuid
 
 Chromosomes = List[dict]
 
-NUM_GENERATIONS = 9
-POPULATION_SIZE = 10
 
 def make_initial_population(num_individuals=10):
     return [make_chromosome_params.make_chromosome_params() for _ in range(num_individuals)]
 
-def run_simulation_normal_IGA():
+def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10):
     best_fitness_history = []
     # 1. 初期個体生成
     population = make_initial_population(POPULATION_SIZE)
@@ -82,12 +80,13 @@ def run_simulation_normal_IGA():
     log_fitness(best_fitness_history,"random")
     return population
 
-PROPOSAL_POPULATION_SIZE = 200
-EVALUATE_SIZE = 9
+
 PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustain_time", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
-TARGET_PARAMS = [0.03, 0.16, 0.89, 0.29, 0.06, 0.31690]
-# TARGET_PARAMS = [3, 16, 89, 29, 6, 316.90]
-def run_simulation_proposal_IGA(evaluate_num=0,times:int=1):
+# TARGET_PARAMS = [0.03, 0.16, 0.89, 0.29, 0.06, 0.31690]
+# TARGET_PARAMS = [3, 160, 89, 29, 6, 316.90]
+TARGET_PARAMS = [0, 0, 0, 0, 0, 200]
+
+def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200, EVALUATE_SIZE=9, evaluate_num=0, times:int=1):
     best_fitness_history = []
     bests = []
     # 1. 初期個体生成
@@ -106,7 +105,7 @@ def run_simulation_proposal_IGA(evaluate_num=0,times:int=1):
         print(f"\n--- Generation {generation + 1} の評価を行います ---")
         if evaluate_num == 0:
         # 2-1. ガウス関数
-            evaluate_method = "gaussian"
+            evaluate_method = "Gaussian"
             evaluate.evaluate_fitness_by_param(
                 #評価対象集団
                 population,
@@ -122,7 +121,7 @@ def run_simulation_proposal_IGA(evaluate_num=0,times:int=1):
             )
         elif evaluate_num == 1:
         # 2-2. スフィア関数
-            evaluate_method = "sphere"
+            evaluate_method = "Sphere"
             evaluate.evaluate_fitness_sphere(
                 population=population,
                 target_params=TARGET_PARAMS,
@@ -131,7 +130,7 @@ def run_simulation_proposal_IGA(evaluate_num=0,times:int=1):
             )
         elif evaluate_num == 2:
         # 2-3. ノイズ関数
-            evaluate_method = "noise"
+            evaluate_method = "Noise"
             evaluate.evaluate_fitness_noise(
                 population=population,
                 target_params=TARGET_PARAMS,
@@ -281,4 +280,4 @@ def run_simulation_proposal_IGA(evaluate_num=0,times:int=1):
     log("result/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", population)
     log("result/best/"+evaluate_method+"/best_individual_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", bests)
     log_fitness(evaluate_method, "result/graph/"+evaluate_method+"/"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+"_best_fitness_history.png", best_fitness_history)
-    return population
+    return best_fitness_history

@@ -50,6 +50,46 @@ def log_fitness(method: str, file_path: str, best_fitness_history):
     plt.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_history.png')
     plt.savefig(file_path)
+    # plt.show()
+    plt.close()
+
+def log_fitness_histories(method_num: int, file_path: str, best_fitness_histories):
+    """
+    複数回のシミュレーションの世代ごとのbest個体のfitness履歴をグラフ表示する
+    best_fitness_histories: [[(世代番号, fitness値), ...], ...] のリスト
+    """
+
+    if not best_fitness_histories:
+        print("履歴データがありません。")
+        return
+    if method_num == 0:
+        method = "Gaussian"
+    elif method_num == 1:
+        method = "Sphere"
+    elif method_num == 2:
+        method = "Noise"
+    elif method_num == 3:
+        method = "Rastrigin"
+    elif method_num == 4:
+        method = "Ackley"
+    elif method_num == 5:
+        method = "Schwefel"
+
+    plt.figure(figsize=(8, 5))
+
+    for idx, best_fitness_history in enumerate(best_fitness_histories):
+        generations = [item[0] for item in best_fitness_history]
+        fitness_values = [item[1] for item in best_fitness_history]
+        plt.plot(generations, fitness_values,
+                 marker='o', linestyle='-', label=f'Run {idx+1}')
+
+    plt.xlabel('Generation')
+    plt.ylabel('Best Fitness')
+    plt.title(method+' Best Fitness Histories')
+    plt.grid(True)
+    plt.tight_layout()
+    # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
+    plt.savefig(f'./result/graph/{method}/{method}{file_path}')
     plt.show()
 
 
