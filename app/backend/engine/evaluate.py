@@ -20,7 +20,7 @@ def evaluate_fitness_random(population: List[dict]):
 def evaluate_fitness_by_param(
     population: List[dict],
     target_params: List[float],
-    sigma: float = 10.0,
+    sigma: float = 100.0,
     param_keys: List[str] = None,
     id_list: List[str] = None
 ):
@@ -131,7 +131,7 @@ def evaluate_fitness_noise(
         target_params: List[float],
         id_list: List[str] = None,
         param_keys: List[str] = None,
-        sigma: float = 10.0,
+        sigma: float = 100.0,
         mean: float = 0.0
 ):
     """
