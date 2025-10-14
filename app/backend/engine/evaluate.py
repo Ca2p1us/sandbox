@@ -181,7 +181,7 @@ def evaluate_fitness_noise(
         total_score = sum(scores)  if scores else 0
 
         # # ノイズを加えて
-        total_score = add_noise(total_score, sigma, mean)  # 0～10にスケール
+        total_score = add_noise(total_score)  # 0～10にスケール
         # total_score = int(round(total_score))  # 0～10の整数に丸める
         # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
         individual['fitness'] = total_score
