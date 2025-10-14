@@ -277,7 +277,7 @@ def evaluate_fitness_Ackley(
 
         # 統合
         fitness = 0
-        fitness -= -A * math.exp(-B * math.sqrt(sum(v**2 for v in values)/len(values))) - math.exp(sum(math.cos(C*v) for v in values)/len(values)) + A + math.e
+        fitness -= -A * math.exp(-B * math.sqrt(sum(v**2 for v in values)/len(values))) - math.exp(sum(np.cos(C*v) for v in values)/len(values)) + A + math.e
         # 必要に応じてスケーリングやノイズ付与も可能
         individual["fitness"] = fitness
 
@@ -323,7 +323,8 @@ def evaluate_fitness_Schwefel(
 
         # 統合,(418.9829,)
         fitness = 0
-        fitness += 418.9829 * len(values) - sum(v * math.sin(math.sqrt(abs(v))) for v in values)
+        # fitness += 418.9829 * len(values) - sum(v * math.sin(math.sqrt(abs(v))) for v in values)
+        fitness += sum(v * np.sin(math.sqrt(abs(v))) for v in values)
         # 必要に応じてスケーリングやノイズ付与も可能
         individual["fitness"] = fitness
 
