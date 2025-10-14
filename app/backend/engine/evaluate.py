@@ -131,7 +131,7 @@ def evaluate_fitness_noise(
         target_params: List[float],
         id_list: List[str] = None,
         param_keys: List[str] = None,
-        sigma: float = 1.0,
+        sigma: float = 10.0,
         mean: float = 0.0
 ):
     """
