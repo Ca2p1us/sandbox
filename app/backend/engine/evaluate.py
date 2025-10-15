@@ -237,8 +237,8 @@ def evaluate_fitness_Ackley(
         population: List[dict],
         param_keys: List[str] = None,
         id_list: List[str] = None,
-        A = 20,
-        B = 0.2,
+        A = 300,
+        B = 0.005,
         C = 2*np.pi
 ):
     """
