@@ -228,7 +228,7 @@ def evaluate_fitness_cos(
                 values.append(float(val))
 
         # 統合
-        fitness = (8 * A - sum(v**2 - 10 *np.cos(2 * np.pi*v) for v in values))
+        fitness = (8 * A - sum(0.005 * v**2 - 100 *np.cos(np.pi*v / 16) for v in values))
         # 必要に応じてスケーリングやノイズ付与も可能
         individual["fitness"] = fitness
 
@@ -237,8 +237,8 @@ def evaluate_fitness_Ackley(
         population: List[dict],
         param_keys: List[str] = None,
         id_list: List[str] = None,
-        A = 20,
-        B = 0.2,
+        A = 300,
+        B = 0.005,
         C = 2*np.pi
 ):
     """
