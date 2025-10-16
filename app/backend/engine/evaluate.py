@@ -228,7 +228,7 @@ def evaluate_fitness_cos(
                 values.append(float(val))
 
         # 統合
-        fitness = (8 * A - sum(v**2 - 10 *np.cos(2 * np.pi*v) for v in values))
+        fitness = (8 * A - sum(0.005 * v**2 - 100 *np.cos(np.pi*v / 16) for v in values))
         # 必要に応じてスケーリングやノイズ付与も可能
         individual["fitness"] = fitness
 
