@@ -32,36 +32,6 @@ python main.py
 
 - ["chatGPTの履歴](https://chatgpt.com/share/68c77ce7-6394-8009-95de-de186ff53d2d)
 
-# 使っている論文
-- [先輩の修論(GithubのURL)](https://github.com/mocoatsu/Research)
-- ["Reducing user fatigue in interactive genetic algorithms by evaluation of population subsets." ](https://www.cse.unr.edu/~quiroz/inc/docs/trans2009.pdf)
-- ["An Experimental Study of Benchmarking Functions for Genetic Algorithms"](https://www.researchgate.net/publication/220662178_An_Experimental_Study_of_Benchmarking_Functions_for_Genetic_Algorithms)
-    - F1～F5
-    - ["An analysis of the behaviour of a class of genetic adaptive systems"](https://deepblue.lib.umich.edu/handle/2027.42/4507)
-- [最適化アルゴリズムを評価するベンチマーク関数まとめ](https://qiita.com/tomitomi3/items/d4318bf7afbc1c835dda)
-- ["Virtual Library of Simulation Experiments:Test Functions and Datasets"](https://www.sfu.ca/~ssurjano/optimization.html)
-- [Test Functions for Unconstrained Global Optimization](http://www-optima.amp.i.kyoto-u.ac.jp/member/student/hedar/Hedar_files/TestGO_files/Page364.htm)
-
-
-# 読むだけ読んだ論文
-- [自己組織化マップを用いた遺伝的アルゴリズムについて](https://doi.org/10.1299/jsmeoptis.2008.8.93)
-- [擬音的発話のニュアンスを反映するインタラクティブ効果音合成](https://www.interaction-ipsj.org/proceedings/2024/data/pdf/1B-34.pdf)
-- ["Voice Recognition based on vote-SOM."](https://www.researchgate.net/publication/281284888_Voice_Recognition_based_on_vote-SOM)
-- ["A spiking neural network framework for robust sound classification."](https://www.frontiersin.org/journals/neuroscience/articles/10.3389/fnins.2018.00836/full)
-- ["対話履歴からの獲得知識に基づく模擬評価関数を用いた対話型進化計算"](https://www.jstage.jst.go.jp/article/jjske/14/4/14_TJSKE-D-15-00069/_pdf)
-- ["Interactive Evolutionary Computation withEvaluation Characteristics of Multi-IEC Users"](https://catalog.lib.kyushu-u.ac.jp/opac_download_md/4488101/IntConf101.pdf)
-    - 過去の好みが似ている別ユーザの評価特性を現在のユーザの特性を学習するまで用いることで収束を早める？
-    - 評価特性の学習はパラメータと評価値をセットにしたデータからNNを用いていた、残念
-    - 根本的には時間稼ぎ的な手法
-- ["Test Functions for Unconstrained Global Optimization"](http://www-optima.amp.i.kyoto-u.ac.jp/member/student/hedar/Hedar_files/TestGO_files/Page364.htm)
-    - エジプトの教授が作ってた評価関数のまとめサイト
-    - [その教授のサイト](http://www-optima.amp.i.kyoto-u.ac.jp/member/student/hedar/Hedar_files/AboutMe.htm)
-    - [その教授の所属大学のサイト](https://www.aun.edu.eg/fci/abdel-rahman-hedar-abdel-rahman-ahmed)
-
-# NotebookLM等で簡単に読んだもの
-- ["Automated Design of a Genetic Algorithm for Image Segmentation Usingthe Iterated Local Search"](https://www.scitepress.org/Papers/2024/129085/129085.pdf)
-    - エントロピーを使うのは面白そうだけど音声なので自分の研究には使えないかも
-
 
 # IGAの評価指標
 - 最良個体の評価値の推移を見る
@@ -75,6 +45,52 @@ python main.py
     - よくわからん
     - 使っていた論文
         - ["推定収束点を用いた対話型進化計算高速化の可能性"](https://api.lib.kyushu-u.ac.jp/opac_download_md/1810697/FSS2017.pdf)
+
+## 使っている論文
+- [先輩の修論(GithubのURL)](https://github.com/mocoatsu/Research)
+- ["Reducing user fatigue in interactive genetic algorithms by evaluation of population subsets." ](https://www.cse.unr.edu/~quiroz/inc/docs/trans2009.pdf)
+- ["An Experimental Study of Benchmarking Functions for Genetic Algorithms"](https://www.researchgate.net/publication/220662178_An_Experimental_Study_of_Benchmarking_Functions_for_Genetic_Algorithms)
+    - F1～F5
+    - ["An analysis of the behaviour of a class of genetic adaptive systems"](https://deepblue.lib.umich.edu/handle/2027.42/4507)
+- [最適化アルゴリズムを評価するベンチマーク関数まとめ](https://qiita.com/tomitomi3/items/d4318bf7afbc1c835dda)
+- ["Virtual Library of Simulation Experiments:Test Functions and Datasets"](https://www.sfu.ca/~ssurjano/optimization.html)
+- [Test Functions for Unconstrained Global Optimization](http://www-optima.amp.i.kyoto-u.ac.jp/member/student/hedar/Hedar_files/TestGO_files/Page364.htm)
+- ["Test Functions for Unconstrained Global Optimization"](http://www-optima.amp.i.kyoto-u.ac.jp/member/student/hedar/Hedar_files/TestGO_files/Page364.htm)
+    - エジプトの教授が作ってた評価関数のまとめサイト
+    - [その教授のサイト](http://www-optima.amp.i.kyoto-u.ac.jp/member/student/hedar/Hedar_files/AboutMe.htm)
+    - [その教授の所属大学のサイト](https://www.aun.edu.eg/fci/abdel-rahman-hedar-abdel-rahman-ahmed)
+
+
+## 読むだけ読んだ論文
+- [自己組織化マップを用いた遺伝的アルゴリズムについて](https://doi.org/10.1299/jsmeoptis.2008.8.93)
+- [擬音的発話のニュアンスを反映するインタラクティブ効果音合成](https://www.interaction-ipsj.org/proceedings/2024/data/pdf/1B-34.pdf)
+- ["Voice Recognition based on vote-SOM."](https://www.researchgate.net/publication/281284888_Voice_Recognition_based_on_vote-SOM)
+- ["A spiking neural network framework for robust sound classification."](https://www.frontiersin.org/journals/neuroscience/articles/10.3389/fnins.2018.00836/full)
+- ["対話履歴からの獲得知識に基づく模擬評価関数を用いた対話型進化計算"](https://www.jstage.jst.go.jp/article/jjske/14/4/14_TJSKE-D-15-00069/_pdf)
+- ["Interactive Evolutionary Computation withEvaluation Characteristics of Multi-IEC Users"](https://catalog.lib.kyushu-u.ac.jp/opac_download_md/4488101/IntConf101.pdf)
+    - 過去の好みが似ている別ユーザの評価特性を現在のユーザの特性を学習するまで用いることで収束を早める？
+    - 評価特性の学習はパラメータと評価値をセットにしたデータからNNを用いていた、残念
+    - 根本的には時間稼ぎ的な手法
+- ["Automated Design of a Genetic Algorithm for Image Segmentation Usingthe Iterated Local Search"](https://www.scitepress.org/Papers/2024/129085/129085.pdf)
+    - エントロピーを使うのは面白そうだけど音声なので自分の研究には使えないかも
+
+
+# IGA,GAが目的としている課題の整理
+- [先輩の修論(GithubのURL)](https://github.com/mocoatsu/Research)
+    - 擬音語に合った音を生成　→　単峰性
+- ["対話型遺伝的アルゴリズムの評価操作におけるユーザの負担軽減の検討"](https://www.jstage.jst.go.jp/article/jsmecmd/2007.20/0/2007.20_315/_pdf/-char/ja)
+    - T-シャツのデザインを個体としたシステム
+    - 提示されたデザインから好みのものを2個選ぶ評価を提案
+    - T-シャツのデザインの嗜好を探る＋ユーザ疲労の軽減
+    - 嗜好を探る点では点数をつける方が良かった
+        - 仮定は単峰性だが結果から見えるのは多峰性か
+- ["対話型遺伝的アルゴリズムにおける嗜好の多峰性に対応可能な個体生成方法"](https://www.jstage.jst.go.jp/article/tjsai/24/1/24_1_127/_pdf)
+    - ECサイトの商品推薦システム
+    - 従来のIGAでは複数の最適解の内の一つに収束する単峰性
+    - 他峰性である嗜好のピークに至りつつ広い空間を探索
+        - 嗜好の一つだけを推薦するのもストレスと書いている
+    
+
 
 # 作成中のメモ
  - 個体の選択
