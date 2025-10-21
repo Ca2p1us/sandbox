@@ -79,16 +79,34 @@ python main.py
 - [先輩の修論(GithubのURL)](https://github.com/mocoatsu/Research)
     - 擬音語に合った音を生成　→　単峰性
 - ["対話型遺伝的アルゴリズムの評価操作におけるユーザの負担軽減の検討"](https://www.jstage.jst.go.jp/article/jsmecmd/2007.20/0/2007.20_315/_pdf/-char/ja)
+    - 単峰性を仮定
     - T-シャツのデザインを個体としたシステム
     - 提示されたデザインから好みのものを2個選ぶ評価を提案
     - T-シャツのデザインの嗜好を探る＋ユーザ疲労の軽減
     - 嗜好を探る点では点数をつける方が良かった
         - 仮定は単峰性だが結果から見えるのは多峰性か
 - ["対話型遺伝的アルゴリズムにおける嗜好の多峰性に対応可能な個体生成方法"](https://www.jstage.jst.go.jp/article/tjsai/24/1/24_1_127/_pdf)
+    - 多峰性を仮定
     - ECサイトの商品推薦システム
     - 従来のIGAでは複数の最適解の内の一つに収束する単峰性
     - 他峰性である嗜好のピークに至りつつ広い空間を探索
         - 嗜好の一つだけを推薦するのもストレスと書いている
+    - 途中のある世代でクラスタリングを行い、個体の生成範囲を絞る
+        - クラスタリングの手法によってはよさげな方法である
+- ["対話型遺伝的アルゴリズムによる人間の感性を反映した音楽作曲"](https://www.jstage.jst.go.jp/article/jsoft/17/6/17_KJ00003983705/_pdf/-char/ja)
+    - 単峰性を仮定
+    - 博士論文紹介であったため詳細は不明
+- ["対話型遺伝的アルゴリズムを用いたユーザの目的に合った楽曲推薦システム"](https://db-event.jpn.org/deim2010/proceedings/files/A4-1.pdf)
+    - 単峰性を仮定
+    - 目的に合っているか否かの二値評価
+- ["Interactive Genetic Algorithms for User Interface Design"](https://www.cse.unr.edu/~dascalus/CEC2007_Quiroz.pdf)
+    - 多峰性か単峰性かわからん
+    - UIのデザイン
+        - デザインの原則やガイドラインがあると言及しているから単峰性を仮定している可能性が高い？
+        - 結果とか人間の美的感覚的には多峰性
+- ["IGAOD: An online design framework for interactive genetic algorithms"](https://www.researchgate.net/publication/363741083_IGAOD_An_online_design_framework_for_interactive_genetic_algorithms#:~:text=In%20order%20to%20prompt%20the,IGA%29%2C%20the)
+    - 多峰性を仮定
+    - 花瓶のデザインを0～10で評価
     
 
 
