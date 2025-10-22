@@ -107,6 +107,10 @@ python main.py
 - ["IGAOD: An online design framework for interactive genetic algorithms"](https://www.researchgate.net/publication/363741083_IGAOD_An_online_design_framework_for_interactive_genetic_algorithms#:~:text=In%20order%20to%20prompt%20the,IGA%29%2C%20the)
     - 多峰性を仮定
     - 花瓶のデザインを0～10で評価
+    - そもそもフレームワークの開発の研究だから入れない方がいいかも
+- ["3D Vase Design Based on Interactive Genetic Algorithm and Enhanced XGBoost Model"](https://www.mdpi.com/2227-7390/12/13/1932#:~:text=The%20human%E2%80%93computer%20interaction%20attribute%20of,three%20parts%3A%20the%20vase%20control)
+    - 単峰性を仮定？
+    - PSOっちゅう粒子群最適化アルゴリズムを使って最適解に移動するらしい
     
 
 
@@ -120,3 +124,5 @@ python main.py
 - 評価関数のパラメータ
     - 10/15 定義域を変えた場合のパラメータ設定についてgeogebraで1次元の場合の関数を眺めながら変えた
     - 10/16 Rastrigin関数は定義域が小さいから成り立っている関数なんだなぁと思ったのででかくした
+- そもそも
+    - 来年以降もIGAを触るならXGBoostとか別の部分からのアプローチも調べないとなぁ
