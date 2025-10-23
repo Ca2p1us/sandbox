@@ -80,6 +80,14 @@ python main.py
 - ["3D Vase Design Based on Interactive Genetic Algorithm and Enhanced XGBoost Model"](https://www.mdpi.com/2227-7390/12/13/1932#:~:text=The%20human%E2%80%93computer%20interaction%20attribute%20of,three%20parts%3A%20the%20vase%20control)
     - 単峰性を仮定？
     - PSOっちゅう粒子群最適化アルゴリズムを使って最適解に移動するらしい
+- ["遺伝的アルゴリズムを利用した最適トラス形態決定法"](https://www.jstage.jst.go.jp/article/kikaia1979/59/562/59_562_1568/_pdf/-char/ja)
+    - 多峰性を仮定
+    - トラス構造の設計で問題となる位相決定問題は多峰性らしい
+    - 従来の最適化とGAを組み合わせることで局所解に陥るのを防いでいるらしい
+- ["遺伝的アルゴリズムの道路整備順位決定問題への適用"](https://www.jstage.jst.go.jp/article/jscej1984/1994/482/1994_482_37/_pdf/-char/ja)
+    - 多峰性を仮定
+    - 道路の整備順を決める問題
+    - どう見ても局所解がたくさんある
 
 # IGAの評価指標
 - 最良個体の評価値の推移を見る
@@ -137,3 +145,5 @@ python main.py
     - 10/16 Rastrigin関数は定義域が小さいから成り立っている関数なんだなぁと思ったのででかくした
 - そもそも
     - 来年以降もIGAを触るならXGBoostとか別の部分からのアプローチも調べないとなぁ
+    - GA単体で何とかする研究は少ないんだなぁ
+    - ほかの最適化手法やシンプルなGAに特殊な処理を加えるとよりよくなる(当たり前)
