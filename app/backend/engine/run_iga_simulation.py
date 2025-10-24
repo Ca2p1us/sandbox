@@ -18,22 +18,73 @@ Chromosomes = List[dict]
 def make_initial_population(num_individuals=10):
     return [make_chromosome_params.make_chromosome_params() for _ in range(num_individuals)]
 
-def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10):
+def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_num=0, times:int=1):
     best_fitness_history = []
+    bests = []
     # 1. 初期個体生成
     population = make_initial_population(POPULATION_SIZE)
     
-    for generation in range(NUM_GENERATIONS):
+    for generation in range(NUM_GENERATIONS - 1):
         # 2. 評価
-        evaluate.evaluate_fitness_by_param(
-            population = population,
-            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690]
+        print(f"\n--- Generation {generation + 1} の評価を行います ---")
+        if evaluate_num == 0:
+        # 2-1. ガウス関数
+            evaluate_method = "Gaussian"
+            evaluate.evaluate_fitness_by_param(
+                #評価対象集団
+                population,
+                #目標値
+                target_params=TARGET_PARAMS,
+                #標準偏差
+                sigma=500.0,
+                #評価対象パラメータ
+                param_keys=PARAMS
+            )
+        elif evaluate_num == 1:
+        # 2-2. スフィア関数
+            evaluate_method = "Sphere"
+            evaluate.evaluate_fitness_sphere(
+                population=population,
+                target_params=TARGET_PARAMS,
+                param_keys=PARAMS
+            )
+        elif evaluate_num == 2:
+        # 2-3. ノイズ関数
+            evaluate_method = "Noise"
+            evaluate.evaluate_fitness_noise(
+                population=population,
+                target_params=TARGET_PARAMS,
+                param_keys=PARAMS
+            )
+        elif evaluate_num == 3:
+        # 2-4. Rastrigin関数
+            evaluate_method = "Rastrigin"
+            evaluate.evaluate_fitness_cos(
+                population=population,
+                param_keys=PARAMS
+            )
+        elif evaluate_num == 4:
+        # 2-5. Ackley関数
+            evaluate_method = "Ackley"
+            evaluate.evaluate_fitness_Ackley(
+                population=population,
+                param_keys=PARAMS
+            )
+        elif evaluate_num == 5:
+        # 2-6. Schwefel関数
+            evaluate_method = "Schwefel"
+            evaluate.evaluate_fitness_Schwefel(
+                population=population,
+                param_keys=PARAMS
             )
         best, worst = evaluate.get_best_and_worst_individuals(population)
         print(f"Generation {generation + 1}\n \t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
+        # 評価の平均値を表示
+        print(f"average fitness:", evaluate.get_average_fitness(population))
         # --- ここで履歴に追加 ---
         if best is not None and "fitness" in best:
             best_fitness_history.append((generation + 1, float(best["fitness"])))
+            bests.append(best)
         # 評価の平均値を表示
         print(f"average fitness:", evaluate.get_average_fitness(population))
         next_generation:List[Chromosomes]  = []
@@ -69,16 +120,56 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10):
 
         # 5. 次世代への更新
         population = next_generation
-        #評価
+        print(f"------------------------------------")
+    # --- ここで最終世代の評価値を再計算 ---
+    if evaluate_num == 0:
         evaluate.evaluate_fitness_by_param(
-            population = population,
-            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690]
-            )
+            population,
+            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690],
+            sigma=500.0,
+            param_keys=PARAMS
+        )
+    elif evaluate_num == 1:
+        evaluate.evaluate_fitness_sphere(
+            population =population,
+            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690],
+            param_keys=PARAMS
+        )
+    elif evaluate_num == 2:
+        evaluate.evaluate_fitness_noise(
+            population=population,
+            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690],
+            param_keys=PARAMS
+        )
+    elif evaluate_num == 3:
+        evaluate.evaluate_fitness_cos(
+            population=population,
+            param_keys=PARAMS
+        )
+    elif evaluate_num == 4:
+        evaluate.evaluate_fitness_Ackley(
+            population=population,
+            param_keys=PARAMS
+        )
+    elif evaluate_num == 5:
+        evaluate.evaluate_fitness_Schwefel(
+            population=population,
+            param_keys=PARAMS
+        )
 
+    # ベスト・ワースト個体の取得
+    best, worst = evaluate.get_best_and_worst_individuals(population)
+    interpolate_by_distance(population, best, worst, target_key='fitness')
+    # 評価の平均値を表示
+    print(f"Generation {NUM_GENERATIONS}\n average fitness:", evaluate.get_average_fitness(population))
+    print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
+    best_fitness_history.append((NUM_GENERATIONS, float(best["fitness"])))
+    bests.append(best)
     # 6. 最終結果の出力
-    log("result/simulation_random.json", population)
-    log_fitness(best_fitness_history,"random")
-    return population
+    log("result/conventional/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+".json", population)
+    log("result/conventional/best/"+evaluate_method+"/best_individual_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+".json", bests)
+    log_fitness(evaluate_method, "result/conventional/graph/"+evaluate_method+"/"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+"_best_fitness_history.png", best_fitness_history)
+    return best_fitness_history
 
 
 PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustain_time", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
@@ -277,7 +368,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     best_fitness_history.append((NUM_GENERATIONS, float(best["fitness"])))
     bests.append(best)
     # 6. 最終結果の出力
-    log("result/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", population)
-    log("result/best/"+evaluate_method+"/best_individual_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", bests)
-    log_fitness(evaluate_method, "result/graph/"+evaluate_method+"/"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+"_best_fitness_history.png", best_fitness_history)
+    log("result/proposal/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", population)
+    log("result/proposal/best/"+evaluate_method+"/best_individual_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", bests)
+    log_fitness(evaluate_method, "result/proposal/graph/"+evaluate_method+"/"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+"_best_fitness_history.png", best_fitness_history)
     return best_fitness_history
