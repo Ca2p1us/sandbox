@@ -53,7 +53,7 @@ def log_fitness(method: str, file_path: str, best_fitness_history):
     # plt.show()
     plt.close()
 
-def log_fitness_histories(method_num: int, file_path: str, best_fitness_histories):
+def log_fitness_histories(method_num: int, file_path: str, best_fitness_histories, ver: str):
     """
     複数回のシミュレーションの世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_histories: [[(世代番号, fitness値), ...], ...] のリスト
@@ -89,7 +89,7 @@ def log_fitness_histories(method_num: int, file_path: str, best_fitness_historie
     plt.grid(True)
     plt.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
-    plt.savefig(f'./result/graph/{method}/{method}{file_path}')
+    plt.savefig(f'./result/{ver}/graph/{method}/{method}{file_path}')
     plt.show()
 
 

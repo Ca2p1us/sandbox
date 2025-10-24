@@ -1,0 +1,140 @@
+{
+  "results": [
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 139.25803808531958,
+          "decay": 195.97455227660336,
+          "sustain": 66.43135403273875,
+          "sustainTime": 121.91605843202116,
+          "release": 284.90713463311215,
+          "frequency": 217.06479588001508
+        }
+      },
+      "fitness": -569.4443990356517,
+      "pre_evaluation": 0.0,
+      "generation": 1,
+      "chromosomeId": "be8e6ab0-5930-49c5-9743-05846d11f4f8"
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 0,
+          "decay": 195.11597425039415,
+          "sustain": 1.3327315500426762,
+          "sustainTime": 111.46991101605391,
+          "release": 278.6943705887044,
+          "frequency": 291.41766473805507
+        }
+      },
+      "generation": 1,
+      "chromosomeId": "c5815eb4-0225-4fec-9736-7db77f977720",
+      "fitness": -491.917701068671
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 0,
+          "decay": 101.55689216292313,
+          "sustain": 36.90624388319776,
+          "sustainTime": 111.16624047129172,
+          "release": 281.50886608369933,
+          "frequency": 577.8994784517675
+        }
+      },
+      "generation": 2,
+      "chromosomeId": "80ab631c-13ac-4147-b9cc-d5800f7ebe63",
+      "fitness": -1618.9046181528813
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 110.1535777875501,
+          "decay": 250,
+          "sustain": 0,
+          "sustainTime": 142.5043560881751,
+          "release": 117.22654798326022,
+          "frequency": 266.0382466701123
+        }
+      },
+      "generation": 3,
+      "chromosomeId": "889a2cd0-44be-4c5c-9b61-744beb43b63c",
+      "fitness": -661.758286225001
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 0,
+          "decay": 109.15499869794675,
+          "sustain": 83.70014135445716,
+          "sustainTime": 134.24260065902442,
+          "release": 2.407828170125587,
+          "frequency": 227.36734037713003
+        }
+      },
+      "generation": 4,
+      "chromosomeId": "02412ff9-d2c4-41ab-bbd2-608d3c785571",
+      "fitness": -64.7013182320085
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 11.389335592496334,
+          "decay": 248.38225874690374,
+          "sustain": 0,
+          "sustainTime": 204.0458100775985,
+          "release": 138.08746136468915,
+          "frequency": 39.92163065366657
+        }
+      },
+      "generation": 5,
+      "chromosomeId": "0b1bf3d9-7b29-4e76-8229-b111a9a7eca9",
+      "fitness": -224.98344788950982
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 12.375421335518585,
+          "decay": 68.66115723179976,
+          "sustain": 67.48033003556138,
+          "sustainTime": 138.14594684102897,
+          "release": 139.43298960549612,
+          "frequency": 203.7257089118165
+        }
+      },
+      "generation": 6,
+      "chromosomeId": "afa36715-4f69-4323-ba20-a33806d555e6",
+      "fitness": -238.27150700875245
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 2.6962791247136355,
+          "decay": 68.34411480556948,
+          "sustain": 66.05781678251282,
+          "sustainTime": 134.81642561338626,
+          "release": 213.13064984002173,
+          "frequency": 196.01411244800866
+        }
+      },
+      "generation": 7,
+      "chromosomeId": "f87dfa35-bc26-4ab3-8589-33760ada52e6",
+      "fitness": -23.29847432514414
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 154.35504676514117,
+          "decay": 95.4735111728755,
+          "sustain": 38.986805206783096,
+          "sustainTime": 249.42219746071308,
+          "release": 167.96165715633904,
+          "frequency": 60.42348328445039
+        }
+      },
+      "generation": 8,
+      "chromosomeId": "ffebcbce-1f5b-41b4-8edf-0c3ab8121f8a",
+      "fitness": 89.31835974821443
+    }
+  ]
+}
