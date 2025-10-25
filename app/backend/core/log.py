@@ -62,12 +62,10 @@ def log_fitness_histories(method_num: int, file_path: str, best_fitness_historie
     if not best_fitness_histories:
         print("履歴データがありません。")
         return
-    if method_num == 0:
+    if method_num == 1:
         method = "Gaussian"
-    elif method_num == 1:
-        method = "Sphere"
     elif method_num == 2:
-        method = "Noise"
+        method = "Sphere"
     elif method_num == 3:
         method = "Rastrigin"
     elif method_num == 4:

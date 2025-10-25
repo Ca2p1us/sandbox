@@ -4,17 +4,20 @@ import uuid
 import numpy as np
 from typing import List
 
-def add_noise(value: float, noise_sigma: float = 1.0, noise_mean = 0) -> float:
+def add_noise(value: float, noise_sigma: float = 1.0, noise_mean = 0, scale = 1.0) -> float:
     # 平均0、標準偏差noise_sigmaの正規分布ノイズを加算
-    return value + random.gauss(noise_mean, noise_sigma)
+    return value + random.gauss(noise_mean, noise_sigma) * scale
 
 # 完全ランダムな評価（1〜10）
-def evaluate_fitness_random(population: List[dict]):
+def evaluate_fitness_random(population: List[dict], noise_is_added: bool = False):
     for individual in population:
         if not isinstance(individual, dict):
             print("警告: individualがdict型ではありません:", individual)
             continue  # またはraise Exceptionで止めてもOK
-        individual["fitness"] = random.randint(1, 10)
+        fitness = random.randint(1, 10)
+        if noise_is_added:
+            fitness = add_noise(value=fitness,scale=1.0)
+        individual["fitness"] = fitness
 
 # FMパラメータに基づいた評価（例：operator1のfrequencyに基づく）
 def evaluate_fitness_by_param(
@@ -22,7 +25,8 @@ def evaluate_fitness_by_param(
     target_params: List[float],
     sigma: float = 100.0,
     param_keys: List[str] = None,
-    id_list: List[str] = None
+    id_list: List[str] = None,
+    noise_is_added: bool = False
 ):
     """
     param_keysで指定した各パラメータがtarget_paramsの値に近いほど高評価（正規分布に基づく）
@@ -69,6 +73,8 @@ def evaluate_fitness_by_param(
 
         # 統合
         total_score = sum(scores)  if scores else 0
+        if noise_is_added:
+            total_score = add_noise(value=total_score, scale=1.0)  # ノイズを加えて
 
         # total_score = total_score * 10  # 0～10にスケール
         # total_score = int(round(total_score))  # 0～10の整数に丸める
@@ -80,7 +86,8 @@ def evaluate_fitness_sphere(
     population: List[dict],
     target_params: List[float],
     param_keys: List[str],
-    id_list: List[str] = None
+    id_list: List[str] = None,
+    noise_is_added: bool = False
 ):
     """
     各個体の二乗和を取ることで評価
@@ -123,75 +130,17 @@ def evaluate_fitness_sphere(
             fitness += -1 * values[i] ** 2
         # fitness = 10 + 3*fitness
         # 必要に応じてスケーリングやノイズ付与も可能
+        if noise_is_added:
+            fitness = add_noise(value=fitness, scale=1.0)
         individual['fitness'] = float(fitness)
-
-
-def evaluate_fitness_noise(
-        population: List[dict],
-        target_params: List[float],
-        id_list: List[str] = None,
-        param_keys: List[str] = None,
-        sigma: float = 100.0,
-        mean: float = 0.0
-):
-    """
-    param_keysで指定した各パラメータがtarget_paramsの値に近いほど高評価（正規分布に基づく）
-    id_listが指定された場合は、そのID（chromosomeId）を持つ個体のみfitnessを付与
-    統合手法は平均値
-    """
-    if param_keys is None:
-        param_keys = ["fmParamsList.operator1.frequency"]
-
-    # id_listが指定されていれば、そのIDのみ評価
-    def should_evaluate(ind):
-        if id_list is None:
-            return True
-        if "chromosomeId" not in ind:
-            return False
-        # UUID型にも対応
-        try:
-            return str(ind["chromosomeId"]) in [str(i) for i in id_list]
-        except Exception:
-            return False
-
-    for individual in population:
-        if not isinstance(individual, dict):
-            print("警告: individualがdict型ではありません:", individual)
-            continue
-        if not should_evaluate(individual):
-            continue
-
-        scores = []
-        for key, target in zip(param_keys, target_params):
-            # ドット区切りでアクセス
-            val = individual
-            for k in key.split('.'):
-                val = val.get(k, None)
-                if val is None:
-                    break
-            if val is None:
-                scores.append(0)
-            else:
-                # 正規分布の確率密度関数（最大値1）
-                # score = math.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
-                score = math.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
-                scores.append(score)
-
-        # 統合
-        total_score = sum(scores)  if scores else 0
-
-        # # ノイズを加えて
-        total_score = add_noise(total_score)  # 0～10にスケール
-        # total_score = int(round(total_score))  # 0～10の整数に丸める
-        # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
-        individual['fitness'] = total_score
 
 
 def evaluate_fitness_cos(
         population: List[dict],
         id_list: List[str] = None,
         param_keys: List[str] = None,
-        A = 10
+        A = 10,
+        noise_is_added: bool = False
 ):
     """
     Rastrigin関数で評価
@@ -230,6 +179,8 @@ def evaluate_fitness_cos(
         # 統合
         fitness = (8 * A - sum(0.005 * v**2 - 100 *np.cos(np.pi*v / 16) for v in values))
         # 必要に応じてスケーリングやノイズ付与も可能
+        if noise_is_added:
+            fitness = add_noise(value=fitness, scale=1.0)
         individual["fitness"] = fitness
 
 
@@ -239,7 +190,8 @@ def evaluate_fitness_Ackley(
         id_list: List[str] = None,
         A = 300,
         B = 0.005,
-        C = 2*np.pi
+        C = 2*np.pi,
+        noise_is_added: bool = False
 ):
     """
     Ackley関数で評価
@@ -279,13 +231,16 @@ def evaluate_fitness_Ackley(
         fitness = 0
         fitness -= -A * math.exp(-B * math.sqrt(sum(v**2 for v in values)/len(values))) - math.exp(sum(np.cos(C*v) for v in values)/len(values)) + A + math.e
         # 必要に応じてスケーリングやノイズ付与も可能
+        if noise_is_added:
+            fitness = add_noise(value=fitness, scale=1.0)
         individual["fitness"] = fitness
 
 
 def evaluate_fitness_Schwefel(
         population: List[dict],
         param_keys: List[str] = None,
-        id_list: List[str] = None
+        id_list: List[str] = None,
+        noise_is_added: bool = False
 ):
     """
     Schwefel関数で評価
@@ -326,6 +281,8 @@ def evaluate_fitness_Schwefel(
         # fitness += 418.9829 * len(values) - sum(v * math.sin(math.sqrt(abs(v))) for v in values)
         fitness += sum(v * np.sin(math.sqrt(abs(v))) for v in values)
         # 必要に応じてスケーリングやノイズ付与も可能
+        if noise_is_added:
+            fitness = add_noise(value=fitness, scale=1.0)
         individual["fitness"] = fitness
 
 
