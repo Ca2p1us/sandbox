@@ -120,6 +120,12 @@ python main.py
     - エジプトの教授が作ってた評価関数のまとめサイト
     - [その教授のサイト](http://www-optima.amp.i.kyoto-u.ac.jp/member/student/hedar/Hedar_files/AboutMe.htm)
     - [その教授の所属大学のサイト](https://www.aun.edu.eg/fci/abdel-rahman-hedar-abdel-rahman-ahmed)
+- ["Accelerating the Evolutionary Algorithms by Gaussian Process Regression with $\epsilon$ -greedy acquisition function"](https://arxiv.org/pdf/2210.06814)
+    - ガウス過程回帰を用いたエリート個体の推定
+    - 個体群から分布を推定して次世代を生成するEDAと個体群を選択交叉して次世代を生成するEAのハイブリッド
+    - 基本はEAアルゴリズムで個体を生成したりする
+    - エリート個体の推定のためにガウス過程回帰で今ある個体から分布の推定をする
+
 
 
 ## 読むだけ読んだ論文
