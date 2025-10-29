@@ -68,3 +68,52 @@ def interpolate_by_distance(
         value = best_val * (1 - ratio) + worst_val * ratio
         ind[target_key] = value
     print(f"{target_key}を補間しました。\nbest {best_val}, worst {worst_val}")
+    return
+
+
+def interpolation_by_Gaussian(
+        population: List[dict],
+    best: dict = None,
+    worst: dict = None,
+    param_keys: List[str] = None,
+    target_key: str = "pre_evaluation",
+    eps_ratio: float = 0.02
+):
+    """
+    ガウス関数 f(x) = A exp(-(x-μ)^2/(2σ^2)) + C のパラメータ推定
+    C ≈ y2 として、わずかに ε を下げた近似で計算。
+    
+    eps_ratio: 全振幅に対する補正割合（例: 0.02 = 2%）
+    """
+    def get_param(ind, key):
+        # "fmParamsList.operator1.frequency" のようなドット区切りでアクセス
+        val = ind
+        for k in key.split('.'):
+            val = val.get(k, None)
+            if val is None:
+                break
+        return val
+
+    best_val = float(best.get(target_key, 1))
+    worst_val = float(worst.get(target_key, 1))
+    eps = (best_val - worst_val) * eps_ratio
+    C = worst_val - eps
+    A = best_val - C
+
+    ratio = (worst[target_key] - C) / (best[target_key] - C)
+    if  ratio <= 0 or ratio >= 1:
+        print("ガウス補間の計算に失敗しました。bestとworstの値を確認してください。")
+        return
+    best_params = [get_param(best, k) for k in param_keys]
+    worst_params = [get_param(worst, k) for k in param_keys]
+    sigma = (sum(abs(b - w) for b, w in zip(best_params, worst_params)) / math.sqrt(-2 * math.log(ratio)))
+    mu = best_params
+    print(f"ガウス補間のパラメータ: A={A}, mu={mu}, sigma={sigma}, C={C}")
+
+    # 個体群のガウス補間
+    for ind in population:
+        ind_params = [get_param(ind, k) for k in param_keys]
+        dist_sq = sum((ip - mp) ** 2 for ip, mp in zip(ind_params, mu))
+        value = A * math.exp(-dist_sq / (2 * sigma ** 2)) + C
+        ind[target_key] = value
+    return
