@@ -7,6 +7,7 @@ from ..core.geneticAlgorithm.mutate import mutate
 from ..core.geneticAlgorithm import make_chromosome_params
 from ..core.geneticAlgorithm.interpolation import interpolate_by_distance
 from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_pre_evaluation
+from ..core.geneticAlgorithm.config import TARGET_PARAMS, PARAMS
 from ..core.log import log, log_fitness
 from ..engine import evaluate
 import uuid
@@ -168,10 +169,7 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
     return best_fitness_history
 
 
-PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustain_time", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
-# TARGET_PARAMS = [0.03, 0.16, 0.89, 0.29, 0.06, 0.31690]
-# TARGET_PARAMS = [3, 160, 89, 29, 6, 316.90]
-TARGET_PARAMS = [0, 0, 0, 0, 0, 200]
+
 
 def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200, EVALUATE_SIZE=9, evaluate_num=0, times:int=1, noise_is_added:bool=False):
     best_fitness_history = []
