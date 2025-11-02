@@ -2,11 +2,15 @@ import random
 import math
 import uuid
 import numpy as np
+from scipy.stats import norm
 from typing import List
 
 def add_noise(value: float, noise_sigma: float = 1.0, noise_mean = 0, scale = 1.0) -> float:
     # 平均0、標準偏差noise_sigmaの正規分布ノイズを加算
-    return value + random.gauss(noise_mean, noise_sigma) * scale
+    rng = np.random.default_rng()
+    val = rng.normal(loc=noise_mean, scale=noise_sigma)
+    val = norm.cdf(val,loc=noise_mean,scale=noise_sigma) * scale  # 0〜1に正規化してscaleをかける
+    return value + val
 
 # 完全ランダムな評価（1〜10）
 def evaluate_fitness_random(population: List[dict], noise_is_added: bool = False):

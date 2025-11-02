@@ -2,7 +2,7 @@
 
 from typing import List
 
-def select_top_individuals_by_pre_evaluation(population: List[dict], top_n: int = 10) -> List[str]:
+def select_top_individuals_by_pre_evaluation(population: List[dict], total_n: int = 10) -> List[str]:
     """
     pre_evaluation（事前評価済み）が整数・小数どちらでも対応し、降順ソートして上位top_n個体のIDリストを返す
     """
@@ -13,12 +13,34 @@ def select_top_individuals_by_pre_evaluation(population: List[dict], top_n: int 
         except Exception:
             return False
 
+    
     # pre_evaluationが未設定または変換できない個体は除外
     valid_population = [
         ind for ind in population
         if "pre_evaluation" in ind and is_number(ind["pre_evaluation"]) and "chromosomeId" in ind
     ]
+    if not valid_population:
+        print("有効な個体が存在しません。")
+        return []
+
     # 降順ソート
     sorted_population = sorted(valid_population, key=lambda x: float(x["pre_evaluation"]), reverse=True)
+
+    # 上位と下位をそれぞれ選択
+    half_top = total_n // 2 + (total_n % 2)  # 奇数なら上位を1つ多く
+    half_bottom = total_n // 2
+
+    top_inds = sorted_population[:half_top]
+    bottom_inds = sorted_population[-half_bottom:] if half_bottom > 0 else []
+
+    # 合体（順序は上位→下位）
+    selected_inds = top_inds + bottom_inds
+
+    # 重複を防止（極端に少ないpopulationでも安全）
+    selected_ids = []
+    for ind in selected_inds:
+        cid = ind["chromosomeId"]
+        if cid not in selected_ids:
+            selected_ids.append(cid)
     # 個体IDリストで返す
-    return [ind["chromosomeId"] for ind in sorted_population[:top_n]]
+    return selected_ids

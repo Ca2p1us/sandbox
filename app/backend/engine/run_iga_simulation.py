@@ -5,7 +5,7 @@ from ..core.geneticAlgorithm import BLX_alpha
 from ..core.geneticAlgorithm.repair import repair_fm_params as repair_gene
 from ..core.geneticAlgorithm.mutate import mutate 
 from ..core.geneticAlgorithm import make_chromosome_params
-from ..core.geneticAlgorithm.interpolation import interpolate_by_distance
+from ..core.geneticAlgorithm.interpolation import interpolate_by_distance, interpolate_by_Gaussian
 from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_pre_evaluation
 from ..core.geneticAlgorithm.config import TARGET_PARAMS, PARAMS
 from ..core.log import log, log_fitness
@@ -177,13 +177,13 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
     # 初期個体の事前評価(補間)
-    interpolate_by_distance(
+    interpolate_by_Gaussian(
         population,
         param_keys=PARAMS,
         target_key="pre_evaluation"
         )
     # 評価個体の選択
-    evaluate_population = select_top_individuals_by_pre_evaluation(population, top_n=EVALUATE_SIZE)
+    evaluate_population = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE)
 
     for generation in range(NUM_GENERATIONS - 1):
         # 2. 評価
@@ -245,7 +245,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         # ベスト・ワースト個体の取得
         best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
         # ほかの個体の評価を補間
-        interpolate_by_distance(population, best, worst,param_keys=PARAMS, target_key="fitness")
+        interpolate_by_Gaussian(population, best, worst, param_keys=PARAMS, target_key="fitness")
         # 評価の平均値を表示
         print(f"average fitness:", evaluate.get_average_fitness(population))
         # 上位9個体の平均評価値を表示
@@ -295,7 +295,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         # 5. 次世代への更新
         population = next_generation
         #事前評価(補間)
-        interpolate_by_distance(
+        interpolate_by_Gaussian(
             population,
             best,
             worst,
@@ -303,7 +303,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             target_key="pre_evaluation"
             )
         # 評価個体の選択
-        evaluate_population = select_top_individuals_by_pre_evaluation(population, top_n=EVALUATE_SIZE)
+        evaluate_population = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE)
         print(f"------------------------------------")
 
     # --- ここで最終世代の評価値を再計算 ---
