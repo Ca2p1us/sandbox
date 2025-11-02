@@ -85,6 +85,15 @@ def interpolation_by_Gaussian(
     
     eps_ratio: 全振幅に対する補正割合（例: 0.02 = 2%）
     """
+    print(f"ガウス補間を開始します。")
+    if not best or not worst:
+        print(f"bestまたはworstがNoneです。ランダムな{target_key}を付与します。")
+        for ind in population:
+            ind[target_key] = random.uniform(1.0, 10.0)
+        return
+    if param_keys is None:
+        # デフォルトはoperator1のfrequencyのみ
+        param_keys = ["fmParamsList.operator1.frequency"]
     def get_param(ind, key):
         # "fmParamsList.operator1.frequency" のようなドット区切りでアクセス
         val = ind
@@ -116,4 +125,5 @@ def interpolation_by_Gaussian(
         dist_sq = sum((ip - mp) ** 2 for ip, mp in zip(ind_params, mu))
         value = A * math.exp(-dist_sq / (2 * sigma ** 2)) + C
         ind[target_key] = value
+    print(f"{target_key}をガウス補間しました。\nbest {best_val}, worst {worst_val}")
     return
