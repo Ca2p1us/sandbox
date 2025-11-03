@@ -71,8 +71,8 @@ def evaluate_fitness_by_param(
                 scores.append(0)
             else:
                 # 正規分布の確率密度関数（最大値1）
-                # score = math.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
-                score = math.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
+                score = math.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
+                # score = math.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
                 scores.append(score)
 
         # 統合
