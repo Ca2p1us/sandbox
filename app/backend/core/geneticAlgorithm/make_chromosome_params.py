@@ -3,7 +3,7 @@ import random
 import numpy as np
 from ..geneticAlgorithm import config
 
-from ..geneticAlgorithm.config import ALGORITHM_NUM
+from ..geneticAlgorithm.config import ALGORITHM_NUM, IGNORE_RANGE
 from ..geneticAlgorithm.make_fm_params.make_with_config import make_fm_params
 from ..geneticAlgorithm.make_fm_params.make_with_args import make_fm_params_with_args
 from ..geneticAlgorithm.make_fm_params.make_zero_params import make_zero_params
@@ -37,6 +37,8 @@ def generate_random_fm_params_list(param_ranges: dict) -> list[float]:
         low, high = param_ranges[key]
         # NumPyのGenerator.uniform(low, high)は low <= x < high の浮動小数点数を生成
         params[key] = RNG.uniform(low, high)
+        while params[key] in IGNORE_RANGE:
+            params[key] = RNG.uniform(low, high)
         
     # make_fm_params_with_args の引数として展開できるように、順番にリスト化して返す
     return [params[key] for key in param_order]

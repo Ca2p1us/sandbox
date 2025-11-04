@@ -130,8 +130,8 @@ def evaluate_fitness_sphere(
         # 線形結合
         fitness = 0
         for i in range(len(values)):
-            # fitness += -1 * (values[i] - target_params[i]) ** 2
-            fitness += -1 * values[i] ** 2
+            fitness += -1 * (values[i] - target_params[i]) ** 2
+            # fitness += -1 * values[i] ** 2
         # fitness = 10 + 3*fitness
         # 必要に応じてスケーリングやノイズ付与も可能
         if noise_is_added:

@@ -310,7 +310,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     if evaluate_num == 1:
         evaluate.evaluate_fitness_by_param(
             population,
-            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690],
+            target_params=TARGET_PARAMS,
             sigma=500.0,
             param_keys=PARAMS,
             id_list=evaluate_population,
@@ -319,7 +319,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     elif evaluate_num == 2:
         evaluate.evaluate_fitness_sphere(
             population =population,
-            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690],
+            target_params=TARGET_PARAMS,
             param_keys=PARAMS,
             id_list=evaluate_population,
             noise_is_added=noise_is_added
