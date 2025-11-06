@@ -1,6 +1,6 @@
 #事前評価・適応度評価を行う
 
-from typing import List, Type
+from typing import List, Dict
 import math
 import random
 import numpy as np
@@ -20,7 +20,7 @@ def interpolate_by_distance(
     """
     print(f"補間を開始します。")
     if not best or not worst:
-        rng = np.random.default_rng(10)  # シードを固定
+        rng = np.random.default_rng(seed=10)
         print(f"bestまたはworstがNoneです。ランダムな{target_key}を付与します。")
         for ind in population:
             ind[target_key] = rng.uniform(1.0, 10.0)
@@ -73,7 +73,7 @@ def interpolate_by_distance(
     return
 
 
-def interpolate_by_Gaussian(
+def interpolation_by_Gaussian(
         population: List[dict],
     best: dict = None,
     worst: dict = None,
@@ -87,9 +87,9 @@ def interpolate_by_Gaussian(
     
     eps_ratio: 全振幅に対する補正割合（例: 0.02 = 2%）
     """
-    print(f"ガウス補間を開始します。\n------------------------------------")
+    print(f"ガウス補間を開始します。")
     if not best or not worst:
-        rng = np.random.default_rng(10)  # シードを固定
+        rng = np.random.default_rng(seed=10)
         print(f"bestまたはworstがNoneです。ランダムな{target_key}を付与します。")
         for ind in population:
             ind[target_key] = rng.uniform(1.0, 10.0)
@@ -112,8 +112,6 @@ def interpolate_by_Gaussian(
     C = worst_val - eps
     A = best_val - C
 
-    print(f"分母:{best[target_key] - C}")
-
     ratio = (worst[target_key] - C) / (best[target_key] - C)
     if  ratio <= 0 or ratio >= 1:
         print("ガウス補間の計算に失敗しました。bestとworstの値を確認してください。")
@@ -122,7 +120,7 @@ def interpolate_by_Gaussian(
     worst_params = [get_param(worst, k) for k in param_keys]
     sigma = (sum(abs(b - w) for b, w in zip(best_params, worst_params)) / math.sqrt(-2 * math.log(ratio)))
     mu = best_params
-    # print(f"ガウス補間のパラメータ: A={A}, mu={mu}, sigma={sigma}, C={C}")
+    print(f"ガウス補間のパラメータ: A={A}, mu={mu}, sigma={sigma}, C={C}")
 
     # 個体群のガウス補間
     for ind in population:
@@ -130,5 +128,5 @@ def interpolate_by_Gaussian(
         dist_sq = sum((ip - mp) ** 2 for ip, mp in zip(ind_params, mu))
         value = A * math.exp(-dist_sq / (2 * sigma ** 2)) + C
         ind[target_key] = value
-    print(f"{target_key}をガウス補間しました。\nbest {best_val}, worst {worst_val}\n------------------------------------\n")
+    print(f"{target_key}をガウス補間しました。\nbest {best_val}, worst {worst_val}")
     return
