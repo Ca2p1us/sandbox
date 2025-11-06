@@ -20,7 +20,7 @@ def interpolate_by_distance(
     """
     print(f"補間を開始します。")
     if not best or not worst:
-        rng = np.random.default_rng(10)
+        rng = np.random.default_rng(seed=10)
         print(f"bestまたはworstがNoneです。ランダムな{target_key}を付与します。")
         for ind in population:
             ind[target_key] = rng.uniform(1.0, 10.0)
@@ -89,7 +89,7 @@ def interpolation_by_Gaussian(
     """
     print(f"ガウス補間を開始します。")
     if not best or not worst:
-        rng = np.random.default_rng(10)
+        rng = np.random.default_rng(seed=10)
         print(f"bestまたはworstがNoneです。ランダムな{target_key}を付与します。")
         for ind in population:
             ind[target_key] = rng.uniform(1.0, 10.0)
