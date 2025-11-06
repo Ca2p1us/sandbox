@@ -73,7 +73,7 @@ def interpolate_by_distance(
     return
 
 
-def interpolation_by_Gaussian(
+def interpolate_by_Gaussian(
         population: List[dict],
     best: dict = None,
     worst: dict = None,
