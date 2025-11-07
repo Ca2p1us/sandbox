@@ -67,8 +67,8 @@ def evaluate_fitness_by_param(
                 scores.append(0)
             else:
                 # 正規分布の確率密度関数（最大値1）
-                # score = math.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
-                score = math.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
+                score = math.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
+                # score = math.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
                 scores.append(score)
 
         # 統合
@@ -126,8 +126,8 @@ def evaluate_fitness_sphere(
         # 線形結合
         fitness = 0
         for i in range(len(values)):
-            # fitness += -1 * (values[i] - target_params[i]) ** 2
-            fitness += -1 * values[i] ** 2
+            fitness += -1 * (values[i] - target_params[i]) ** 2
+            # fitness += -1 * values[i] ** 2
         # fitness = 10 + 3*fitness
         # 必要に応じてスケーリングやノイズ付与も可能
         if noise_is_added:
