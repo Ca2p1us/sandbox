@@ -108,6 +108,7 @@ def interpolate_by_Gaussian(
 
     best_val = float(best.get(target_key, 1))
     worst_val = float(worst.get(target_key, 1))
+    print(f"best_val: {best_val}, worst_val: {worst_val}")
     eps = (best_val - worst_val) * eps_ratio
     C = worst_val - eps
     A = best_val - C
