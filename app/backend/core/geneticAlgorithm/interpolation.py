@@ -74,7 +74,7 @@ def interpolate_by_distance(
 
 
 def interpolate_by_Gaussian(
-        population: List[dict],
+    population: List[dict],
     best: dict = None,
     worst: dict = None,
     param_keys: List[str] = None,

@@ -21,13 +21,13 @@ OPERATOR_PARAM_RANGES = {
 
 # 1. シード値固定のためのGeneratorオブジェクトを作成
 # シード値 (例: 42) を指定することで、乱数のシーケンスが固定されます。
-RNG = np.random.default_rng(seed=42)
 
 def generate_random_fm_params_list(param_ranges: dict) -> list[float]:
     """
     OPERATOR_PARAM_RANGESに基づいて、シード値固定の乱数パラメータのリストを生成する。
     make_fm_params_with_argsの引数順に値を返す。
     """
+    RNG = np.random.default_rng(seed=42)
     params = {}
     
     # 辞書のキーの順番を固定し、make_fm_params_with_argsの引数順に乱数を生成
