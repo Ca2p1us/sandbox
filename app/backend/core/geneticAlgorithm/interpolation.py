@@ -111,7 +111,7 @@ def interpolate_by_Gaussian(
     eps = (best_val - worst_val) * eps_ratio
     C = worst_val - eps
     A = best_val - C
-
+    print(best[target_key] - C)
     ratio = (worst[target_key] - C) / (best[target_key] - C)
     if  ratio <= 0 or ratio >= 1:
         print("ガウス補間の計算に失敗しました。bestとworstの値を確認してください。")
