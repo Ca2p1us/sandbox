@@ -5,6 +5,8 @@ import math
 import random
 import numpy as np
 
+RNG = np.random.default_rng(seed=10)
+
 def interpolate_by_distance(
     population: List[dict],
     best: dict = None,
@@ -89,10 +91,9 @@ def interpolation_by_Gaussian(
     """
     print(f"ガウス補間を開始します。")
     if not best or not worst:
-        rng = np.random.default_rng(seed=10)
         print(f"bestまたはworstがNoneです。ランダムな{target_key}を付与します。")
         for ind in population:
-            ind[target_key] = rng.uniform(1.0, 10.0)
+            ind[target_key] = RNG.uniform(1.0, 10.0)
         return
     if param_keys is None:
         # デフォルトはoperator1のfrequencyのみ

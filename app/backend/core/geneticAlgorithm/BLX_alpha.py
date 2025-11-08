@@ -1,5 +1,8 @@
 import random
 from collections.abc import Callable
+import numpy as np
+
+RNG = np.random.default_rng(seed=30)
 
 
 def exec_blx_alpha(parents_chromosomes: list, func_repair_gene, mutate) -> dict:
@@ -19,10 +22,14 @@ def exec_blx_alpha(parents_chromosomes: list, func_repair_gene, mutate) -> dict:
             offspring_param_range: tuple = culc_offspring_param_range(
                 chromosome1_operator_param_value, chromosome2_operator_param_value)
             # 子孫のパラメータを範囲内からランダムに決定
-            offspring_param: float = random.uniform(
-                offspring_param_range[0], offspring_param_range[1])
+            # offspring_param: float = random.uniform(
+            #     offspring_param_range[0], offspring_param_range[1])
+            offspring_param: float = RNG.uniform(
+                offspring_param_range[0], offspring_param_range[1]
+            )
             # 一定確率で突然変異 確率は通常[1/遺伝子型の数]
-            mutete_probability = random.random()
+            # mutete_probability = random.random()
+            mutete_probability = RNG.uniform()
             if mutete_probability <= 1/8:
                 offspring_param = mutate(param_name)
             # パラメータの修正

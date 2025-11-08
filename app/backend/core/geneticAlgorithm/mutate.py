@@ -1,5 +1,8 @@
 import random
 from ..geneticAlgorithm.config import *
+import numpy as np
+
+RNG = np.random.default_rng(seed=40)
 
 def mutate(param_name: str):
     if param_name == "attack":
@@ -38,4 +41,4 @@ def mutate(param_name: str):
 
 
 def choice_from_all_range(min,max):
-    return random.uniform(min,max)
+    return RNG.uniform(min,max)
