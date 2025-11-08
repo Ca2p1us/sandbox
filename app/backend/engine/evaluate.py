@@ -27,7 +27,7 @@ def evaluate_fitness_random(population: List[dict], noise_is_added: bool = False
 def evaluate_fitness_by_param(
     population: List[dict],
     target_params: List[float],
-    sigma: float = 100.0,
+    sigma: float = 80.0,
     param_keys: List[str] = None,
     id_list: List[str] = None,
     noise_is_added: bool = False

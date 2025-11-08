@@ -248,8 +248,6 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         interpolate_by_Gaussian(population, best, worst, param_keys=PARAMS, target_key="fitness")
         # 評価の平均値を表示
         print(f"average fitness:", evaluate.get_average_fitness(population))
-        # 上位9個体の平均評価値を表示
-        print(f"average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
         print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
 
         # --- ここで履歴に追加 ---
