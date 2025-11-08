@@ -154,6 +154,14 @@ python main.py
 - 評価関数のパラメータ
     - 10/15 定義域を変えた場合のパラメータ設定についてgeogebraで1次元の場合の関数を眺めながら変えた
     - 10/16 Rastrigin関数は定義域が小さいから成り立っている関数なんだなぁと思ったのででかくした
+- 乱数について
+    - numpy.randomのdefault_rngってやつで生成器を定義する(シード値を固定できる)
+    - 各パーツのシード値を書いておかなければならない
+        - interpolation.py seed=10
+        - tournament.py seed=20
+        - BLX-alpha.py seed=30
+        - mutate.py seed=40
+        - make_chromosome_params.py seed=42
 - そもそも
     - 来年以降もIGAを触るならXGBoostとか別の部分からのアプローチも調べないとなぁ
     - GA単体で何とかする研究は少ないんだなぁ
