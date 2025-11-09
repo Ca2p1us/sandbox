@@ -160,9 +160,11 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
     best, worst = evaluate.get_best_and_worst_individuals(population)
     interpolate_by_distance(population, best, worst, target_key='fitness')
     # 評価の平均値を表示
-    print(f"Generation {NUM_GENERATIONS}\n average fitness:", evaluate.get_average_fitness(population))
+    average = evaluate.get_average_fitness(population)
+    print(f"Generation {NUM_GENERATIONS}\n average fitness:", average)
     print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
     best_fitness_history.append((NUM_GENERATIONS, float(best["fitness"])))
+    average_fitness_history.append((NUM_GENERATIONS, float(average)))
     bests.append(best)
     # 6. 最終結果の出力
     log("result/conventional/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+".json", population)
@@ -247,10 +249,10 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             )
         # ベスト・ワースト個体の取得
         best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
-        average = evaluate.get_average_fitness(population)
         # ほかの個体の評価を補間
         interpolate_by_distance(population, best, worst,param_keys=PARAMS, target_key="fitness")
         # 評価の平均値を表示
+        average = evaluate.get_average_fitness(population)
         print(f"average fitness:", average)
         # 上位9個体の平均評価値を表示
         print(f"average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
@@ -355,11 +357,13 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
     interpolate_by_distance(population, best, worst, target_key='fitness')
     # 評価の平均値を表示
-    print(f"Generation {NUM_GENERATIONS}\n average fitness:", evaluate.get_average_fitness(population))
+    average = evaluate.get_average_fitness(population)
+    print(f"Generation {NUM_GENERATIONS}\n average fitness:", average)
     # 上位9個体の平均評価値を表示
     print(f" average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
     print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
     best_fitness_history.append((NUM_GENERATIONS, float(best["fitness"])))
+    average_fitness_history.append((NUM_GENERATIONS, float(average)))
     bests.append(best)
     # 6. 最終結果の出力
     log("result/proposal/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", population)
