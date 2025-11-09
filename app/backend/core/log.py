@@ -254,6 +254,6 @@ def plot_individual_params(population: list[dict], param_keys: list[str], genera
     plt.ylabel("2nd parameter")
     plt.grid(True)
     plt.scatter(param_values1, param_values2)
-    plt.savefig(file_path)
-    # plt.show()
+    # plt.savefig(file_path)
+    plt.show()
     plt.close()
