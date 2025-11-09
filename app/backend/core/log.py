@@ -27,7 +27,7 @@ def log(file_path: str, answer):
     return
 
 
-def log_fitness(method: str, file_path: str, best_fitness_history):
+def log_fitness(method: str, file_path: str, best_fitness_history, average_fitness_history=None):
     """
     世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_history: [(世代番号, fitness値), ...] のリスト
@@ -36,18 +36,32 @@ def log_fitness(method: str, file_path: str, best_fitness_history):
     if not best_fitness_history:
         print("履歴データがありません。")
         return
+    fig, ax = plt.subplots()
 
     generations = [item[0] for item in best_fitness_history]
     fitness_values = [item[1] for item in best_fitness_history]
+    average_values = [item[1] for item in average_fitness_history] if average_fitness_history else None
 
-    plt.figure(figsize=(8, 5))
-    plt.plot(generations, fitness_values,
-             marker='o', linestyle='-', color='blue')
-    plt.xlabel('Generation')
-    plt.ylabel('Best Fitness')
-    plt.title(method+' Best Fitness History')
-    plt.grid(True)
-    plt.tight_layout()
+    ax.set_xlabel('Generation')  # x軸ラベル
+    ax.set_ylabel('Fitness')  # y軸ラベル
+    ax.set_title(method+' Fitness History')  # グラフタイトル
+    ax.grid(True)
+    ax.plot(generations, fitness_values,
+             marker='o', linestyle='-', color='blue', label='Best Fitness')
+    if average_values:
+        ax.plot(generations, average_values,
+                 marker='o', linestyle='--', color='orange', label='Average Fitness')
+        ax.legend()
+    ax.legend(loc=0)
+    fig.tight_layout()
+    # plt.figure(figsize=(8, 5))
+    # plt.plot(generations, fitness_values,
+    #          marker='o', linestyle='-', color='blue')
+    # plt.xlabel('Generation')
+    # plt.ylabel('Best Fitness')
+    # plt.title(method+' Best Fitness History')
+    # plt.grid(True)
+    # plt.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_history.png')
     plt.savefig(file_path)
     # plt.show()
