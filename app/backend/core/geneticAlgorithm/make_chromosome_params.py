@@ -37,7 +37,7 @@ def generate_random_fm_params_list(param_ranges: dict) -> list[float]:
         low, high = param_ranges[key]
         # NumPyのGenerator.uniform(low, high)は low <= x < high の浮動小数点数を生成
         params[key] = RNG.uniform(low, high)
-        while params[key] in IGNORE_RANGE:
+        while IGNORE_RANGE[0] <= params[key] <= IGNORE_RANGE[1]:
             params[key] = RNG.uniform(low, high)
         
     # make_fm_params_with_args の引数として展開できるように、順番にリスト化して返す

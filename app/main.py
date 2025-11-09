@@ -6,10 +6,12 @@ NUM_GENERATIONS = 9
 POPULATION_SIZE = 10
 PROPOSAL_POPULATION_SIZE = 200
 EVALUATE_SIZE = 9
+EXPERIMENT_TIMES = 5
 
 
 best_fitness_histories = []
 noise_is_added = False
+look = False
 print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション\n3: 音の確認")
 choice = input("実行するシミュレーションを選択 (1/3): ")
 if choice == "2":
@@ -19,10 +21,14 @@ if choice == "2":
     TF = input("ノイズを追加しますか？ (0/1): ")
     if TF == "1":
         noise_is_added = True
-    for i in range(5):
+    print(f"途中経過を見ますか？\n0: 見ない\n1: 見る")
+    TF2 = input("途中経過を見ますか？ (0/1): ")
+    if TF2 == "1":
+        look = True
+    for i in range(EXPERIMENT_TIMES):
         print(f"評価関数 {i}: {evaluate_num}")
         print("提案型IGAシミュレーション"+str(i+1)+"回目を実行")
-        best_fitness_histories.append(iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=PROPOSAL_POPULATION_SIZE, EVALUATE_SIZE=EVALUATE_SIZE, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added))
+        best_fitness_histories.append(iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=PROPOSAL_POPULATION_SIZE, EVALUATE_SIZE=EVALUATE_SIZE, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added, look=look))
         print("提案型IGAシミュレーション"+str(i+1)+"回目が完了")
     log_fitness_histories(int(evaluate_num), "_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_best_fitness_histories.png", best_fitness_histories, ver="proposal")
 elif choice == "1":
@@ -32,9 +38,13 @@ elif choice == "1":
     TF = input("ノイズを追加しますか？ (0/1): ")
     if TF == "1":
         noise_is_added = True
-    for i in range(5):
+    print(f"途中経過を見ますか？\n0: 見ない\n1: 見る")
+    TF2 = input("途中経過を見ますか？ (0/1): ")
+    if TF2 == "1":
+        look = True
+    for i in range(EXPERIMENT_TIMES):
         print("普通のIGAシミュレーション"+str(i+1)+"回目を実行")
-        best_fitness_histories.append(iga.run_simulation_normal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, POPULATION_SIZE=POPULATION_SIZE, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added))
+        best_fitness_histories.append(iga.run_simulation_normal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, POPULATION_SIZE=POPULATION_SIZE, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added, look=look))
         print("普通のIGAシミュレーション"+str(i+1)+"回目が完了")
     log_fitness_histories(int(evaluate_num), "_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_best_fitness_histories.png", best_fitness_histories, ver="conventional")
 elif choice == "3":
