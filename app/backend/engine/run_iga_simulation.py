@@ -167,7 +167,7 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
     # 6. 最終結果の出力
     log("result/conventional/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+".json", population)
     log("result/conventional/best/"+evaluate_method+"/best_individual_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+".json", bests)
-    log_fitness(evaluate_method, "result/conventional/graph/"+evaluate_method+"/"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+"_best_fitness_history.png", best_fitness_history, average= average_fitness_history)
+    log_fitness(evaluate_method, "result/conventional/graph/"+evaluate_method+"/"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+"_best_fitness_history.png", best_fitness_history, average_fitness_history= average_fitness_history)
     return best_fitness_history
 
 
@@ -364,5 +364,5 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     # 6. 最終結果の出力
     log("result/proposal/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", population)
     log("result/proposal/best/"+evaluate_method+"/best_individual_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", bests)
-    log_fitness(evaluate_method, "result/proposal/graph/"+evaluate_method+"/"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+"_best_fitness_history.png", best_fitness_history, average=average_fitness_history)
+    log_fitness(evaluate_method, "result/proposal/graph/"+evaluate_method+"/"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+"_best_fitness_history.png", best_fitness_history, average_fitness_history=average_fitness_history)
     return best_fitness_history
