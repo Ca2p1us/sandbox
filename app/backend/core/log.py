@@ -230,7 +230,7 @@ def sound_check(file_path=None):
     else:
         print("音声の再生をスキップします。")
 
-def plot_individual_params(population: list[dict], param_keys: list[str], generation: int, look: bool = False):
+def plot_individual_params(population: list[dict], param_keys: list[str], generation: int):
     """
     個体群の指定されたパラメータをプロットする関数
     param_key: "fmParamsList.operator1.frequency" のようなドット区切りで指定
@@ -255,6 +255,5 @@ def plot_individual_params(population: list[dict], param_keys: list[str], genera
     plt.grid(True)
     plt.scatter(param_values1, param_values2)
     # plt.savefig(file_path)
-    if look:
-        plt.show()
+    plt.show()
     plt.close()

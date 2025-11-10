@@ -292,9 +292,9 @@ def get_best_and_worst_individuals(population: List[dict]):
     valid_population = [ind for ind in population if "fitness" in ind]
     if not valid_population:
         return None, None
-    # fitnessはstrなのでintに変換して比較
-    best = max(valid_population, key=lambda x: int(x["fitness"]))
-    worst = min(valid_population, key=lambda x: int(x["fitness"]))
+    # fitnessはstrなのでfloatに変換して比較
+    best = max(valid_population, key=lambda x: float(x["fitness"]))
+    worst = min(valid_population, key=lambda x: float(x["fitness"]))
     return best, worst
 
 def proposal_evaluate_random(id_list: List[str], population: List[dict]):

@@ -88,7 +88,8 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
         if average is not None:
             average_fitness_history.append((generation + 1, float(average)))
         next_generation:List[Chromosomes]  = []
-        plot_individual_params(population, PARAMS, generation+1, look=look)
+        if look:
+            plot_individual_params(population, PARAMS, generation+1)
         for _ in range(POPULATION_SIZE):
             # 3. 選択
             selected = tournament.exec_tournament_selection(population)
@@ -126,7 +127,7 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
     if evaluate_num == 1:
         evaluate.evaluate_fitness_by_param(
             population,
-            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690],
+            target_params=TARGET_PARAMS,
             sigma=500.0,
             param_keys=PARAMS,
             noise_is_added=noise_is_added
@@ -134,7 +135,7 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
     elif evaluate_num == 2:
         evaluate.evaluate_fitness_sphere(
             population =population,
-            target_params=[0.03, 0.16, 0.89, 0.29, 0.06, 0.31690],
+            target_params=TARGET_PARAMS,
             param_keys=PARAMS,
             noise_is_added=noise_is_added
         )
@@ -166,7 +167,9 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
     print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
     best_fitness_history.append((NUM_GENERATIONS, float(best["fitness"])))
     bests.append(best)
-    plot_individual_params(population, PARAMS, NUM_GENERATIONS, look=look)
+    average_fitness_history.append((NUM_GENERATIONS, float(average)))
+    if look:
+        plot_individual_params(population, PARAMS, NUM_GENERATIONS)
     # 6. 最終結果の出力
     log("result/conventional/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+".json", population)
     log("result/conventional/best/"+evaluate_method+"/best_individual_"+evaluate_method+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+".json", bests)
@@ -264,7 +267,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             bests.append(best)
         if average is not None:
             average_fitness_history.append((generation + 1, float(average)))
-        plot_individual_params(population, PARAMS, generation+1, look=look)
+        if look:
+            plot_individual_params(population, PARAMS, generation+1)
         next_generation:List[Chromosomes]  = []
         for _ in range(PROPOSAL_POPULATION_SIZE):
             # 3. 選択
@@ -365,7 +369,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     best_fitness_history.append((NUM_GENERATIONS, float(best["fitness"])))
     bests.append(best)
     average_fitness_history.append((NUM_GENERATIONS, float(average)))
-    plot_individual_params(population, PARAMS, NUM_GENERATIONS, look=look)
+    if look:
+        plot_individual_params(population, PARAMS, NUM_GENERATIONS)
     # 6. 最終結果の出力
     log("result/proposal/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", population)
     log("result/proposal/best/"+evaluate_method+"/best_individual_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", bests)
