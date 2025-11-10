@@ -37,8 +37,6 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
                 population,
                 #目標値
                 target_params=TARGET_PARAMS,
-                #標準偏差
-                sigma=500.0,
                 #評価対象パラメータ
                 param_keys=PARAMS,
                 noise_is_added=noise_is_added
@@ -128,7 +126,6 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
         evaluate.evaluate_fitness_by_param(
             population,
             target_params=TARGET_PARAMS,
-            sigma=500.0,
             param_keys=PARAMS,
             noise_is_added=noise_is_added
         )
@@ -192,7 +189,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         target_key="pre_evaluation"
         )
     # 評価個体の選択
-    evaluate_population = select_top_individuals_by_pre_evaluation(population, top_n=EVALUATE_SIZE)
+    evaluate_population = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE)
 
     for generation in range(NUM_GENERATIONS - 1):
         # 2. 評価
@@ -205,8 +202,6 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
                 population,
                 #目標値
                 target_params=TARGET_PARAMS,
-                #標準偏差
-                sigma=500.0,
                 #評価対象パラメータ
                 param_keys=PARAMS,
                 #評価方法"product", "mean", "max", "min", "median"
@@ -315,7 +310,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             target_key="pre_evaluation"
             )
         # 評価個体の選択
-        evaluate_population = select_top_individuals_by_pre_evaluation(population, top_n=EVALUATE_SIZE)
+        evaluate_population = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE)
         print(f"------------------------------------")
 
     # --- ここで最終世代の評価値を再計算 ---
@@ -323,7 +318,6 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         evaluate.evaluate_fitness_by_param(
             population,
             target_params=TARGET_PARAMS,
-            sigma=500.0,
             param_keys=PARAMS,
             id_list=evaluate_population,
             noise_is_added=noise_is_added
