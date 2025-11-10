@@ -313,6 +313,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         print(f"------------------------------------")
 
     # --- ここで最終世代の評価値を再計算 ---
+    print(f"\n--- Generation {NUM_GENERATIONS} の評価を行います ---")
     if evaluate_num == 1:
         evaluate.evaluate_fitness_by_param(
             population,
@@ -364,6 +365,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     bests.append(best)
     if look:
         plot_individual_params(population, PARAMS, NUM_GENERATIONS)
+    print(f"------------------------------------")
     # 6. 最終結果の出力
     log("result/proposal/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", population)
     log("result/proposal/best/"+evaluate_method+"/best_individual_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", bests)
