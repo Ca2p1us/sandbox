@@ -6,6 +6,7 @@ import pyaudio
 import wave
 from scipy.signal import sawtooth
 import uuid
+from .geneticAlgorithm.config import ATTACK_RANGE
 
 
 def log(file_path: str, answer):
@@ -247,8 +248,8 @@ def plot_individual_params(population: list[dict], param_keys: list[str], genera
     param_values1 = [get_param(ind, param_keys[0]) for ind in population]
     param_values2 = [get_param(ind, param_keys[1]) for ind in population]
 
-    plt.xlim(-50,550)
-    plt.ylim(-50,550)
+    plt.xlim(-50,ATTACK_RANGE[1]+50)
+    plt.ylim(-50,ATTACK_RANGE[1]+50)
     plt.title(f"Generation {generation} - individuals'")
     plt.xlabel("1st parameter")
     plt.ylabel("2nd parameter")
