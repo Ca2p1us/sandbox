@@ -30,7 +30,7 @@ def exec_blx_alpha(parents_chromosomes: list, func_repair_gene, mutate) -> dict:
             # 一定確率で突然変異 確率は通常[1/遺伝子型の数]
             # mutete_probability = random.random()
             mutete_probability = RNG.uniform()
-            if mutete_probability <= 1/8:
+            if mutete_probability <= 1/100:
                 offspring_param = mutate(param_name)
             # パラメータの修正
             offspring_param = func_repair_gene(param_name, offspring_param)
