@@ -7,6 +7,7 @@ import wave
 from scipy.signal import sawtooth
 import uuid
 from .geneticAlgorithm.config import ATTACK_RANGE
+from .geneticAlgorithm.config import ATTACK_RANGE
 
 
 def log(file_path: str, answer):
@@ -29,10 +30,12 @@ def log(file_path: str, answer):
 
 
 def log_fitness(method: str, file_path: str, best_fitness_history, average_fitness_history=None):
+def log_fitness(method: str, file_path: str, best_fitness_history, average_fitness_history=None):
     """
     世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_history: [(世代番号, fitness値), ...] のリスト
     """
+    fig, ax = plt.subplots()
     fig, ax = plt.subplots()
     if not best_fitness_history:
         print("履歴データがありません。")
@@ -231,6 +234,33 @@ def sound_check(file_path=None):
     else:
         print("音声の再生をスキップします。")
 
+def plot_individual_params(population: list[dict], param_keys: list[str], generation: int):
+    """
+    個体群の指定されたパラメータをプロットする関数
+    param_key: "fmParamsList.operator1.frequency" のようなドット区切りで指定
+    """
+    def get_param(ind, key):
+        # "fmParamsList.operator1.frequency" のようなドット区切りでアクセス
+        val = ind
+        for k in key.split('.'):
+            val = val.get(k, None)
+            if val is None:
+                break
+        return val
+
+    param_values1 = [get_param(ind, param_keys[0]) for ind in population]
+    param_values2 = [get_param(ind, param_keys[1]) for ind in population]
+
+    plt.xlim(-50,ATTACK_RANGE[1]+50)
+    plt.ylim(-50,ATTACK_RANGE[1]+50)
+    plt.title(f"Generation {generation} - individuals'")
+    plt.xlabel("1st parameter")
+    plt.ylabel("2nd parameter")
+    plt.grid(True)
+    plt.scatter(param_values1, param_values2)
+    # plt.savefig(file_path)
+    plt.show()
+    plt.close()
 def plot_individual_params(population: list[dict], param_keys: list[str], generation: int):
     """
     個体群の指定されたパラメータをプロットする関数

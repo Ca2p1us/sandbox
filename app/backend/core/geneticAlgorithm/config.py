@@ -35,6 +35,12 @@ ALGORITHM_NUM: int = 1
 # SUSTAIN_RANGE = (0, 100)
 # SUSTAIN_TIME_RANGE = (0, 300)
 # RELEASE_RANGE = (0, 350)
+# 元のパラメータ群
+# ATTACK_RANGE = (0, 250)
+# DECAY_RANGE = (0, 250)
+# SUSTAIN_RANGE = (0, 100)
+# SUSTAIN_TIME_RANGE = (0, 300)
+# RELEASE_RANGE = (0, 350)
 # FREQUENCY_RANGE = (200, 1300)
 
 ATTACK_RANGE = (0, 500)
@@ -47,6 +53,7 @@ IGNORE_RANGE = (200,300)
 PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustainTime", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
 # TARGET_PARAMS = [0.03, 0.16, 0.89, 0.29, 0.06, 0.31690]
 # TARGET_PARAMS = [3, 160, 89, 29, 6, 316.90]
+TARGET_PARAMS = [250, 250, 250, 250, 250, 250]
 TARGET_PARAMS = [250, 250, 250, 250, 250, 250]
 
 

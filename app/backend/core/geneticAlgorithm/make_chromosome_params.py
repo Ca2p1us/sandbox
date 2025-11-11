@@ -22,6 +22,7 @@ OPERATOR_PARAM_RANGES = {
 # 1. シード値固定のためのGeneratorオブジェクトを作成
 # シード値 (例: 42) を指定することで、乱数のシーケンスが固定されます。
 RNG = np.random.default_rng(seed=42)
+RNG = np.random.default_rng(seed=42)
 
 def generate_random_fm_params_list(param_ranges: dict) -> list[float]:
     """
@@ -37,6 +38,8 @@ def generate_random_fm_params_list(param_ranges: dict) -> list[float]:
         low, high = param_ranges[key]
         # NumPyのGenerator.uniform(low, high)は low <= x < high の浮動小数点数を生成
         params[key] = RNG.uniform(low, high)
+        # while IGNORE_RANGE[0] <= params[key] <= IGNORE_RANGE[1]:
+        #     params[key] = RNG.uniform(low, high)
         # while IGNORE_RANGE[0] <= params[key] <= IGNORE_RANGE[1]:
         #     params[key] = RNG.uniform(low, high)
         
