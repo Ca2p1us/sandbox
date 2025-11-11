@@ -1,7 +1,6 @@
 import random
 import numpy as np
 from collections.abc import Callable
-RNG = np.random.default_rng(seed=30)import numpy as np
 
 RNG = np.random.default_rng(seed=30)
 
