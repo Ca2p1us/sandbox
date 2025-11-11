@@ -21,7 +21,6 @@ def make_initial_population(num_individuals=10):
     return [make_chromosome_params.make_chromosome_params() for _ in range(num_individuals)]
 
 def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_num=0, times:int=1, noise_is_added: bool = False, look: bool = False):
-def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_num=0, times:int=1, noise_is_added: bool = False, look: bool = False):
     best_fitness_history = []
     average_fitness_history = []
     average_fitness_history = []
@@ -133,14 +132,12 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
         evaluate.evaluate_fitness_by_param(
             population,
             target_params=TARGET_PARAMS,
-            target_params=TARGET_PARAMS,
             param_keys=PARAMS,
             noise_is_added=noise_is_added
         )
     elif evaluate_num == 2:
         evaluate.evaluate_fitness_sphere(
             population =population,
-            target_params=TARGET_PARAMS,
             target_params=TARGET_PARAMS,
             param_keys=PARAMS,
             noise_is_added=noise_is_added
@@ -186,23 +183,29 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
 
 
 
-
-def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200, EVALUATE_SIZE=9, evaluate_num=0, times:int=1, noise_is_added:bool=False, look: bool = False):
-def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200, EVALUATE_SIZE=9, evaluate_num=0, times:int=1, noise_is_added:bool=False, look: bool = False):
+def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200, EVALUATE_SIZE=9, evaluate_num=0, interpolate_num=0, times:int=1, noise_is_added:bool=False, look: bool = False):
     best_fitness_history = []
     average_fitness_history = []
     average_fitness_history = []
     bests = []
+    interpolate = "linear"
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
     # 初期個体の事前評価(補間)
-    interpolate_by_Gaussian(
-        population,
-        param_keys=PARAMS,
-        target_key="pre_evaluation"
-        )
+    if interpolate_num == 0:
+        interpolate_by_distance(
+            population,
+            param_keys=PARAMS,
+            target_key="pre_evaluation"
+            )
+    elif interpolate_num == 1:
+        interpolate = "Gauss"
+        interpolate_by_Gaussian(
+            population,
+            param_keys=PARAMS,
+            target_key="pre_evaluation"
+            )
     # 評価個体の選択
-    evaluate_population = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE)
     evaluate_population = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE)
 
     for generation in range(NUM_GENERATIONS - 1):
@@ -263,7 +266,10 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         # ベスト・ワースト個体の取得
         best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
         # ほかの個体の評価を補間
-        interpolate_by_Gaussian(population, best, worst, param_keys=PARAMS, target_key="fitness")
+        if interpolate_num == 0:
+            interpolate_by_distance(population, best, worst, target_key='fitness')
+        elif interpolate_num == 1:
+            interpolate_by_Gaussian(population, best, worst, param_keys=PARAMS, target_key="fitness")
         # 評価の平均値を表示
         average = evaluate.get_average_fitness(population)
         print(f"average fitness:", average)
@@ -315,15 +321,22 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         # 5. 次世代への更新
         population = next_generation
         #事前評価(補間)
-        interpolate_by_Gaussian(
+        if interpolate_num == 0:
+            interpolate_by_distance(
             population,
             best,
             worst,
-            param_keys=PARAMS,
             target_key="pre_evaluation"
             )
+        elif interpolate_num == 1:
+            interpolate_by_Gaussian(
+                population,
+                best,
+                worst,
+                param_keys=PARAMS,
+                target_key="pre_evaluation"
+                )
         # 評価個体の選択
-        evaluate_population = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE)
         evaluate_population = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE)
         print(f"------------------------------------")
 
@@ -333,7 +346,6 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         evaluate.evaluate_fitness_by_param(
             population,
             target_params=TARGET_PARAMS,
-            target_params=TARGET_PARAMS,
             param_keys=PARAMS,
             id_list=evaluate_population,
             noise_is_added=noise_is_added
@@ -341,7 +353,6 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     elif evaluate_num == 2:
         evaluate.evaluate_fitness_sphere(
             population =population,
-            target_params=TARGET_PARAMS,
             target_params=TARGET_PARAMS,
             param_keys=PARAMS,
             id_list=evaluate_population,
@@ -370,7 +381,10 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         )
     # ベスト・ワースト個体の取得
     best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population, population)
-    interpolate_by_distance(population, best, worst, target_key='fitness')
+    if interpolate_num == 0:
+        interpolate_by_distance(population, best, worst, target_key='fitness')
+    elif interpolate_num == 1:
+        interpolate_by_Gaussian(population, best, worst, param_keys=PARAMS, target_key="fitness")
     # 評価の平均値を表示
     average = evaluate.get_average_fitness(population)
     print(f"Generation {NUM_GENERATIONS}\n average fitness:", average)
@@ -386,8 +400,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         plot_individual_params(population, PARAMS, NUM_GENERATIONS)
     print(f"------------------------------------")
     # 6. 最終結果の出力
-    log("result/proposal/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", population)
-    log("result/proposal/best/"+evaluate_method+"/best_individual_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", bests)
-    log_fitness(evaluate_method, "result/proposal/graph/"+evaluate_method+"/"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+"_best_fitness_history.png", best_fitness_history, average_fitness_history=average_fitness_history)
-    log_fitness(evaluate_method, "result/proposal/graph/"+evaluate_method+"/"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+"_best_fitness_history.png", best_fitness_history, average_fitness_history=average_fitness_history)
+    log("result/proposal/last_gen_individuals/"+evaluate_method+"/"+interpolate+"/simulation_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", population)
+    log("result/proposal/best/"+evaluate_method+"/"+interpolate+"/best_individual_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", bests)
+    log_fitness(evaluate_method, "result/proposal/graph/"+evaluate_method+"/"+interpolate+"/"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+"_best_fitness_history.png", best_fitness_history, average_fitness_history=average_fitness_history)
     return best_fitness_history

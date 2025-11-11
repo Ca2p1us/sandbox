@@ -30,12 +30,10 @@ def log(file_path: str, answer):
 
 
 def log_fitness(method: str, file_path: str, best_fitness_history, average_fitness_history=None):
-def log_fitness(method: str, file_path: str, best_fitness_history, average_fitness_history=None):
     """
     世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_history: [(世代番号, fitness値), ...] のリスト
     """
-    fig, ax = plt.subplots()
     fig, ax = plt.subplots()
     if not best_fitness_history:
         print("履歴データがありません。")
@@ -69,7 +67,7 @@ def log_fitness(method: str, file_path: str, best_fitness_history, average_fitne
     # plt.show()
     plt.close()
 
-def log_fitness_histories(method_num: int, file_path: str, best_fitness_histories, ver: str):
+def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str, best_fitness_histories, ver: str):
     """
     複数回のシミュレーションの世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_histories: [[(世代番号, fitness値), ...], ...] のリスト
@@ -88,23 +86,29 @@ def log_fitness_histories(method_num: int, file_path: str, best_fitness_historie
         method = "Ackley"
     elif method_num == 5:
         method = "Schwefel"
+    if interpolate_num == 0:
+        interpolate = "linear"
+    elif interpolate_num == 1:
+        interpolate = "Gauss"
 
-    plt.figure(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(8, 5))
 
     for idx, best_fitness_history in enumerate(best_fitness_histories):
         generations = [item[0] for item in best_fitness_history]
         fitness_values = [item[1] for item in best_fitness_history]
-        plt.plot(generations, fitness_values,
+        ax.plot(generations, fitness_values,
                  marker='o', linestyle='-', label=f'Run {idx+1}')
 
-    plt.xlabel('Generation')
-    plt.ylabel('Best Fitness')
-    plt.title(method+' Best Fitness Histories')
-    plt.grid(True)
-    plt.tight_layout()
+    ax.set_xlabel('Generation')
+    ax.set_ylabel('Best Fitness')
+    ax.set_title(method+' Best Fitness Histories')
+    ax.grid(True)
+    fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
-    plt.savefig(f'./result/{ver}/graph/{method}/{method}{file_path}')
+    plt.savefig(f'./result/{ver}/graph/{method}/{interpolate}/{method}{file_path}')
     plt.show()
+    plt.close()
+    return
 
 
 # サンプリング周波数と再生時間の設定
@@ -261,30 +265,4 @@ def plot_individual_params(population: list[dict], param_keys: list[str], genera
     # plt.savefig(file_path)
     plt.show()
     plt.close()
-def plot_individual_params(population: list[dict], param_keys: list[str], generation: int):
-    """
-    個体群の指定されたパラメータをプロットする関数
-    param_key: "fmParamsList.operator1.frequency" のようなドット区切りで指定
-    """
-    def get_param(ind, key):
-        # "fmParamsList.operator1.frequency" のようなドット区切りでアクセス
-        val = ind
-        for k in key.split('.'):
-            val = val.get(k, None)
-            if val is None:
-                break
-        return val
-
-    param_values1 = [get_param(ind, param_keys[0]) for ind in population]
-    param_values2 = [get_param(ind, param_keys[1]) for ind in population]
-
-    plt.xlim(-50,ATTACK_RANGE[1]+50)
-    plt.ylim(-50,ATTACK_RANGE[1]+50)
-    plt.title(f"Generation {generation} - individuals'")
-    plt.xlabel("1st parameter")
-    plt.ylabel("2nd parameter")
-    plt.grid(True)
-    plt.scatter(param_values1, param_values2)
-    # plt.savefig(file_path)
-    plt.show()
-    plt.close()
+    return

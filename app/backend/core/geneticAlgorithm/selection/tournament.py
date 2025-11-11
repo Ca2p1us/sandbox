@@ -7,7 +7,6 @@ import numpy as np
 Chromosomes = List[dict]
 
 RNG = np.random.default_rng(seed=20)
-RNG = np.random.default_rng(seed=20)
 
 # def exec_tournament_selection(chromosomes_params:dict) ->  List[Chromosomes]:
 def exec_tournament_selection(chromosomes_params, participants_num=3):

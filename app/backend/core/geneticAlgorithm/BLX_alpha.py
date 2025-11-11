@@ -27,9 +27,6 @@ def exec_blx_alpha(parents_chromosomes: list, func_repair_gene, mutate) -> dict:
             offspring_param: float = RNG.uniform(
                 offspring_param_range[0], offspring_param_range[1]
             )
-            offspring_param: float = RNG.uniform(
-                offspring_param_range[0], offspring_param_range[1]
-            )
             # 一定確率で突然変異 確率は通常[1/遺伝子型の数]
             # mutete_probability = random.random()
             mutete_probability = RNG.uniform()
