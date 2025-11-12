@@ -106,8 +106,8 @@ def interpolate_by_Gaussian(
                 break
         return val
 
-    best_val = float(best.get(target_key, 1))
-    worst_val = float(worst.get(target_key, 1))
+    best_val = float(best.get("fitness", 1))
+    worst_val = float(worst.get("fitness", 1))
     print(f"best_val: {best_val}, worst_val: {worst_val}")
     eps = (best_val - worst_val) * eps_ratio
     C = worst_val - eps
@@ -124,9 +124,11 @@ def interpolate_by_Gaussian(
     print(f"ガウス補間のパラメータ: A={A}, mu={mu}, sigma={sigma}, C={C}")
 
     # 個体群のガウス補間
+    N = len(param_keys)
     for ind in population:
         ind_params = [get_param(ind, k) for k in param_keys]
         dist_sq = sum((ip - mp) ** 2 for ip, mp in zip(ind_params, mu))
+        dist_sq /= N  # 次元数で割る
         value = A * math.exp(-dist_sq / (2 * sigma ** 2)) + C
         ind[target_key] = value
     print(f"{target_key}をガウス補間しました。\nbest {best_val}, worst {worst_val}")
