@@ -1,0 +1,9 @@
+# Python
+__pycache__/
+*.pyc
+
+# Simulation Results
+*.json
+*.png
+# 必要に応じて、結果ファイルが保存されるディレクトリ全体
+app/result/
