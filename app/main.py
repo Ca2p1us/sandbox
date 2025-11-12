@@ -49,7 +49,7 @@ elif choice == "1":
         print("普通のIGAシミュレーション"+str(i+1)+"回目を実行")
         best_fitness_histories.append(iga.run_simulation_normal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, POPULATION_SIZE=POPULATION_SIZE, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added, look=look))
         print("普通のIGAシミュレーション"+str(i+1)+"回目が完了")
-    log_fitness_histories(int(evaluate_num), "_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_best_fitness_histories.png", best_fitness_histories, ver="conventional")
+    log_fitness_histories(int(evaluate_num), 2, "_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_best_fitness_histories.png", best_fitness_histories, ver="conventional")
 
 elif choice == "3":
     print("音の確認を実行")

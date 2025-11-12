@@ -87,10 +87,6 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
         print(f"average fitness:", average)
         if average is not None:
             average_fitness_history.append((generation + 1, float(average)))
-        average = evaluate.get_average_fitness(population)
-        print(f"average fitness:", average)
-        if average is not None:
-            average_fitness_history.append((generation + 1, float(average)))
         next_generation:List[Chromosomes]  = []
         if look:
             plot_individual_params(population, PARAMS, generation + 1)

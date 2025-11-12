@@ -105,7 +105,10 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     ax.grid(True)
     fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
-    plt.savefig(f'./result/{ver}/graph/{method}/{interpolate}/{method}{file_path}')
+    if interpolate_num ==2:
+        plt.savefig(f'./result/{ver}/graph/{method}/{method}{file_path}')
+    else:
+        plt.savefig(f'./result/{ver}/graph/{method}/{interpolate}/{method}{file_path}')
     plt.show()
     plt.close()
     return
