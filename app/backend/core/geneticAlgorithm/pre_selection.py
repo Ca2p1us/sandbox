@@ -1,6 +1,7 @@
 #評価する個体を選ぶプログラム
 
 from typing import List
+import numpy as np
 
 def select_top_individuals_by_pre_evaluation(population: List[dict], total_n: int = 10) -> List[str]:
     """
@@ -44,3 +45,33 @@ def select_top_individuals_by_pre_evaluation(population: List[dict], total_n: in
             selected_ids.append(cid)
     # 個体IDリストで返す
     return selected_ids
+
+def select_active_samples(population, evaluated_inds, n_select, param_keys):
+    """
+    補間モデルの不確実性（＝評価済み個体からの距離）に基づき、未評価個体から選択
+    """
+    def get_param_vec(ind):
+        vals = []
+        for k in param_keys:
+            val = ind
+            for kk in k.split('.'):
+                val = val.get(kk, None)
+                if val is None:
+                    break
+            vals.append(val)
+        return np.array(vals, dtype=float)
+    
+    evaluated_vecs = [get_param_vec(ind) for ind in evaluated_inds]
+    
+    # 各未評価個体について、最も近い評価済み個体までの距離を算出
+    candidates = []
+    for ind in population:
+        if ind in evaluated_inds:
+            continue
+        v = get_param_vec(ind)
+        dist = min(np.linalg.norm(v - e) for e in evaluated_vecs)
+        candidates.append((dist, ind))
+    
+    # 距離が大きい＝不確実性が高い
+    candidates.sort(reverse=True, key=lambda x: x[0])
+    return [ind for _, ind in candidates[:n_select]]

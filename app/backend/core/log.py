@@ -102,6 +102,8 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     ax.set_xlabel('Generation')
     ax.set_ylabel('Best Fitness')
     ax.set_title(method+' Best Fitness Histories')
+    # ax.set_xlim(0.5,9.5)
+    # ax.set_ylim(0,6)
     ax.grid(True)
     fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
@@ -269,3 +271,18 @@ def plot_individual_params(population: list[dict], param_keys: list[str], genera
     plt.show()
     plt.close()
     return
+
+def compute_interpolation_error(population, true_eval_func, param_keys):
+    """
+    全個体について補間値と真値のMSEを計算
+    """
+    errors = []
+    for ind in population:
+        # 真値計算
+        params = [get_nested_value(ind, k) for k in param_keys]
+        true_val = true_eval_func(params)
+        interp_val = ind.get("pre_evaluation", None)
+        if interp_val is None:
+            continue
+        errors.append((true_val - interp_val) ** 2)
+    return np.mean(errors) if errors else None

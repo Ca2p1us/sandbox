@@ -80,7 +80,8 @@ def interpolate_by_Gaussian(
     worst: dict = None,
     param_keys: List[str] = None,
     target_key: str = "pre_evaluation",
-    eps_ratio: float = 0.02
+    eps_ratio: float = 0.02,
+    eps_floor_ratio: float = 1e-6
 ):
     """
     ガウス関数 f(x) = A exp(-(x-μ)^2/(2σ^2)) + C のパラメータ推定
@@ -105,31 +106,53 @@ def interpolate_by_Gaussian(
             if val is None:
                 break
         return val
+    best_params = [get_param(best, k) for k in param_keys]
+    worst_params = [get_param(worst, k) for k in param_keys]
 
-    best_val = float(best.get("fitness", 1))
-    worst_val = float(worst.get("fitness", 1))
-    print(f"best_val: {best_val}, worst_val: {worst_val}")
+    if any(p is None for p in best_params) or any(p is None for p in worst_params):
+        raise ValueError("best/worst に param_keys が存在しません。")
+    
+    best_val = float(best.get("fitness", 1.0))
+    worst_val = float(worst.get("fitness", 1.0))
     eps = (best_val - worst_val) * eps_ratio
     C = worst_val - eps
     A = best_val - C
+    print(f"best_val: {best_val}, worst_val: {worst_val}")
     print(best[target_key] - C)
-    ratio = (worst[target_key] - C) / (best[target_key] - C)
-    if  ratio <= 0 or ratio >= 1:
-        print("ガウス補間の計算に失敗しました。bestとworstの値を確認してください。")
-        return
-    best_params = [get_param(best, k) for k in param_keys]
-    worst_params = [get_param(worst, k) for k in param_keys]
-    sigma = (sum(abs(b - w) for b, w in zip(best_params, worst_params)) / math.sqrt(-2 * math.log(ratio)))
+
+    # ratio for sigma estimation（数値安定化）
+    denom = (best.get("fitness", 1e-12) - C)
+    if denom == 0:
+        raise ValueError("best の target が C と等しい。sigma を推定できません。")
+    ratio = (worst.get("fitness", 1e-12) - C) / denom
+    if not (0 < ratio < 1):
+        raise ValueError("ratio が (0,1) の範囲にない。best/worst の target を確認してください。")
+
+    sigma = []
+    for b, w in zip(best_params, worst_params):
+        raw = abs(b - w)
+        # if raw == 0, we still need a meaningful scale; use relative floor
+        floor = max(abs(b), abs(w), 1.0) * eps_floor_ratio
+        raw = max(raw, floor)
+        s = raw / math.sqrt(-2.0 * math.log(ratio))
+        s = max(s, floor)  # avoid exact zero
+        sigma.append(s)
     mu = best_params
-    print(f"ガウス補間のパラメータ: A={A}, mu={mu}, sigma={sigma}, C={C}")
+    print(f"ガウス補間のパラメータ: \n\tA={A}, \n\tmu={mu}, \n\tsigma={sigma}, \n\tC={C}")
 
     # 個体群のガウス補間
-    N = len(param_keys)
     for ind in population:
         ind_params = [get_param(ind, k) for k in param_keys]
-        dist_sq = sum((ip - mp) ** 2 for ip, mp in zip(ind_params, mu))
-        dist_sq /= N  # 次元数で割る
-        value = A * math.exp(-dist_sq / (2 * sigma ** 2)) + C
+        if any(p is None for p in ind_params):
+            ind[target_key] = RNG.uniform(1.0, 10.0)
+            continue
+        # compute normalized squared distance
+        dist_sq = 0.0
+        for xj, muj, sj in zip(ind_params, mu, sigma):
+            z = (xj - muj) / sj
+            dist_sq += z * z
+        # note: DO NOT divide by N; the scale is already handled by sigma
+        value = A * math.exp(-0.5 * dist_sq) + C
         ind[target_key] = value
     print(f"{target_key}をガウス補間しました。\nbest {best_val}, worst {worst_val}")
     return

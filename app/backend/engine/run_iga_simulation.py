@@ -106,7 +106,7 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
                     if isinstance(ind, dict):
                         # algorithmNumを親からコピー（selected[0]を例とする）
                         # ind["algorithmNum"] = selected[0].get("algorithmNum", None)
-                        ind["generation"] = generation + 1
+                        ind["generation"] = generation + 2
                         # 新しいchromosomeIdを付与
                         ind["chromosomeId"] = str(uuid.uuid4())
                         next_generation.append(ind)
@@ -114,7 +114,7 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
                         print("警告: offspring内にdict以外が含まれています:", ind)
             elif isinstance(offspring, dict):
                 # offspring["algorithmNum"] = selected[0].get("algorithmNum", None)
-                offspring["generation"] = generation + 1
+                offspring["generation"] = generation + 2
                 offspring["chromosomeId"] = str(uuid.uuid4())
                 next_generation.append(offspring)
             else:
@@ -182,8 +182,8 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
 def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200, EVALUATE_SIZE=9, evaluate_num=0, interpolate_num=0, times:int=1, noise_is_added:bool=False, look: bool = False):
     best_fitness_history = []
     average_fitness_history = []
-    average_fitness_history = []
     bests = []
+    evaluate_method = ""
     interpolate = "linear"
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
@@ -280,7 +280,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         if look:
             plot_individual_params(population, PARAMS, generation + 1)
         next_generation:List[Chromosomes]  = []
-        for _ in range(PROPOSAL_POPULATION_SIZE):
+        # for _ in range(PROPOSAL_POPULATION_SIZE):
+        while len(next_generation) < PROPOSAL_POPULATION_SIZE:
             # 3. 選択
             selected = tournament.exec_tournament_selection(population)
 
@@ -293,6 +294,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             # offspringがリストの場合
             if isinstance(offspring, list):
                 for ind in offspring:
+                    if len(next_generation) >= PROPOSAL_POPULATION_SIZE:
+                        break
                     if isinstance(ind, dict):
                         # algorithmNumを親からコピー（selected[0]を例とする）
                         # ind["algorithmNum"] = selected[0].get("algorithmNum", None)
@@ -382,8 +385,6 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     elif interpolate_num == 1:
         interpolate_by_Gaussian(population, best, worst, param_keys=PARAMS, target_key="fitness")
     # 評価の平均値を表示
-    average = evaluate.get_average_fitness(population)
-    print(f"Generation {NUM_GENERATIONS}\n average fitness:", average)
     average = evaluate.get_average_fitness(population)
     print(f"Generation {NUM_GENERATIONS}\n average fitness:", average)
     # 上位9個体の平均評価値を表示
