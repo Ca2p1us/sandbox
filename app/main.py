@@ -3,10 +3,10 @@ from backend.core.log import sound_check, log_fitness, log_fitness_histories
 
 
 NUM_GENERATIONS = 9
-POPULATION_SIZE = 200
+POPULATION_SIZE = 9
 PROPOSAL_POPULATION_SIZE = 200
 EVALUATE_SIZE = 9
-EXPERIMENT_TIMES = 10
+EXPERIMENT_TIMES = 5
 
 
 best_fitness_histories = []

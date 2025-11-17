@@ -125,6 +125,7 @@ python main.py
 ## 使っている論文
 - [先輩の修論(GithubのURL)](https://github.com/mocoatsu/Research)
 - ["Reducing user fatigue in interactive genetic algorithms by evaluation of population subsets." ](https://www.cse.unr.edu/~quiroz/inc/docs/trans2009.pdf)
+    - 主に使っている論文、元の母集団は大量だけど実際に評価するのは一部の個体、残りは補間するやつ
 - ["An Experimental Study of Benchmarking Functions for Genetic Algorithms"](https://www.researchgate.net/publication/220662178_An_Experimental_Study_of_Benchmarking_Functions_for_Genetic_Algorithms)
     - F1～F5
     - ["An analysis of the behaviour of a class of genetic adaptive systems"](https://deepblue.lib.umich.edu/handle/2027.42/4507)

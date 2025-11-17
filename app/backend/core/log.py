@@ -102,15 +102,15 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     ax.set_xlabel('Generation')
     ax.set_ylabel('Best Fitness')
     ax.set_title(method+' Best Fitness Histories')
-    # ax.set_xlim(0.5,9.5)
-    # ax.set_ylim(0,6)
+    ax.set_xlim(0.5,9.5)
+    ax.set_ylim(1,6)
     ax.grid(True)
     fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
     if interpolate_num ==2:
-        plt.savefig(f'./result/{ver}/graph/{method}/{method}{file_path}')
+        plt.savefig(f'./result/{ver}/graph/{method}/best_fitnesses/{method}{file_path}')
     else:
-        plt.savefig(f'./result/{ver}/graph/{method}/{interpolate}/{method}{file_path}')
+        plt.savefig(f'./result/{ver}/graph/{method}/{interpolate}/best_fitnesses/{method}{file_path}')
     plt.show()
     plt.close()
     return
@@ -243,7 +243,7 @@ def sound_check(file_path=None):
     else:
         print("音声の再生をスキップします。")
 
-def plot_individual_params(population: list[dict], param_keys: list[str], generation: int):
+def plot_individual_params(population: list[dict], param_keys: list[str], generation: int, file_path: str = None):
     """
     個体群の指定されたパラメータをプロットする関数
     param_key: "fmParamsList.operator1.frequency" のようなドット区切りで指定
@@ -267,8 +267,7 @@ def plot_individual_params(population: list[dict], param_keys: list[str], genera
     plt.ylabel("2nd parameter")
     plt.grid(True)
     plt.scatter(param_values1, param_values2)
-    # plt.savefig(file_path)
-    plt.show()
+    plt.savefig(file_path)
     plt.close()
     return
 
