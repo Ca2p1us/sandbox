@@ -156,3 +156,99 @@ def interpolate_by_Gaussian(
         ind[target_key] = value
     print(f"{target_key}をガウス補間しました。\nbest {best_val}, worst {worst_val}")
     return
+
+def interpolate_by_RBF(
+    evaluate_population: List[str],      # 評価済み個体のUUIDリスト
+    population: dict,        # {UUID: 個体オブジェクト} の辞書
+    population_to_interp: List[dict], # 補間対象の個体オブジェクトリスト
+    param_keys: List[str] = None,
+    target_key: str = "pre_evaluation",
+    N_SAMPLES: int = 60
+):
+    """
+    UUIDリストで管理された評価済み個体（上位N_SAMPLES）の fitness を用いて、
+    population_to_interp の pre_evaluation をRBF補間する。
+    カーネルはGaussianを使用する。
+    """
+    print(f"RBF補間（Gaussian, N={N_SAMPLES}）を開始します。")
+
+    FITNESS_KEY = "fitness"
+    
+    def get_param(ind, key):
+        val = ind
+        for k in key.split('.'):
+            val = val.get(k, None)
+            if val is None:
+                break
+        return val
+
+    def to_vec(ind):
+        vec = []
+        for k in param_keys:
+            val = get_param(ind, k)
+            try:
+                # None または非数値の場合は 0.0 を使用
+                vec.append(float(val) if val is not None else 0.0)
+            except ValueError:
+                vec.append(0.0)
+        return vec
+    # --- ヘルパー関数ここまで ---
+
+    if param_keys is None:
+        param_keys = ["fmParamsList.operator1.frequency"]
+    
+    # --- 1. サンプリングデータの準備（上位60個体の抽出） ---
+    
+    # UUIDリストから実際の個体オブジェクトを取得
+    evaluated_objects = []
+    for uid in evaluate_population:
+        ind = population.get(uid)
+        # 個体が存在し、かつ fitness を持っていることを確認
+        if ind and ind.get(FITNESS_KEY) is not None:
+             evaluated_objects.append(ind)
+    
+    if len(evaluated_objects) < N_SAMPLES:
+        print(f"警告: 評価済み個体数が不足しています (現在: {len(evaluated_objects)})。補間をスキップします。")
+        # フォールバック処理 (population_to_interp 全体にランダム値を付与)
+        for ind in population_to_interp:
+            ind[target_key] = RNG.uniform(1.0, 10.0)
+        return
+
+    # fitness の降順でソートし、上位 N_SAMPLES 個体を選択
+    # reverse=True で値が大きい（良い）順
+    rbf_samples = sorted(
+        evaluated_objects,
+        key=lambda ind: ind.get(FITNESS_KEY, -np.inf),
+        reverse=True
+    )[:N_SAMPLES]
+
+    # パラメータベクトル X_train と評価値 Y_train を抽出
+    X_train = np.array([to_vec(ind) for ind in rbf_samples])
+    Y_train = np.array([ind.get(FITNESS_KEY, 0.0) for ind in rbf_samples], dtype=float)
+
+    if X_train.size == 0 or Y_train.size == 0 or np.any(np.isnan(X_train)) or np.any(np.isnan(Y_train)):
+        print("エラー: サンプルデータが不正です。RBF補間をスキップします。")
+        return
+
+    # --- 2. RBFInterpolator モデルの作成と補間 ---
+    
+    # kernel='gaussian' を指定し、epsilon='auto' で最適な滑らかさを自動推定
+    rbfi = RBFInterpolator(X_train, Y_train, kernel='gaussian', epsilon='auto')
+
+    # 補間対象の個体のパラメータベクトル X_predict を作成
+    X_predict = np.array([to_vec(ind) for ind in population_to_interp])
+    
+    # 補間実行
+    try:
+        Y_predict = rbfi(X_predict)
+    except Exception as e:
+        print(f"RBF補間中にエラーが発生しました: {e}。補間をスキップします。")
+        return
+    
+    # 補間結果を個体群に格納
+    for ind, value in zip(population_to_interp, Y_predict):
+        # 予測値が浮動小数点数であることを保証
+        ind[target_key] = float(value)
+        
+    print(f"{target_key}をRBF補間しました。N_SAMPLES={N_SAMPLES}, kernel=Gaussian")
+    return
