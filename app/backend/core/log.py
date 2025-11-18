@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.animation as ani
 import os
 import json
 import numpy as np
@@ -105,7 +106,7 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     ax.set_xlim(0.5,9.5)
     ax.set_ylim(1,6)
     ax.grid(True)
-    fig.tight_layout()
+    # fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
     if interpolate_num ==2:
         plt.savefig(f'./result/{ver}/graph/{method}/best_fitnesses/{method}{file_path}')

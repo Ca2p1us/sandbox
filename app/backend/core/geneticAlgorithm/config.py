@@ -54,7 +54,6 @@ PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmPa
 # TARGET_PARAMS = [0.03, 0.16, 0.89, 0.29, 0.06, 0.31690]
 # TARGET_PARAMS = [3, 160, 89, 29, 6, 316.90]
 TARGET_PARAMS = [250, 250, 250, 250, 250, 250]
-TARGET_PARAMS = [250, 250, 250, 250, 250, 250]
 
 
 GENERATION_CHROMOSOME_NUM: int = 10
