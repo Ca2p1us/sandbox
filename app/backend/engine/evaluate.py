@@ -29,7 +29,7 @@ def evaluate_fitness_by_param(
     target_params: List[float],
     sigma: float = 50.0,
     param_keys: List[str] = None,
-    id_list: List[str] = None,
+    evaluate_population: List[dict] = None,
     noise_is_added: bool = False
 ):
     """
@@ -39,24 +39,14 @@ def evaluate_fitness_by_param(
     """
     if param_keys is None:
         param_keys = ["fmParamsList.operator1.frequency"]
-
-    # id_listが指定されていれば、そのIDのみ評価
-    def should_evaluate(ind):
-        if id_list is None:
-            return True
-        if "chromosomeId" not in ind:
-            return False
-        # UUID型にも対応
-        try:
-            return str(ind["chromosomeId"]) in [str(i) for i in id_list]
-        except Exception:
-            return False
+    if evaluate_population is None:
+        evaluate_population = population
 
     for individual in population:
         if not isinstance(individual, dict):
             print("警告: individualがdict型ではありません:", individual)
             continue
-        if not should_evaluate(individual):
+        if not individual in evaluate_population:
             continue
 
         scores = []
@@ -90,7 +80,7 @@ def evaluate_fitness_sphere(
     population: List[dict],
     target_params: List[float],
     param_keys: List[str],
-    id_list: List[str] = None,
+    evaluate_population: List[dict] = None,
     noise_is_added: bool = False
 ):
     """
@@ -98,21 +88,14 @@ def evaluate_fitness_sphere(
     param_keys: 評価対象パラメータ名リスト（例: ["fmParamsList.operator1.frequency", ...]）
     id_list: 評価対象のchromosomeIdリスト（Noneなら全個体）
     """
-    def should_evaluate(ind):
-        if id_list is None:
-            return True
-        if "chromosomeId" not in ind:
-            return False
-        try:
-            return str(ind["chromosomeId"]) in [str(i) for i in id_list]
-        except Exception:
-            return False
+    if evaluate_population is None:
+        evaluate_population = population
 
     for individual in population:
         if not isinstance(individual, dict):
             print("警告: individualがdict型ではありません:", individual)
             continue
-        if not should_evaluate(individual):
+        if not individual in evaluate_population:
             continue
 
         values = []
@@ -191,7 +174,8 @@ def evaluate_fitness_cos(
 def evaluate_fitness_Ackley(
         population: List[dict],
         param_keys: List[str] = None,
-        id_list: List[str] = None,
+        target_params: List[float] = None,
+        evaluate_population: List[dict] = None,
         A = 300,
         B = 0.005,
         C = 2*np.pi,
@@ -202,21 +186,13 @@ def evaluate_fitness_Ackley(
     param_keys: 評価対象パラメータ名リスト（例: ["fmParamsList.operator1.frequency", ...]）
     id_list: 評価対象のchromosomeIdリスト（Noneなら全個体）
     """
-    def should_evaluate(ind):
-        if id_list is None:
-            return True
-        if "chromosomeId" not in ind:
-            return False
-        try:
-            return str(ind["chromosomeId"]) in [str(i) for i in id_list]
-        except Exception:
-            return False
-
+    if evaluate_population is None:
+        evaluate_population = population
     for individual in population:
         if not isinstance(individual, dict):
             print("警告: individualがdict型ではありません:", individual)
             continue
-        if not should_evaluate(individual):
+        if not individual in evaluate_population:
             continue
 
         values = []
@@ -233,8 +209,10 @@ def evaluate_fitness_Ackley(
 
         # 統合
         fitness = 0
-        fitness -= -A * math.exp(-B * math.sqrt(sum(v**2 for v in values)/len(values))) - math.exp(sum(np.cos(C*v) for v in values)/len(values)) + A + math.e
+        fitness -= -A * math.exp(-B * math.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - math.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + math.e
         # 必要に応じてスケーリングやノイズ付与も可能
+        fitness = -fitness
+        fitness = fitness / 50.0
         if noise_is_added:
             fitness = add_noise(value=fitness, scale=1.0)
         individual["fitness"] = fitness
@@ -311,61 +289,29 @@ def proposal_evaluate_random(id_list: List[str], population: List[dict]):
         if "chromosomeId" in individual and individual["chromosomeId"] in id_list:
             individual["fitness"] = (round(add_noise(random.randint(1, 10))))
 
-def get_best_and_worst_individuals_by_id(id_list: List[str], population: List[dict]):
+def get_best_and_worst_individuals_by_id(evaluated_population: List[dict]):
     """
     id_listに含まれるchromosomeIdを持つ個体群から、最もfitnessが高い個体と低い個体を返す
     fitnessが小数値でも取得できるようにfloat変換で判定
     """
-    # id_listをUUID型に変換
-    id_set = set()
-    for cid in id_list:
-        try:
-            id_set.add(uuid.UUID(str(cid)))
-        except Exception:
-            continue
-
-    def is_number(s):
-        try:
-            float(s)
-            return True
-        except Exception:
-            return False
-
-    valid_population = [
-        ind for ind in population
-        if "fitness" in ind and "chromosomeId" in ind
-        and (
-            (isinstance(ind["chromosomeId"], uuid.UUID) and ind["chromosomeId"] in id_set)
-            or
-            (isinstance(ind["chromosomeId"], str) and uuid.UUID(ind["chromosomeId"]) in id_set)
-        )
-        and is_number(ind["fitness"])
-    ]
-    if not valid_population:
+    if not evaluated_population:
         return None, None
-    best = max(valid_population, key=lambda x: float(x["fitness"]))
-    worst = min(valid_population, key=lambda x: float(x["fitness"]))
+    best = max(evaluated_population, key=lambda x: float(x["fitness"]))
+    worst = min(evaluated_population, key=lambda x: float(x["fitness"]))
     return best, worst
 
-def get_average_fitness(population: List[dict], id_list: List[str] = None) -> float:
+def get_average_fitness(population: List[dict], evaluate_population: List[dict] = None) -> float:
     """
     population内のfitnessの平均値を返す（fitnessが未設定・不正な個体は除外）
     id_listが指定された場合は、そのID（chromosomeId）を持つ個体のみ対象
     """
-    if id_list is not None:
-        # UUID型も考慮してセット化
-        id_set = set()
-        for cid in id_list:
-            try:
-                id_set.add(str(uuid.UUID(str(cid))))
-            except Exception:
-                id_set.add(str(cid))
+    if evaluate_population is not None:
         fitness_values = [
             float(ind["fitness"])
             for ind in population
             if "fitness" in ind
             and "chromosomeId" in ind
-            and str(ind["chromosomeId"]) in id_set
+            and str(ind["chromosomeId"]) in [str(evaluated_ind["chromosomeId"]) for evaluated_ind in evaluate_population]
             and str(ind["fitness"]).strip() not in ("", "None")
             and str(ind["fitness"]).replace('.', '', 1).isdigit()
         ]

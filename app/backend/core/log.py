@@ -91,6 +91,8 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
         interpolate = "linear"
     elif interpolate_num == 1:
         interpolate = "Gauss"
+    elif interpolate_num == 2:
+        interpolate = "RBF"
 
     fig, ax = plt.subplots(figsize=(8, 5))
 
@@ -108,7 +110,7 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     ax.grid(True)
     # fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
-    if interpolate_num ==2:
+    if interpolate_num == 100:
         plt.savefig(f'./result/{ver}/graph/{method}/best_fitnesses/{method}{file_path}')
     else:
         plt.savefig(f'./result/{ver}/graph/{method}/{interpolate}/best_fitnesses/{method}{file_path}')
