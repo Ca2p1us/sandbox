@@ -1,0 +1,140 @@
+{
+  "results": [
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 457.79743063175977,
+          "decay": 499.90781541894785,
+          "sustain": 475.4417438466687,
+          "sustainTime": 14.982915927690687,
+          "release": 410.8487917787718,
+          "frequency": 32.21319318420313
+        }
+      },
+      "fitness": 4.00856782230753,
+      "pre_evaluation": 0.0,
+      "generation": 1,
+      "chromosomeId": "d1368556-689a-4a5a-8ff4-767438c14dc4"
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 500,
+          "decay": 495.0283428717453,
+          "sustain": 7.131226304589987,
+          "sustainTime": 18.01962698189587,
+          "release": 460.4902981102852,
+          "frequency": 500
+        }
+      },
+      "generation": 2,
+      "chromosomeId": "94d9a8b5-25f6-4cff-82c3-4bfa68a4ac4e",
+      "fitness": 4.199508718808302
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 0,
+          "decay": 500,
+          "sustain": 409.54969849641765,
+          "sustainTime": 455.6392945705454,
+          "release": 47.53460657729843,
+          "frequency": 500
+        }
+      },
+      "generation": 3,
+      "chromosomeId": "5f98052a-9614-49c5-ad01-75c10d073196",
+      "fitness": 4.057494079789574
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 424.1322288459121,
+          "decay": 500,
+          "sustain": 500,
+          "sustainTime": 500,
+          "release": 53.77371319593796,
+          "frequency": 500
+        }
+      },
+      "generation": 4,
+      "chromosomeId": "2048cae0-47bd-4e21-9a36-ec8cdd501289",
+      "fitness": 4.1147641204918965
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 496.9860191284912,
+          "decay": 475.7582385093243,
+          "sustain": 465.7540658159588,
+          "sustainTime": 0,
+          "release": 500,
+          "frequency": 18.094527107554462
+        }
+      },
+      "generation": 5,
+      "chromosomeId": "7de45704-5c44-4087-a1f3-a61861894c44",
+      "fitness": 4.1824820861601255
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 1.0662223526879302,
+          "decay": 133.6350706749015,
+          "sustain": 0,
+          "sustainTime": 0,
+          "release": 0,
+          "frequency": 0
+        }
+      },
+      "generation": 6,
+      "chromosomeId": "aea4e020-4197-437e-bb9a-f5f6c1aae1c9",
+      "fitness": 4.141438630957152
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 500,
+          "decay": 449.411699332337,
+          "sustain": 425.73408235916344,
+          "sustainTime": 2.593550828933611,
+          "release": 0,
+          "frequency": 0
+        }
+      },
+      "generation": 7,
+      "chromosomeId": "d0fc5bcc-4c36-47a4-b7c3-799474bf424d",
+      "fitness": 4.13675831530518
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 500,
+          "decay": 422.5751771706556,
+          "sustain": 486.25563539640723,
+          "sustainTime": 0,
+          "release": 500,
+          "frequency": 0
+        }
+      },
+      "generation": 8,
+      "chromosomeId": "63a84a1e-cf5e-4598-8918-f88d472ae30a",
+      "fitness": 4.181930004174396
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 500,
+          "decay": 439.26216463461935,
+          "sustain": 0,
+          "sustainTime": 500,
+          "release": 500,
+          "frequency": 457.4548512253458
+        }
+      },
+      "generation": 9,
+      "chromosomeId": "aa632369-204d-40c1-a313-95cf393122ce",
+      "fitness": 4.16045504766217
+    }
+  ]
+}

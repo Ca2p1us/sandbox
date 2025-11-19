@@ -178,7 +178,7 @@ python main.py
         - tournament.py seed=20
         - BLX-alpha.py seed=30
         - mutate.py seed=40
-        - make_chromosome_params.py seed=42
+        - make_chromosome_params.py seed=242
 - 補間関連
     - ガウス補間を上手くいかせるために上位と下位から実際の評価個体を選択するようにした
     - **各世代のベスト±標準偏差と平均±標準偏差をプロットをするべき**

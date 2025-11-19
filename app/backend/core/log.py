@@ -106,7 +106,10 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     ax.set_ylabel('Best Fitness')
     ax.set_title(method+' Best Fitness Histories')
     ax.set_xlim(0.5,9.5)
-    ax.set_ylim(1,6)
+    if method == "Gaussian":
+        ax.set_ylim(1,6)
+    if method == "Ackley":
+        ax.set_ylim(3.0,4.5)
     ax.grid(True)
     # fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
