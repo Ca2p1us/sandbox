@@ -30,11 +30,33 @@ def log(file_path: str, answer):
     return
 
 
-def log_fitness(method: str, file_path: str, best_fitness_history, average_fitness_history=None):
+def log_fitness(method: str = None, file_path: str = None, best_fitness_history=None, average_fitness_history=None, evaluate_num: int = None, interpolate_num: int = None, ver: str = None):
     """
     世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_history: [(世代番号, fitness値), ...] のリスト
     """
+    if evaluate_num == 1:
+        method = "Gaussian"
+    elif evaluate_num == 2:
+        method = "Sphere"
+    elif evaluate_num == 3:
+        method = "Rastrigin"
+    elif evaluate_num == 4:
+        method = "Ackley"
+    elif evaluate_num == 5:
+        method = "Schwefel"
+    if interpolate_num == 0:
+        interpolate = "linear"
+    elif interpolate_num == 1:
+        interpolate = "Gauss"
+    elif interpolate_num == 2:
+        interpolate = "RBF"
+    if isinstance(evaluate_num, int):
+        if isinstance(interpolate_num, int):
+            file_path = f'./result/{ver}/graph/{method}/{interpolate}/best_fitnesses/{method}{file_path}'
+        else:
+            file_path = f'./result/{ver}/graph/{method}/best_fitnesses/{method}{file_path}'
+    
     fig, ax = plt.subplots()
     if not best_fitness_history:
         print("履歴データがありません。")
