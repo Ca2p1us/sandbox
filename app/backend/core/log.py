@@ -30,7 +30,7 @@ def log(file_path: str, answer):
     return
 
 
-def log_fitness(method: str = None, file_path: str = None, best_fitness_history=None, average_fitness_history=None, evaluate_num: int = None, interpolate_num: int = None, ver: str = None):
+def log_fitness(method: str = None, file_path: str = None, best_fitness_history=None, average_fitness_history=None, evaluate_num: int = None, interpolate_num: int = None, ver: str = None, title: str = None):
     """
     世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_history: [(世代番号, fitness値), ...] のリスト
@@ -68,7 +68,12 @@ def log_fitness(method: str = None, file_path: str = None, best_fitness_history=
 
     ax.set_xlabel('Generation')  # x軸ラベル
     ax.set_ylabel('Fitness')  # y軸ラベル
-    ax.set_title(method+' Fitness History')  # グラフタイトル
+    ax.set_title(method+' Fitness History'+ (f" - {title}" if title else ""))  # グラフタイトル
+    ax.set_xlim(0.5,9.5)
+    if method == "Gaussian":
+        ax.set_ylim(0,6)
+    if method == "Ackley":
+        ax.set_ylim(3.0,4.5)
     ax.grid(True)
     ax.plot(generations, fitness_values,
              marker='o', linestyle='-', color='blue', label='Best Fitness')
@@ -76,7 +81,7 @@ def log_fitness(method: str = None, file_path: str = None, best_fitness_history=
         ax.plot(generations, average_values,
                  marker='o', linestyle='--', color='orange', label='Average Fitness')
     ax.legend(loc=0)
-    fig.tight_layout()
+    # fig.tight_layout()
     # plt.figure(figsize=(8, 5))
     # plt.plot(generations, fitness_values,
     #          marker='o', linestyle='-', color='blue')
@@ -129,7 +134,7 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     ax.set_title(method+' Best Fitness Histories')
     ax.set_xlim(0.5,9.5)
     if method == "Gaussian":
-        ax.set_ylim(1,6)
+        ax.set_ylim(0,6)
     if method == "Ackley":
         ax.set_ylim(3.0,4.5)
     ax.grid(True)
