@@ -147,6 +147,65 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     plt.show()
     plt.close()
     return
+def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best_fitness_histories_few_ave, best_fitness_histories_many_ave, best_fitness_histories_ave):
+    """
+    複数回のシミュレーションの世代ごとのbest個体のfitness履歴をグラフ表示する
+    best_fitness_histories: [[(世代番号, fitness値), ...], ...] のリスト
+    """
+
+    if not best_fitness_histories_ave:
+        print("履歴データがありません。")
+        return
+    if evaluate_num == 1:
+        method = "Gaussian"
+    elif evaluate_num == 2:
+        method = "Sphere"
+    elif evaluate_num == 3:
+        method = "Rastrigin"
+    elif evaluate_num == 4:
+        method = "Ackley"
+    elif evaluate_num == 5:
+        method = "Schwefel"
+    if interpolate_num == 0:
+        interpolate = "linear"
+    elif interpolate_num == 1:
+        interpolate = "Gauss"
+    elif interpolate_num == 2:
+        interpolate = "RBF"
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+
+    generations = [item[0] for item in best_fitness_histories_ave]
+    fitness_values_few = [item[1] for item in best_fitness_histories_few_ave]
+    fitness_values_many = [item[1] for item in best_fitness_histories_many_ave]
+    fitness_values_proposal = [item[1] for item in best_fitness_histories_ave]
+
+    ax.plot(generations, fitness_values_few,
+             marker='o', linestyle='-', label='Normal IGA (few evals)')
+    ax.plot(generations, fitness_values_many,
+             marker='o', linestyle='-', label='Normal IGA (many evals)')
+    ax.plot(generations, fitness_values_proposal,
+             marker='o', linestyle='-', label='Proposed IGA')
+
+    ax.set_xlabel('Generation')
+    ax.set_ylabel('Best Fitness')
+    ax.set_title(method+' Best Fitness Comparison')
+    ax.set_xlim(0.5,9.5)
+    if method == "Gaussian":
+        ax.set_ylim(0,6)
+    if method == "Ackley":
+        ax.set_ylim(3.0,4.5)
+    ax.grid(True)
+    ax.legend(loc=0)
+    # fig.tight_layout()
+    # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
+    if interpolate_num == 100:
+        plt.savefig(f'./result/comparison/{method}{file_path}')
+    else:
+        plt.savefig(f'./result/comparison/{method}/{interpolate}/{method}{file_path}')
+    plt.show()
+    plt.close()
+    return
 
 
 # サンプリング周波数と再生時間の設定
