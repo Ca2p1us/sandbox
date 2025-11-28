@@ -2,7 +2,7 @@ import random
 import numpy as np
 from collections.abc import Callable
 
-RNG = np.random.default_rng(seed=30)
+RNG = np.random.default_rng(seed=230)
 
 
 def exec_blx_alpha(parents_chromosomes: list, func_repair_gene, mutate) -> dict:

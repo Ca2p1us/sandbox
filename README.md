@@ -176,7 +176,7 @@ python main.py
     - 各パーツのシード値を書いておかなければならない
         - interpolation.py seed=10
         - tournament.py seed=20
-        - BLX-alpha.py seed=30
+        - BLX-alpha.py seed=230
         - mutate.py seed=40
         - make_chromosome_params.py seed=242
 - 補間関連

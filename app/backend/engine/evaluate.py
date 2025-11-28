@@ -7,7 +7,7 @@ from typing import List
 
 def add_noise(value: float, noise_sigma: float = 1.0, noise_mean = 0, scale = 1.0) -> float:
     # 平均0、標準偏差noise_sigmaの正規分布ノイズを加算
-    rng = np.random.default_rng()
+    rng = np.random.default_rng(seed=50)
     val = rng.normal(loc=noise_mean, scale=noise_sigma)
     val = norm.cdf(val,loc=noise_mean,scale=noise_sigma) * scale  # 0〜1に正規化してscaleをかける
     return value + val
