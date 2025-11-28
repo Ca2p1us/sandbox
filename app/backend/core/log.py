@@ -7,8 +7,7 @@ import pyaudio
 import wave
 from scipy.signal import sawtooth
 import uuid
-from .geneticAlgorithm.config import ATTACK_RANGE
-from .geneticAlgorithm.config import ATTACK_RANGE
+from .geneticAlgorithm.config import ATTACK_RANGE, NUM_GENERATIONS
 
 
 def log(file_path: str, answer):
@@ -69,7 +68,7 @@ def log_fitness(method: str = None, file_path: str = None, best_fitness_history=
     ax.set_xlabel('Generation')  # x軸ラベル
     ax.set_ylabel('Fitness')  # y軸ラベル
     ax.set_title(method+' Fitness History'+ (f" - {title}" if title else ""))  # グラフタイトル
-    ax.set_xlim(0.5,9.5)
+    ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
     if method == "Gaussian":
         ax.set_ylim(0,6)
     if method == "Ackley":
@@ -132,7 +131,7 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     ax.set_xlabel('Generation')
     ax.set_ylabel('Best Fitness')
     ax.set_title(method+' Best Fitness Histories')
-    ax.set_xlim(0.5,9.5)
+    ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
     if method == "Gaussian":
         ax.set_ylim(0,6)
     if method == "Ackley":
@@ -147,7 +146,7 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     plt.show()
     plt.close()
     return
-def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best_fitness_histories_few_ave, best_fitness_histories_many_ave, best_fitness_histories_ave):
+def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best_fitness_histories_few_ave, best_fitness_histories_many_ave, best_fitness_histories_ave,indicator : str):
     """
     複数回のシミュレーションの世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_histories: [[(世代番号, fitness値), ...], ...] のリスト
@@ -181,16 +180,16 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best
     fitness_values_proposal = [item[1] for item in best_fitness_histories_ave]
 
     ax.plot(generations, fitness_values_few,
-             marker='o', linestyle='-', label='Normal IGA (few evals)')
+             marker='o', linestyle='-', label='Normal IGA (few)')
     ax.plot(generations, fitness_values_many,
-             marker='o', linestyle='-', label='Normal IGA (many evals)')
+             marker='o', linestyle='-', label='Normal IGA (many)')
     ax.plot(generations, fitness_values_proposal,
              marker='o', linestyle='-', label='Proposed IGA')
 
     ax.set_xlabel('Generation')
-    ax.set_ylabel('Best Fitness')
-    ax.set_title(method+' Best Fitness Comparison')
-    ax.set_xlim(0.5,9.5)
+    ax.set_ylabel(indicator+'Fitness')
+    ax.set_title(method+' '+indicator+' Fitness Comparison')
+    ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
     if method == "Gaussian":
         ax.set_ylim(0,6)
     if method == "Ackley":

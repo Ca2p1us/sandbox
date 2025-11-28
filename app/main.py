@@ -1,13 +1,8 @@
 from backend.engine import run_iga_simulation as iga
 from backend.core.log import sound_check, log_fitness, log_fitness_histories, log_comparison
 import numpy as np
+from backend.core.geneticAlgorithm.config import NUM_GENERATIONS, POPULATION_SIZE, PROPOSAL_POPULATION_SIZE, EVALUATE_SIZE, EXPERIMENT_TIMES
 
-
-NUM_GENERATIONS = 9
-POPULATION_SIZE = 9
-PROPOSAL_POPULATION_SIZE = 200
-EVALUATE_SIZE = 9
-EXPERIMENT_TIMES = 20
 
 
 best_fitness_histories = []
@@ -117,5 +112,5 @@ elif choice == "3":
     average_fitness_histories_ave = [tuple(row) for row in average_fitness_histories_ave]
     log_fitness_histories(int(evaluate_num), int(interpolate_num), "_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_best_fitness_histories.png", best_fitness_histories, ver="proposal")
     log_fitness(file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_average_fitness_histories.png", best_fitness_history= best_fitness_histories_ave, average_fitness_history=average_fitness_histories_ave,evaluate_num=int(evaluate_num), interpolate_num=int(interpolate_num), ver="proposal",title=f"mean of {EXPERIMENT_TIMES} times")
-    log_comparison(int(evaluate_num), int(interpolate_num), "_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison.png", best_fitness_histories_few_ave, best_fitness_histories_many_ave, best_fitness_histories_ave)
-    log_comparison(int(evaluate_num), int(interpolate_num), "_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison_average.png", average_fitness_histories_few_ave, average_fitness_histories_many_ave, average_fitness_histories_ave)
+    log_comparison(int(evaluate_num), int(interpolate_num), "_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison.png", best_fitness_histories_few_ave, best_fitness_histories_many_ave, best_fitness_histories_ave, "Best ")
+    log_comparison(int(evaluate_num), int(interpolate_num), "_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison_average.png", average_fitness_histories_few_ave, average_fitness_histories_many_ave, average_fitness_histories_ave, "Average ")
