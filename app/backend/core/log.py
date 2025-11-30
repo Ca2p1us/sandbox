@@ -334,10 +334,38 @@ def sound_check(file_path=None):
     else:
         print("音声の再生をスキップします。")
 
-def plot_individual_params(population: list[dict], param_keys: list[str], generation: int, file_path: str = None):
+# def plot_individual_params(population: list[dict], param_keys: list[str], generation: int, file_path: str = None):
+#     """
+#     個体群の指定されたパラメータをプロットする関数
+#     param_key: "fmParamsList.operator1.frequency" のようなドット区切りで指定
+#     """
+#     def get_param(ind, key):
+#         # "fmParamsList.operator1.frequency" のようなドット区切りでアクセス
+#         val = ind
+#         for k in key.split('.'):
+#             val = val.get(k, None)
+#             if val is None:
+#                 break
+#         return val
+
+#     param_values1 = [get_param(ind, param_keys[0]) for ind in population]
+#     param_values2 = [get_param(ind, param_keys[1]) for ind in population]
+
+#     plt.xlim(-50,ATTACK_RANGE[1]+50)
+#     plt.ylim(-50,ATTACK_RANGE[1]+50)
+#     plt.title(f"Generation {generation} - individuals'")
+#     plt.xlabel("1st parameter")
+#     plt.ylabel("2nd parameter")
+#     plt.grid(True)
+#     plt.scatter(param_values1, param_values2)
+#     plt.savefig(file_path)
+#     plt.close()
+#     return
+
+def plot_individual_params(population: list[dict], param_keys: list[str], generation: int, file_path: str):
     """
-    個体群の指定されたパラメータをプロットする関数
-    param_key: "fmParamsList.operator1.frequency" のようなドット区切りで指定
+    個体群の指定されたパラメータを3つのペアでプロットし、1枚の画像にまとめる関数
+    param_keys: 少なくとも6つのキーが必要
     """
     def get_param(ind, key):
         # "fmParamsList.operator1.frequency" のようなドット区切りでアクセス
@@ -348,18 +376,44 @@ def plot_individual_params(population: list[dict], param_keys: list[str], genera
                 break
         return val
 
-    param_values1 = [get_param(ind, param_keys[0]) for ind in population]
-    param_values2 = [get_param(ind, param_keys[1]) for ind in population]
+    # 1行3列のサブプロットを作成 (figsizeは横長に設定)
+    fig, axes = plt.subplots(3, 1, figsize=(6, 18))
+    
+    # プロットするペアのインデックスリスト
+    pair_indices = [(0, 1), (2, 3), (4, 5)]
 
-    plt.xlim(-50,ATTACK_RANGE[1]+50)
-    plt.ylim(-50,ATTACK_RANGE[1]+50)
-    plt.title(f"Generation {generation} - individuals'")
-    plt.xlabel("1st parameter")
-    plt.ylabel("2nd parameter")
-    plt.grid(True)
-    plt.scatter(param_values1, param_values2)
+    # 全体のタイトル
+    fig.suptitle(f"Generation {generation} - Individuals' Parameters", fontsize=16)
+
+    # 3つのグラフをループで描画
+    for i, (idx1, idx2) in enumerate(pair_indices):
+        key1 = param_keys[idx1]
+        key2 = param_keys[idx2]
+        ax = axes[i] # 現在のサブプロットを取得
+
+        # データの抽出
+        param_values1 = [get_param(ind, key1) for ind in population]
+        param_values2 = [get_param(ind, key2) for ind in population]
+
+        # プロット設定
+        ax.scatter(param_values1, param_values2, alpha=1.0) # 重なりが見やすいように透過度を設定
+        
+        # 軸範囲の設定 (元のコードに準拠)
+        ax.set_xlim(-50, ATTACK_RANGE[1] + 50)
+        ax.set_ylim(-50, ATTACK_RANGE[1] + 50)
+        
+        # ラベルとグリッド
+        ax.set_xlabel(f"param{idx1}", fontsize=9) # パラメータ番号をラベルにする
+        ax.set_ylabel(f"param{idx2}", fontsize=9)
+        ax.set_title(f"Pair {i+1}")
+        ax.grid(True)
+
+    # レイアウトを自動調整して重なりを防ぐ
+    plt.tight_layout()
+    
+    # ファイル保存
     plt.savefig(file_path)
-    plt.close()
+    plt.close() # メモリ解放
     return
 
 def compute_interpolation_error(population, true_eval_func, param_keys):
