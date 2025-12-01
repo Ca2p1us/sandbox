@@ -10,7 +10,7 @@ import uuid
 from .geneticAlgorithm.config import ATTACK_RANGE, NUM_GENERATIONS
 
 
-def log(file_path: str, answer):
+def log(file_path: str, answer,times: int):
     # UUID型をstr型に変換するヘルパー関数
     def convert_uuid_to_str(obj):
         if isinstance(obj, dict):
@@ -24,7 +24,7 @@ def log(file_path: str, answer):
 
     save_data = convert_uuid_to_str(answer)
     with open(file_path, "w", encoding="utf-8") as f:
-        json.dump({"results": save_data}, f, indent=2)
+        json.dump({f"{times}_results": save_data}, f, indent=2)
 
     return
 
@@ -414,6 +414,40 @@ def plot_individual_params(population: list[dict], param_keys: list[str], genera
     # ファイル保存
     plt.savefig(file_path)
     plt.close() # メモリ解放
+    return
+def log_average_fitness(method: str = None, interpolate_method:str = None,file_path: str = None, average_fitness_history=None, times: int = None):
+    """
+    世代ごとのaverage個体のfitness履歴をjsonファイルに保存する
+    average_fitness_history: [(世代番号, fitness値), ...] のリスト
+    """
+    method_num = None
+    interpolate_num = None
+    if method == "Gaussian":
+        method_num = 1
+    elif method == "Sphere":
+        method_num = 2
+    elif method == "Rastrigin":
+        method_num = 3
+    elif method == "Ackley":
+        method_num = 4
+    elif method == "Schwefel":
+        method_num = 5
+    if interpolate_method == "linear":
+        interpolate_num = 0
+    elif interpolate_method == "Gauss":
+        interpolate_num = 1
+    elif interpolate_method == "RBF":
+        interpolate_num = 2
+    if isinstance(method_num, int):
+        if isinstance(interpolate_num, int):
+            file_path = f'./result/proposal/average/{method}/{interpolate_method}/{method}{file_path}'
+        else:
+            file_path = f'./result/conventional/average/{method}/{method}{file_path}'
+    
+    # JSONファイルに保存
+    with open(file_path, 'w', encoding='utf-8') as f:
+        json.dump({f"{times}_average_fitness":average_fitness_history}, f, indent=2)
+
     return
 
 def compute_interpolation_error(population, true_eval_func, param_keys):
