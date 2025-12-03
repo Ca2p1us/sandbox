@@ -195,7 +195,7 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best
     if method == "Ackley":
         ax.set_ylim(3.0,4.5)
     ax.grid(True)
-    ax.legend(loc=0)
+    ax.legend(["補間なし9個体","補間なし200個体","補間あり"],prop={"family":"MS Gothic"},loc=0)
     # fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
     if interpolate_num == 100:
