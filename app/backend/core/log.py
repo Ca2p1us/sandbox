@@ -377,19 +377,16 @@ def plot_individual_params(population: list[dict], param_keys: list[str], genera
         return val
 
     # 1行3列のサブプロットを作成 (figsizeは横長に設定)
-    fig, axes = plt.subplots(3, 1, figsize=(6, 18))
     
     # プロットするペアのインデックスリスト
     pair_indices = [(0, 1), (2, 3), (4, 5)]
 
-    # 全体のタイトル
-    fig.suptitle(f"Generation {generation} - Individuals' Parameters", fontsize=16)
 
     # 3つのグラフをループで描画
     for i, (idx1, idx2) in enumerate(pair_indices):
+        fig, ax = plt.subplots(figsize=(6, 6))
         key1 = param_keys[idx1]
         key2 = param_keys[idx2]
-        ax = axes[i] # 現在のサブプロットを取得
 
         # データの抽出
         param_values1 = [get_param(ind, key1) for ind in population]
@@ -403,17 +400,17 @@ def plot_individual_params(population: list[dict], param_keys: list[str], genera
         ax.set_ylim(-50, ATTACK_RANGE[1] + 50)
         
         # ラベルとグリッド
-        ax.set_xlabel(f"param{idx1}", fontsize=9) # パラメータ番号をラベルにする
-        ax.set_ylabel(f"param{idx2}", fontsize=9)
-        ax.set_title(f"Pair {i+1}")
+        ax.set_xlabel(f"param{idx1+1}", fontsize=9) # パラメータ番号をラベルにする
+        ax.set_ylabel(f"param{idx2+1}", fontsize=9)
+        ax.set_title(f"Gen {generation} - Pair {i+1} (Param {idx1+1} vs Param {idx2+1})")
         ax.grid(True)
 
-    # レイアウトを自動調整して重なりを防ぐ
-    plt.tight_layout()
-    
-    # ファイル保存
-    plt.savefig(file_path)
-    plt.close() # メモリ解放
+        # レイアウトを自動調整して重なりを防ぐ
+        plt.tight_layout()
+        
+        # ファイル保存
+        plt.savefig(f"{file_path}_pair{i+1}.png")
+        plt.close() # メモリ解放
     return
 def log_average_fitness(method: str = None, interpolate_method:str = None,file_path: str = None, average_fitness_history=None, times: int = None):
     """
