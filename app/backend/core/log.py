@@ -195,7 +195,7 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best
     if method == "Ackley":
         ax.set_ylim(3.0,4.5)
     ax.grid(True)
-    ax.legend(loc=0)
+    ax.legend(["補間なし9個体","補間なし200個体","補間あり"],prop={"family":"MS Gothic"},loc=0)
     # fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
     if interpolate_num == 100:
@@ -377,13 +377,13 @@ def plot_individual_params(population: list[dict], param_keys: list[str], genera
         return val
 
     # 1行3列のサブプロットを作成 (figsizeは横長に設定)
-    fig, axes = plt.subplots(3, 1, figsize=(6, 18))
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
     
     # プロットするペアのインデックスリスト
     pair_indices = [(0, 1), (2, 3), (4, 5)]
 
     # 全体のタイトル
-    fig.suptitle(f"Generation {generation} - Individuals' Parameters", fontsize=16)
+    fig.suptitle(f"Generation {generation} - Individuals'", fontsize=16)
 
     # 3つのグラフをループで描画
     for i, (idx1, idx2) in enumerate(pair_indices):
