@@ -67,7 +67,7 @@ def log_fitness(method: str = None, file_path: str = None, best_fitness_history=
 
     ax.set_xlabel('Generation')  # x軸ラベル
     ax.set_ylabel('Fitness')  # y軸ラベル
-    ax.set_title(method+' Fitness History'+ (f" - {title}" if title else ""))  # グラフタイトル
+    ax.set_title("")  # グラフタイトル
     ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
     if method == "Gaussian":
         ax.set_ylim(0,6)
@@ -128,8 +128,8 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
         ax.plot(generations, fitness_values,
                  marker='o', linestyle='-', label=f'Run {idx+1}')
 
-    ax.set_xlabel('Generation')
-    ax.set_ylabel('Best Fitness')
+    ax.set_xlabel('Generation',fontsize=18)
+    ax.set_ylabel('Best Fitness',fontsize=18)
     ax.set_title(method+' Best Fitness Histories')
     ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
     if method == "Gaussian":
@@ -186,9 +186,9 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best
     ax.plot(generations, fitness_values_proposal,
              marker='o', linestyle='-', label='Proposed IGA')
 
-    ax.set_xlabel('Generation')
-    ax.set_ylabel(indicator+'Fitness')
-    ax.set_title(method+' '+indicator+' Fitness Comparison')
+    ax.set_xlabel('Generation',fontsize=18)
+    ax.set_ylabel(indicator+'Fitness',fontsize=18)
+    ax.set_title("")
     ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
     if method == "Gaussian":
         ax.set_ylim(0,6)

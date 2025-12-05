@@ -92,7 +92,7 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
             plot_individual_params(population, PARAMS, generation + 1, file_path=f'./result/conventional/graph/{evaluate_method}/scatter/{evaluate_method}_noise{str(noise_is_added)}_{str(POPULATION_SIZE)}_individuals_{str(generation + 1)}gens')
         for _ in range(POPULATION_SIZE):
             # 3. 選択
-            selected = tournament.exec_tournament_selection(population)
+            selected = tournament.exec_tournament_selection(chromosomes_params=population, participants_num=int(POPULATION_SIZE * 0.3))
 
             # 4. 交叉&突然変異
             offspring = BLX_alpha.exec_blx_alpha(
@@ -296,7 +296,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         # for _ in range(PROPOSAL_POPULATION_SIZE):
         while len(next_generation) < PROPOSAL_POPULATION_SIZE:
             # 3. 選択
-            selected = tournament.exec_tournament_selection(population)
+            selected = tournament.exec_tournament_selection(chromosomes_params=population, participants_num=int(PROPOSAL_POPULATION_SIZE * 0.3))
 
             # 4. 交叉&突然変異
             offspring = BLX_alpha.exec_blx_alpha(
