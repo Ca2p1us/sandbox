@@ -40,7 +40,7 @@ def plot_gauss_function():
 
     # 軸（枠線）の太さを変える
     axis_width = 1.5  # 太さの設定
-    for spine in ax.spines.values():
+    for spine in ax.spines.x():
         spine.set_linewidth(axis_width)
 
     # メモリ（数字）のフォントサイズと、メモリ自体の太さを変える
