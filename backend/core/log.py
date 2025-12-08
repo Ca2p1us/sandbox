@@ -44,7 +44,7 @@ def log_fitness(method: str = None, file_path: str = None, best_fitness_history=
     elif evaluate_num == 4:
         method = "Ackley"
     elif evaluate_num == 5:
-        method = "Schwefel"
+        method = "Gaussian_two_peak"
     if interpolate_num == 0:
         interpolate = "linear"
     elif interpolate_num == 1:
@@ -113,7 +113,7 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     elif method_num == 4:
         method = "Ackley"
     elif method_num == 5:
-        method = "Schwefel"
+        method = "Gaussian_two_peak"
     if interpolate_num == 0:
         interpolate = "linear"
     elif interpolate_num == 1:
@@ -165,7 +165,7 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best
     elif evaluate_num == 4:
         method = "Ackley"
     elif evaluate_num == 5:
-        method = "Schwefel"
+        method = "Gaussian_two_peak"
     if interpolate_num == 0:
         interpolate = "linear"
     elif interpolate_num == 1:
@@ -195,6 +195,8 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best
         ax.set_ylim(0,6)
     if method == "Ackley":
         ax.set_ylim(3.0,4.5)
+    if method == "Gaussian_two_peak":
+        ax.set_ylim(0,6)
     ax.grid(True)
     ax.legend(["補間なし9個体","補間なし200個体","補間あり"],prop={"family":"MS Gothic"},loc=0)
     # fig.tight_layout()
@@ -401,7 +403,7 @@ def plot_individual_params(population: list[dict],best: dict,worst: dict, param_
         ax.scatter(param_values1, param_values2, alpha=1.0) # 重なりが見やすいように透過度を設定
         ax.scatter(best_value1, best_value2, color='red', s=100, label='Best', edgecolors='black') # 最良個体を強調表示
         ax.scatter(worst_value1, worst_value2, color='blue', s=100, label='Worst', edgecolors='black') # 最悪個体を強調表示
-        ax.legend(['個体群', '最良個体', '最悪個体',],prop={"family":"MS Gothic"})
+        ax.legend(['個体群', 'best', 'worst',],prop={"family":"MS Gothic"})
         
         # 軸範囲の設定 (元のコードに準拠)
         ax.set_xlim(-50, ATTACK_RANGE[1] + 50)
@@ -435,7 +437,7 @@ def log_average_fitness(method: str = None, interpolate_method:str = None,file_p
         method_num = 3
     elif method == "Ackley":
         method_num = 4
-    elif method == "Schwefel":
+    elif method == "Gaussian_two_peak":
         method_num = 5
     if interpolate_method == "linear":
         interpolate_num = 0

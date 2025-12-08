@@ -7,7 +7,7 @@ from ..core.geneticAlgorithm.mutate import mutate
 from ..core.geneticAlgorithm import make_chromosome_params
 from ..core.geneticAlgorithm.interpolation import interpolate_by_distance, interpolate_by_Gaussian, interpolate_by_RBF, get_evaluated_individuals
 from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_pre_evaluation
-from ..core.geneticAlgorithm.config import TARGET_PARAMS, PARAMS
+from ..core.geneticAlgorithm.config import TARGET_PARAMS, PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2
 from ..core.log import log, log_fitness, plot_individual_params, log_average_fitness
 from ..engine import evaluate
 import uuid
@@ -69,10 +69,12 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
                 noise_is_added=noise_is_added
             )
         elif evaluate_num == 5:
-        # 2-5. Schwefel関数
-            evaluate_method = "Schwefel"
-            evaluate.evaluate_fitness_Schwefel(
+        # 2-5. Gaussian_two_peak関数
+            evaluate_method = "Gaussian_two_peak"
+            evaluate.evaluate_fitness_gaussian_two_peak(
                 population=population,
+                target_params=TARGET_PARAMS_1,
+                target_params_2=TARGET_PARAMS_2,
                 param_keys=PARAMS,
                 noise_is_added=noise_is_added
             )
@@ -152,8 +154,10 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
             noise_is_added=noise_is_added
         )
     elif evaluate_num == 5:
-        evaluate.evaluate_fitness_Schwefel(
+        evaluate.evaluate_fitness_gaussian_two_peak(
             population=population,
+            target_params=TARGET_PARAMS_1,
+            target_params_2=TARGET_PARAMS_2,
             param_keys=PARAMS,
             noise_is_added=noise_is_added
         )
@@ -262,12 +266,14 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
                 noise_is_added=noise_is_added
             )
         elif evaluate_num == 5:
-        # 2-6. Schwefel関数
-            evaluate_method = "Schwefel"
-            evaluate.evaluate_fitness_Schwefel(
+        # 2-6. Gaussian_two_peak関数
+            evaluate_method = "Gaussian_two_peak"
+            evaluate.evaluate_fitness_gaussian_two_peak(
                 population=population,
+                target_params=TARGET_PARAMS_1,
+                target_params_2=TARGET_PARAMS_2,
                 param_keys=PARAMS,
-                id_list=evaluate_population,
+                evaluate_population =evaluate_population,
                 noise_is_added=noise_is_added
             )
         # ベスト・ワースト個体の取得
@@ -395,10 +401,12 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             noise_is_added=noise_is_added
         )
     elif evaluate_num == 5:
-        evaluate.evaluate_fitness_Schwefel(
+        evaluate.evaluate_fitness_gaussian_two_peak(
             population=population,
+            target_params=TARGET_PARAMS_1,
+            target_params_2=TARGET_PARAMS_2,
             param_keys=PARAMS,
-            id_list=evaluate_population,
+            evaluate_population=evaluate_population,
             noise_is_added=noise_is_added
         )
     # ベスト・ワースト個体の取得

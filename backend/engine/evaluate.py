@@ -4,6 +4,7 @@ import uuid
 import numpy as np
 from scipy.stats import norm
 from typing import List
+from ..core.geneticAlgorithm.config import TARGET_PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2
 
 def add_noise(value: float, noise_sigma: float = 1.0, noise_mean = 0, scale = 1.0) -> float:
     # 平均0、標準偏差noise_sigmaの正規分布ノイズを加算
@@ -26,7 +27,7 @@ def evaluate_fitness_random(population: List[dict], noise_is_added: bool = False
 # FMパラメータに基づいた評価（例：operator1のfrequencyに基づく）
 def evaluate_fitness_by_param(
     population: List[dict],
-    target_params: List[float],
+    target_params: List[float] = TARGET_PARAMS,
     sigma: float = 75.0,
     param_keys: List[str] = None,
     evaluate_population: List[dict] = None,
@@ -61,8 +62,8 @@ def evaluate_fitness_by_param(
                 scores.append(0)
             else:
                 # 正規分布の確率密度関数（最大値1）
-                score = math.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
-                # score = math.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
+                score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
+                # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
                 scores.append(score)
 
         # 統合
@@ -78,8 +79,8 @@ def evaluate_fitness_by_param(
 
 def evaluate_fitness_sphere(
     population: List[dict],
-    target_params: List[float],
-    param_keys: List[str],
+    target_params: List[float] = TARGET_PARAMS,
+    param_keys: List[str] = None,
     evaluate_population: List[dict] = None,
     noise_is_added: bool = False
 ):
@@ -174,7 +175,7 @@ def evaluate_fitness_cos(
 def evaluate_fitness_Ackley(
         population: List[dict],
         param_keys: List[str] = None,
-        target_params: List[float] = None,
+        target_params: List[float] = TARGET_PARAMS,
         evaluate_population: List[dict] = None,
         A = 300,
         B = 0.005,
@@ -209,7 +210,7 @@ def evaluate_fitness_Ackley(
 
         # 統合
         fitness = 0
-        fitness -= -A * math.exp(-B * math.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - math.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + math.e
+        fitness -= -A * np.exp(-B * np.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - np.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + np.e
         # 必要に応じてスケーリングやノイズ付与も可能
         fitness = -fitness
         fitness = fitness / 50.0
@@ -260,12 +261,65 @@ def evaluate_fitness_Schwefel(
 
         # 統合,(418.9829,)
         fitness = 0
-        # fitness += 418.9829 * len(values) - sum(v * math.sin(math.sqrt(abs(v))) for v in values)
-        fitness += sum(v * np.sin(math.sqrt(abs(v))) for v in values)
+        # fitness += 418.9829 * len(values) - sum(v * np.sin(np.sqrt(abs(v))) for v in values)
+        fitness += sum(v * np.sin(np.sqrt(abs(v))) for v in values)
         # 必要に応じてスケーリングやノイズ付与も可能
         if noise_is_added:
             fitness = add_noise(value=fitness, scale=1.0)
         individual["fitness"] = fitness
+
+
+def evaluate_fitness_gaussian_two_peak(
+    population: List[dict],
+    target_params: List[float] = TARGET_PARAMS_1,
+    target_params_2: List[float] = TARGET_PARAMS_2,
+    sigma: float = 50.0,
+    param_keys: List[str] = None,
+    evaluate_population: List[dict] = None,
+    noise_is_added: bool = False
+):
+    """
+    param_keysで指定した各パラメータがtarget_paramsの値に近いほど高評価（正規分布に基づく）
+    id_listが指定された場合は、そのID（chromosomeId）を持つ個体のみfitnessを付与
+    統合手法は平均値
+    """
+    if param_keys is None:
+        param_keys = ["fmParamsList.operator1.frequency"]
+    if evaluate_population is None:
+        evaluate_population = population
+
+    for individual in population:
+        if not isinstance(individual, dict):
+            print("警告: individualがdict型ではありません:", individual)
+            continue
+        if not individual in evaluate_population:
+            continue
+
+        scores = []
+        for key, target, target_2 in zip(param_keys, target_params, target_params_2):
+            # ドット区切りでアクセス
+            val = individual
+            for k in key.split('.'):
+                val = val.get(k, None)
+                if val is None:
+                    break
+            if val is None:
+                scores.append(0)
+            else:
+                # 正規分布の確率密度関数（最大値1）
+                score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + np.exp(-((float(val) - target_2) ** 2) / (2 * sigma ** 2))
+                # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
+                scores.append(score)
+
+        # 統合
+        total_score = sum(scores)  if scores else 0
+        if noise_is_added:
+            total_score = add_noise(value=total_score, scale=1.0)  # ノイズを加えて
+
+        # total_score = total_score * 10  # 0～10にスケール
+        # total_score = int(round(total_score))  # 0～10の整数に丸める
+        # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
+        individual['fitness'] = total_score
 
 
 # 最も適応度の高い個体と最も低い個体を取得
