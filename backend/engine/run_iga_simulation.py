@@ -95,7 +95,7 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
         for _ in range(POPULATION_SIZE):
             # 3. 選択
             selected = tournament.exec_tournament_selection(chromosomes_params=population, participants_num=int(POPULATION_SIZE * 0.3))
-
+            # selected = tournament.exec_tournament_selection(chromosomes_params=population, participants_num=3)
             # 4. 交叉&突然変異
             offspring = BLX_alpha.exec_blx_alpha(
                 parents_chromosomes=selected,
@@ -128,7 +128,7 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
     # --- ここで最終世代の評価値を再計算 ---
     if evaluate_num == 1:
         evaluate.evaluate_fitness_by_param(
-            population,
+            population=population,
             target_params=TARGET_PARAMS,
             param_keys=PARAMS,
             noise_is_added=noise_is_added
@@ -302,8 +302,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         # for _ in range(PROPOSAL_POPULATION_SIZE):
         while len(next_generation) < PROPOSAL_POPULATION_SIZE:
             # 3. 選択
-            selected = tournament.exec_tournament_selection(chromosomes_params=population, participants_num=int(PROPOSAL_POPULATION_SIZE * 0.2))
-
+            selected = tournament.exec_tournament_selection(chromosomes_params=population, participants_num=int(PROPOSAL_POPULATION_SIZE * 0.3))
+            # selected = tournament.exec_tournament_selection(chromosomes_params=population, participants_num=3) 
             # 4. 交叉&突然変異
             offspring = BLX_alpha.exec_blx_alpha(
                 parents_chromosomes=selected,

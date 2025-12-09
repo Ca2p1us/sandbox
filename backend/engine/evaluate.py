@@ -273,7 +273,7 @@ def evaluate_fitness_gaussian_two_peak(
     population: List[dict],
     target_params: List[float] = TARGET_PARAMS_1,
     target_params_2: List[float] = TARGET_PARAMS_2,
-    sigma: float = 50.0,
+    sigma: float = 30.0,
     param_keys: List[str] = None,
     evaluate_population: List[dict] = None,
     noise_is_added: bool = False

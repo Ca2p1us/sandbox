@@ -21,6 +21,8 @@ def exec_tournament_selection(chromosomes_params, participants_num=3):
             用に引数で指定された件数分抽出された中から上位の2つの個体が
             設定される。
         """
+        if participants_num < 3:
+            participants_num = 3
         # participants_num: int = len(chromosomes_params) // 2
         # participants: List = sample(list(chromosomes_params.values()), k=participants_num)
         # participants = sample(chromosomes_params, k=participants_num)
