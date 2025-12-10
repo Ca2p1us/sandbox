@@ -321,6 +321,58 @@ def evaluate_fitness_gaussian_two_peak(
         # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
         individual['fitness'] = total_score
 
+def evaluate_fitness_gaussian_cos(
+    population: List[dict],
+    target_params: List[float] = TARGET_PARAMS,
+    sigma: float = 75.0,
+    frequency: float = 0.02,
+    param_keys: List[str] = None,
+    evaluate_population: List[dict] = None,
+    noise_is_added: bool = False
+):
+    """
+    param_keysで指定した各パラメータがtarget_paramsの値に近いほど高評価（正規分布に基づく）
+    id_listが指定された場合は、そのID（chromosomeId）を持つ個体のみfitnessを付与
+    統合手法は平均値
+    """
+    if param_keys is None:
+        param_keys = ["fmParamsList.operator1.frequency"]
+    if evaluate_population is None:
+        evaluate_population = population
+
+    for individual in population:
+        if not isinstance(individual, dict):
+            print("警告: individualがdict型ではありません:", individual)
+            continue
+        if not individual in evaluate_population:
+            continue
+
+        scores = []
+        for key, target in zip(param_keys, target_params):
+            # ドット区切りでアクセス
+            val = individual
+            for k in key.split('.'):
+                val = val.get(k, None)
+                if val is None:
+                    break
+            if val is None:
+                scores.append(0)
+            else:
+                # 正規分布の確率密度関数（最大値1）
+                score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + 0.5 * np.cos(2 * np.pi * frequency * float(val))
+                # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
+                scores.append(score)
+
+        # 統合
+        total_score = sum(scores)  if scores else 0
+        if noise_is_added:
+            total_score = add_noise(value=total_score, scale=1.0)  # ノイズを加えて
+
+        # total_score = total_score * 10  # 0～10にスケール
+        # total_score = int(round(total_score))  # 0～10の整数に丸める
+        # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
+        individual['fitness'] = total_score
+
 
 # 最も適応度の高い個体と最も低い個体を取得
 def get_best_and_worst_individuals(population: List[dict]):
