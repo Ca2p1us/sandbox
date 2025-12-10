@@ -195,7 +195,7 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best
     if method == "Gaussian":
         ax.set_ylim(0,6)
     if method == "Ackley":
-        ax.set_ylim(3.0,4.5)
+        ax.set_ylim(2.0,4.5)
     if method == "Gaussian_two_peak":
         ax.set_ylim(0,6)
     ax.grid(True)
