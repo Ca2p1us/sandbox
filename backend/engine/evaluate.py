@@ -24,6 +24,81 @@ def evaluate_fitness_random(population: List[dict], noise_is_added: bool = False
             fitness = add_noise(value=fitness,scale=1.0)
         individual["fitness"] = fitness
 
+def evaluate_fitness(
+    population: List[dict],
+    param_keys: List[str] = None,
+    evaluate_population: List[dict] = None,
+    noise_is_added: bool = False,
+    evaluate_num: int = 1
+    ):
+    """"
+    評価関数の振り分け
+    """
+    if param_keys is None:
+        param_keys = ["fmParamsList.operator1.frequency"]
+    if evaluate_population is None:
+        evaluate_population = population
+    for ind in population:
+        if not isinstance(ind, dict):
+            print("警告: individualがdict型ではありません:", ind)
+            continue
+        if ind not in evaluate_population:
+            continue
+        if evaluate_num == 1:
+            ind['fitness'] = calculate_Gaussian(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
+        elif evaluate_num == 2:
+            ind['fitness'] = calculate_Sphere(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
+        elif evaluate_num == 3:
+            ind['fitness'] = calculate_Gaussian_cos(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
+        elif evaluate_num == 4:
+            ind['fitness'] = calculate_Ackley(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
+        elif evaluate_num == 5:
+            ind['fitness'] = calculate_Gaussian_two_peak(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS_1, target_params_2=TARGET_PARAMS_2, noise_is_added=noise_is_added)
+    return None
+
+def calculate_Gaussian(
+        individual: dict = None,
+        param_keys: List[str] = None,
+        target_params: List[float] = TARGET_PARAMS,
+        noise_is_added: bool = False,
+        sigma: float = 75.0
+    ):
+    scores = []
+    for key, target in zip(param_keys, target_params):
+        # ドット区切りでアクセス
+        val = individual
+        for k in key.split('.'):
+            val = val.get(k, None)
+            if val is None:
+                break
+        if val is None:
+            scores.append(0)
+        else:
+            # 正規分布の確率密度関数（最大値1）
+            score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
+            # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
+            scores.append(score)
+
+    # 統合
+    total_score = sum(scores)  if scores else 0
+    if noise_is_added:
+        total_score = add_noise(value=total_score, scale=1.0)  # ノイズを加えて
+
+    # total_score = total_score * 10  # 0～10にスケール
+    # total_score = int(round(total_score))  # 0～10の整数に丸める
+    # total_score = (max(0, min(10, total_score)))  # 範囲外は補正
+    return total_score
+
+    pass
+def calculate_Sphere():
+    pass
+def calculate_Gaussian_cos():
+    pass
+def calculate_Ackley():
+    pass
+def calculate_Gaussian_two_peak():
+    pass
+
 # FMパラメータに基づいた評価（例：operator1のfrequencyに基づく）
 def evaluate_fitness_by_param(
     population: List[dict],

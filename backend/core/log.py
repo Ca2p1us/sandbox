@@ -8,6 +8,7 @@ import wave
 from scipy.signal import sawtooth
 import uuid
 from .geneticAlgorithm.config import ATTACK_RANGE, NUM_GENERATIONS
+from typing import List
 import japanize_matplotlib
 
 
@@ -40,7 +41,7 @@ def log_fitness(method: str = None, file_path: str = None, best_fitness_history=
     elif evaluate_num == 2:
         method = "Sphere"
     elif evaluate_num == 3:
-        method = "Rastrigin"
+        method = "Gaussian_cos"
     elif evaluate_num == 4:
         method = "Ackley"
     elif evaluate_num == 5:
@@ -109,7 +110,7 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     elif method_num == 2:
         method = "Sphere"
     elif method_num == 3:
-        method = "Rastrigin"
+        method = "Gaussian_cos"
     elif method_num == 4:
         method = "Ackley"
     elif method_num == 5:
@@ -161,7 +162,7 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best
     elif evaluate_num == 2:
         method = "Sphere"
     elif evaluate_num == 3:
-        method = "Rastrigin"
+        method = "Gaussian_cos"
     elif evaluate_num == 4:
         method = "Ackley"
     elif evaluate_num == 5:
@@ -433,7 +434,7 @@ def log_average_fitness(method: str = None, interpolate_method:str = None,file_p
         method_num = 1
     elif method == "Sphere":
         method_num = 2
-    elif method == "Rastrigin":
+    elif method == "Gaussian_cos":
         method_num = 3
     elif method == "Ackley":
         method_num = 4
@@ -456,18 +457,3 @@ def log_average_fitness(method: str = None, interpolate_method:str = None,file_p
         json.dump({f"{times}_average_fitness":average_fitness_history}, f, indent=2)
 
     return
-
-def compute_interpolation_error(population, true_eval_func, param_keys):
-    """
-    全個体について補間値と真値のMSEを計算
-    """
-    errors = []
-    for ind in population:
-        # 真値計算
-        params = [get_nested_value(ind, k) for k in param_keys]
-        true_val = true_eval_func(params)
-        interp_val = ind.get("pre_evaluation", None)
-        if interp_val is None:
-            continue
-        errors.append((true_val - interp_val) ** 2)
-    return np.mean(errors) if errors else None

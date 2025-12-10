@@ -50,6 +50,7 @@ SUSTAIN_TIME_RANGE = (0, 500)
 RELEASE_RANGE = (0, 500)
 FREQUENCY_RANGE = (0, 500)
 PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustainTime", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
+FITNESS_KEY = ["fitness", "pre_evaluation"]
 TARGET_PARAMS = [250, 250, 250, 250, 250, 250]
 TARGET_PARAMS_1 = [150, 150, 150, 150, 150, 150]
 TARGET_PARAMS_2 = [350, 350, 350, 350, 350, 350]

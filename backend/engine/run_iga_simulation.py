@@ -52,9 +52,9 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
                 noise_is_added=noise_is_added
             )
         elif evaluate_num == 3:
-        # 2-3. Rastrigin関数
-            evaluate_method = "Rastrigin"
-            evaluate.evaluate_fitness_cos(
+        # 2-3. Gauss関数+cos関数
+            evaluate_method = "Gaussian_cos"
+            evaluate.evaluate_fitness_gaussian_cos(
                 population=population,
                 param_keys=PARAMS,
                 noise_is_added=noise_is_added
@@ -141,7 +141,7 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
             noise_is_added=noise_is_added
         )
     elif evaluate_num == 3:
-        evaluate.evaluate_fitness_cos(
+        evaluate.evaluate_fitness_gaussian_cos(
             population=population,
             param_keys=PARAMS,
             noise_is_added=noise_is_added
@@ -177,8 +177,8 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
     if look and times == 1:
         plot_individual_params(population=population,best=best,worst=worst, param_keys=PARAMS, generation=NUM_GENERATIONS, file_path=f'./result/conventional/graph/{evaluate_method}/scatter/{evaluate_method}_noise{str(noise_is_added)}_{str(POPULATION_SIZE)}_individuals_{str(NUM_GENERATIONS)}gens')
     # 6. 最終結果の出力
-    log("result/conventional/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+".json", population,times = times+1)
-    log("result/conventional/best/"+evaluate_method+"/best_individual_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+".json", bests,times = times+1)
+    log("result/conventional/last_gen_individuals/"+evaluate_method+"/simulation_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+".json", population,times = times)
+    log("result/conventional/best/"+evaluate_method+"/best_individual_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+".json", bests,times = times)
     log_fitness(method=evaluate_method, file_path="result/conventional/graph/"+evaluate_method+"/best_fitnesses/"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+"_best_fitness_history.png", best_fitness_history=best_fitness_history, average_fitness_history=average_fitness_history)
     log_average_fitness(method=evaluate_method, file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_"+str(times)+"_average_fitness_history.json", average_fitness_history=average_fitness_history, times=times)
     return best_fitness_history,average_fitness_history
@@ -188,6 +188,7 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
 def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200, EVALUATE_SIZE=9, evaluate_num=0, interpolate_num=0, times:int=1, noise_is_added:bool=False, look: bool = False):
     best_fitness_history = []
     average_fitness_history = []
+    MSE_history = []
     bests = []
     evaluate_method = ""
     interpolate = "linear"
@@ -247,12 +248,12 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
                 noise_is_added=noise_is_added
             )
         elif evaluate_num == 3:
-        # 2-4. Rastrigin関数
-            evaluate_method = "Rastrigin"
-            evaluate.evaluate_fitness_cos(
+        # 2-4. Gauss関数+cos関数
+            evaluate_method = "Gaussian_cos"
+            evaluate.evaluate_fitness_gaussian_cos(
                 population=population,
                 param_keys=PARAMS,
-                id_list=evaluate_population,
+                evaluate_population=evaluate_population,
                 noise_is_added=noise_is_added
             )
         elif evaluate_num == 4:
@@ -386,10 +387,10 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             noise_is_added=noise_is_added
         )
     elif evaluate_num == 3:
-        evaluate.evaluate_fitness_cos(
+        evaluate.evaluate_fitness_gaussian_cos(
             population=population,
             param_keys=PARAMS,
-            id_list=evaluate_population,
+            evaluate_population=evaluate_population,
             noise_is_added=noise_is_added
         )
     elif evaluate_num == 4:
@@ -430,8 +431,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         plot_individual_params(population=population,best=best,worst=worst, param_keys=PARAMS, generation=NUM_GENERATIONS, file_path=f'./result/proposal/graph/{evaluate_method}/{interpolate}/scatter/{evaluate_method}_noise{str(noise_is_added)}_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}_individuals_{str(NUM_GENERATIONS)}gens')
     print(f"------------------------------------")
     # 6. 最終結果の出力
-    log("result/proposal/last_gen_individuals/"+evaluate_method+"/"+interpolate+"/simulation_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", population,times = times+1)
-    log("result/proposal/best/"+evaluate_method+"/"+interpolate+"/best_individual_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", bests,times = times+1)
+    log("result/proposal/last_gen_individuals/"+evaluate_method+"/"+interpolate+"/simulation_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", population,times = times)
+    log("result/proposal/best/"+evaluate_method+"/"+interpolate+"/best_individual_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", bests,times = times)
     log_fitness(method=evaluate_method, file_path="result/proposal/graph/"+evaluate_method+"/"+interpolate+"/best_fitnesses/"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_"+str(times)+"_best_fitness_history.png", best_fitness_history=best_fitness_history, average_fitness_history=average_fitness_history)
     log_average_fitness(method=evaluate_method, interpolate_method=interpolate, file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_"+str(times)+"_average_fitness_history.json", average_fitness_history=average_fitness_history, times=times)
     return best_fitness_history, average_fitness_history

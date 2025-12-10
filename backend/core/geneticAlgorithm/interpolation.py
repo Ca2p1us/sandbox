@@ -4,8 +4,11 @@ from typing import List, Dict
 import math
 from scipy.interpolate import RBFInterpolator
 import numpy as np
+from ..geneticAlgorithm.config import FITNESS_KEY
+from ...engine import evaluate
 
 RNG = np.random.default_rng(seed=10)
+
 
 def interpolate_by_distance(
     population: List[dict],

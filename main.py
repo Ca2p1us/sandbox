@@ -17,7 +17,7 @@ interpolate_num = 100
 print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション\n3: 3種比較")
 choice = input("実行するシミュレーションを選択 (1/3): ")
 if choice == "2":
-    print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Rastrigin関数\n4: Ackley関数\n5: Gaussian_two_peak関数")
+    print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Gauss関数+cos関数\n4: Ackley関数\n5: Gaussian_two_peak関数")
     evaluate_num = input("評価関数の番号を入力してください: ")
     print(f"補間方法を選択してください。\n0: 距離に基づく線形補間\n1: ガウス関数に基づく補間\n2: RBF補間")
     interpolate_num = input("補間方法の番号を入力してください: ")
@@ -39,7 +39,7 @@ if choice == "2":
     log_fitness_histories(int(evaluate_num), int(interpolate_num), "_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_best_fitness_histories.png", best_fitness_histories, ver="proposal")
 
 elif choice == "1":
-    print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Rastrigin関数\n4: Ackley関数\n5: Gaussian_two_peak関数")
+    print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Gauss関数+cos関数\n4: Ackley関数\n5: Gaussian_two_peak関数")
     evaluate_num = input("評価関数の番号を入力してください: ")
     print(f"ノイズを追加しますか？\n0: 追加しない\n1: 追加する")
     TF = input("ノイズを追加しますか？ (0/1): ")
@@ -64,7 +64,7 @@ elif choice == "3":
     evaluate_size = int(input(f"評価個体数を入力してください\n評価個体数: "))
     if evaluate_size <= 0:
         evaluate_size = EVALUATE_SIZE
-    print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Rastrigin関数\n4: Ackley関数\n5: Gaussian_two_peak関数")
+    print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Gauss関数+cos関数\n4: Ackley関数\n5: Gaussian_two_peak関数")
     evaluate_num = input("評価関数の番号を入力してください: ")
     print(f"補間方法を選択してください。\n0: 距離に基づく線形補間\n1: ガウス関数に基づく補間\n2: RBF補間")
     interpolate_num = input("補間方法の番号を入力してください: ")
