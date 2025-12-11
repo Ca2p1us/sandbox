@@ -4,10 +4,31 @@ from typing import List, Dict
 import math
 from scipy.interpolate import RBFInterpolator
 import numpy as np
-from ..geneticAlgorithm.config import FITNESS_KEY
+from ..geneticAlgorithm.config import FITNESS_KEY, PARAMS
 from ...engine import evaluate
 
 RNG = np.random.default_rng(seed=10)
+
+
+def interpolation(
+  population: List[dict],
+  best: dict,
+  worst: dict,
+  method_num: int = 0,
+  param_keys: List[str] = PARAMS,
+  target_key: str = "pre_evaluation",      
+):
+    print(f"補間を開始します。")
+    if not best or not worst:
+        print(f"bestまたはworstがNoneです。ランダムな{target_key}を付与します。")
+        for ind in population:
+            ind[target_key] = RNG.uniform(1.0, 10.0)
+        return
+    if param_keys is None:
+        # デフォルトはoperator1のfrequencyのみ
+        param_keys = ["fmParamsList.operator1.frequency"]
+    
+    return
 
 
 def interpolate_by_distance(

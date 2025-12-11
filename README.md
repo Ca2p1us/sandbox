@@ -196,3 +196,7 @@ python main.py
     - 来年以降もIGAを触るならXGBoostとか別の部分からのアプローチも調べないとなぁ
     - GA単体で何とかする研究は少ないんだなぁ
     - ほかの最適化手法やシンプルなGAに特殊な処理を加えるとよりよくなる(当たり前)
+
+- やること
+    - evaluate.pyの大規模改修
+        - 評価関数の分岐をrun_iga_simulationではなく、method_numで管理してevaluate.pyで行う

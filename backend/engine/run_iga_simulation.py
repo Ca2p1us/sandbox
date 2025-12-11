@@ -9,7 +9,7 @@ from ..core.geneticAlgorithm.interpolation import interpolate_by_distance, inter
 from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_pre_evaluation
 from ..core.geneticAlgorithm.config import TARGET_PARAMS, PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2
 from ..core.log import log, log_fitness, plot_individual_params, log_average_fitness
-from ..engine import evaluate
+from ..engine.evaluate import evaluate_fitness, get_best_and_worst_individuals, get_best_and_worst_individuals_by_id, get_average_fitness
 import uuid
 
 
@@ -24,68 +24,41 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
     average_fitness_history = []
     average_fitness_history = []
     bests = []
+    if evaluate_num == 1:
+    # 2-1. ガウス関数
+        evaluate_method = "Gaussian"
+    elif evaluate_num == 2:
+    # 2-2. スフィア関数
+        evaluate_method = "Sphere"
+    elif evaluate_num == 3:
+    # 2-3. Gauss関数+cos関数
+        evaluate_method = "Gaussian_cos"
+    elif evaluate_num == 4:
+    # 2-4. Ackley関数
+        evaluate_method = "Ackley"
+    elif evaluate_num == 5:
+    # 2-5. Gaussian_two_peak関数
+            evaluate_method = "Gaussian_two_peak"
     # 1. 初期個体生成
     population = make_initial_population(POPULATION_SIZE)
     
     for generation in range(NUM_GENERATIONS - 1):
         # 2. 評価
         print(f"\n--- Generation {generation + 1} の評価を行います ---")
-        if evaluate_num == 1:
-        # 2-1. ガウス関数
-            evaluate_method = "Gaussian"
-            evaluate.evaluate_fitness_by_param(
-                #評価対象集団
-                population,
-                #目標値
-                target_params=TARGET_PARAMS,
-                #評価対象パラメータ
-                param_keys=PARAMS,
-                noise_is_added=noise_is_added
-            )
-        elif evaluate_num == 2:
-        # 2-2. スフィア関数
-            evaluate_method = "Sphere"
-            evaluate.evaluate_fitness_sphere(
-                population=population,
-                target_params=TARGET_PARAMS,
-                param_keys=PARAMS,
-                noise_is_added=noise_is_added
-            )
-        elif evaluate_num == 3:
-        # 2-3. Gauss関数+cos関数
-            evaluate_method = "Gaussian_cos"
-            evaluate.evaluate_fitness_gaussian_cos(
-                population=population,
-                param_keys=PARAMS,
-                noise_is_added=noise_is_added
-            )
-        elif evaluate_num == 4:
-        # 2-4. Ackley関数
-            evaluate_method = "Ackley"
-            evaluate.evaluate_fitness_Ackley(
-                population=population,
-                param_keys=PARAMS,
-                target_params=TARGET_PARAMS,
-                noise_is_added=noise_is_added
-            )
-        elif evaluate_num == 5:
-        # 2-5. Gaussian_two_peak関数
-            evaluate_method = "Gaussian_two_peak"
-            evaluate.evaluate_fitness_gaussian_two_peak(
-                population=population,
-                target_params=TARGET_PARAMS_1,
-                target_params_2=TARGET_PARAMS_2,
-                param_keys=PARAMS,
-                noise_is_added=noise_is_added
-            )
-        best, worst = evaluate.get_best_and_worst_individuals(population)
+        evaluate_fitness(
+            population=population,
+            evaluate_num=evaluate_num,
+            param_keys=PARAMS,
+            noise_is_added=noise_is_added
+        )
+        best, worst = get_best_and_worst_individuals(population)
         print(f"Generation {generation + 1}\n \t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
         # --- ここで履歴に追加 ---
         if best is not None and "fitness" in best:
             best_fitness_history.append((generation + 1, float(best["fitness"])))
             bests.append(best)
         # 評価の平均値を表示
-        average = evaluate.get_average_fitness(population)
+        average = get_average_fitness(population)
         print(f"average fitness:", average)
         if average is not None:
             average_fitness_history.append((generation + 1, float(average)))
@@ -126,49 +99,20 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
         population = next_generation
         print(f"------------------------------------")
     # --- ここで最終世代の評価値を再計算 ---
-    if evaluate_num == 1:
-        evaluate.evaluate_fitness_by_param(
+    evaluate_fitness(
             population=population,
-            target_params=TARGET_PARAMS,
-            param_keys=PARAMS,
-            noise_is_added=noise_is_added
-        )
-    elif evaluate_num == 2:
-        evaluate.evaluate_fitness_sphere(
-            population =population,
-            target_params=TARGET_PARAMS,
-            param_keys=PARAMS,
-            noise_is_added=noise_is_added
-        )
-    elif evaluate_num == 3:
-        evaluate.evaluate_fitness_gaussian_cos(
-            population=population,
-            param_keys=PARAMS,
-            noise_is_added=noise_is_added
-        )
-    elif evaluate_num == 4:
-        evaluate.evaluate_fitness_Ackley(
-            population=population,
-            param_keys=PARAMS,
-            target_params=TARGET_PARAMS,
-            noise_is_added=noise_is_added
-        )
-    elif evaluate_num == 5:
-        evaluate.evaluate_fitness_gaussian_two_peak(
-            population=population,
-            target_params=TARGET_PARAMS_1,
-            target_params_2=TARGET_PARAMS_2,
+            evaluate_num=evaluate_num,
             param_keys=PARAMS,
             noise_is_added=noise_is_added
         )
 
     # ベスト・ワースト個体の取得
-    best, worst = evaluate.get_best_and_worst_individuals(population)
+    best, worst = get_best_and_worst_individuals(population)
     interpolate_by_distance(population, best, worst, target_key='fitness')
     # 評価の平均値を表示
-    average = evaluate.get_average_fitness(population)
+    average = get_average_fitness(population)
     print(f"Generation {NUM_GENERATIONS}\n average fitness:", average)
-    average = evaluate.get_average_fitness(population)
+    average = get_average_fitness(population)
     print(f"Generation {NUM_GENERATIONS}\n average fitness:", average)
     print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
     best_fitness_history.append((NUM_GENERATIONS, float(best["fitness"])))
@@ -192,6 +136,21 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     bests = []
     evaluate_method = ""
     interpolate = "linear"
+    if evaluate_num == 1:
+    # 2-1. ガウス関数
+        evaluate_method = "Gaussian"
+    elif evaluate_num == 2:
+    # 2-2. スフィア関数
+        evaluate_method = "Sphere"
+    elif evaluate_num == 3:
+    # 2-3. Gauss関数+cos関数
+        evaluate_method = "Gaussian_cos"
+    elif evaluate_num == 4:
+    # 2-4. Ackley関数
+        evaluate_method = "Ackley"
+    elif evaluate_num == 5:
+    # 2-5. Gaussian_two_peak関数
+        evaluate_method = "Gaussian_two_peak"
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
     # 初期個体の事前評価(補間)
@@ -222,72 +181,23 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     for generation in range(NUM_GENERATIONS - 1):
         # 2. 評価
         print(f"\n--- Generation {generation + 1} の評価を行います ---")
-        if evaluate_num == 1:
-        # 2-1. ガウス関数
-            evaluate_method = "Gaussian"
-            evaluate.evaluate_fitness_by_param(
-                #評価対象集団
-                population,
-                #目標値
-                target_params=TARGET_PARAMS,
-                #評価対象パラメータ
-                param_keys=PARAMS,
-                #評価方法"product", "mean", "max", "min", "median"
-                #評価個体のリスト
-                evaluate_population=evaluate_population,
-                noise_is_added=noise_is_added
-            )
-        elif evaluate_num == 2:
-        # 2-2. スフィア関数
-            evaluate_method = "Sphere"
-            evaluate.evaluate_fitness_sphere(
-                population=population,
-                target_params=TARGET_PARAMS,
-                param_keys=PARAMS,
-                evaluate_population=evaluate_population,
-                noise_is_added=noise_is_added
-            )
-        elif evaluate_num == 3:
-        # 2-4. Gauss関数+cos関数
-            evaluate_method = "Gaussian_cos"
-            evaluate.evaluate_fitness_gaussian_cos(
-                population=population,
-                param_keys=PARAMS,
-                evaluate_population=evaluate_population,
-                noise_is_added=noise_is_added
-            )
-        elif evaluate_num == 4:
-        # 2-5. Ackley関数
-            evaluate_method = "Ackley"
-            evaluate.evaluate_fitness_Ackley(
-                population=population,
-                param_keys=PARAMS,
-                target_params=TARGET_PARAMS,
-                evaluate_population=evaluate_population,
-                noise_is_added=noise_is_added
-            )
-        elif evaluate_num == 5:
-        # 2-6. Gaussian_two_peak関数
-            evaluate_method = "Gaussian_two_peak"
-            evaluate.evaluate_fitness_gaussian_two_peak(
-                population=population,
-                target_params=TARGET_PARAMS_1,
-                target_params_2=TARGET_PARAMS_2,
-                param_keys=PARAMS,
-                evaluate_population =evaluate_population,
-                noise_is_added=noise_is_added
-            )
+        evaluate_fitness(
+            population=evaluate_population,
+            evaluate_num=evaluate_num,
+            param_keys=PARAMS,
+            noise_is_added=noise_is_added
+        )
         # ベスト・ワースト個体の取得
-        best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population)
+        best, worst = get_best_and_worst_individuals_by_id(evaluate_population)
         # ほかの個体の評価を補間
         if interpolate_num == 0:
-            interpolate_by_distance(population, best, worst, target_key='fitness')
+            interpolate_by_distance(population, best, worst, param_keys=PARAMS, target_key='fitness')
         elif interpolate_num == 1:
             interpolate_by_Gaussian(population, best, worst, param_keys=PARAMS, target_key="fitness")
         elif interpolate_num == 2:
             interpolate_by_RBF(population, evaluate_population, param_keys=PARAMS, target_key="fitness")
         # 評価の平均値を表示
-        average = evaluate.get_average_fitness(population)
+        average = get_average_fitness(population)
         print(f"average fitness:", average)
         print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
 
@@ -370,48 +280,14 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
 
     # --- ここで最終世代の評価値を再計算 ---
     print(f"\n--- Generation {NUM_GENERATIONS} の評価を行います ---")
-    if evaluate_num == 1:
-        evaluate.evaluate_fitness_by_param(
-            population,
-            target_params=TARGET_PARAMS,
+    evaluate_fitness(
+            population=evaluate_population,
+            evaluate_num=evaluate_num,
             param_keys=PARAMS,
-            evaluate_population=evaluate_population,
-            noise_is_added=noise_is_added
-        )
-    elif evaluate_num == 2:
-        evaluate.evaluate_fitness_sphere(
-            population =population,
-            target_params=TARGET_PARAMS,
-            param_keys=PARAMS,
-            evaluate_population=evaluate_population,
-            noise_is_added=noise_is_added
-        )
-    elif evaluate_num == 3:
-        evaluate.evaluate_fitness_gaussian_cos(
-            population=population,
-            param_keys=PARAMS,
-            evaluate_population=evaluate_population,
-            noise_is_added=noise_is_added
-        )
-    elif evaluate_num == 4:
-        evaluate.evaluate_fitness_Ackley(
-            population=population,
-            param_keys=PARAMS,
-            target_params=TARGET_PARAMS,
-            evaluate_population=evaluate_population,
-            noise_is_added=noise_is_added
-        )
-    elif evaluate_num == 5:
-        evaluate.evaluate_fitness_gaussian_two_peak(
-            population=population,
-            target_params=TARGET_PARAMS_1,
-            target_params_2=TARGET_PARAMS_2,
-            param_keys=PARAMS,
-            evaluate_population=evaluate_population,
             noise_is_added=noise_is_added
         )
     # ベスト・ワースト個体の取得
-    best, worst = evaluate.get_best_and_worst_individuals_by_id(evaluate_population)
+    best, worst = get_best_and_worst_individuals_by_id(evaluate_population)
     if interpolate_num == 0:
         interpolate_by_distance(population, best, worst, target_key='fitness')
     elif interpolate_num == 1:
@@ -419,10 +295,10 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     elif interpolate_num == 2:
         interpolate_by_RBF(population, evaluate_population, param_keys=PARAMS, target_key="fitness")
     # 評価の平均値を表示
-    average = evaluate.get_average_fitness(population)
+    average = get_average_fitness(population)
     print(f"Generation {NUM_GENERATIONS}\n average fitness:", average)
     # 上位9個体の平均評価値を表示
-    print(f" average fitness of top {EVALUATE_SIZE}:", evaluate.get_average_fitness(population,evaluate_population))
+    print(f" average fitness of top {EVALUATE_SIZE}:", get_average_fitness(population,evaluate_population))
     print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
     best_fitness_history.append((NUM_GENERATIONS, float(best["fitness"])))
     average_fitness_history.append((NUM_GENERATIONS, float(average)))

@@ -4,7 +4,7 @@ import uuid
 import numpy as np
 from scipy.stats import norm
 from typing import List
-from ..core.geneticAlgorithm.config import TARGET_PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2
+from ..core.geneticAlgorithm.config import PARAMS, TARGET_PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2
 
 def add_noise(value: float, noise_sigma: float = 1.0, noise_mean = 0, scale = 1.0) -> float:
     # 平均0、標準偏差noise_sigmaの正規分布ノイズを加算
@@ -26,23 +26,18 @@ def evaluate_fitness_random(population: List[dict], noise_is_added: bool = False
 
 def evaluate_fitness(
     population: List[dict],
-    param_keys: List[str] = None,
-    evaluate_population: List[dict] = None,
+    evaluate_num: int = 1,
+    param_keys: List[str] = PARAMS,
     noise_is_added: bool = False,
-    evaluate_num: int = 1
     ):
     """"
     評価関数の振り分け
     """
     if param_keys is None:
         param_keys = ["fmParamsList.operator1.frequency"]
-    if evaluate_population is None:
-        evaluate_population = population
     for ind in population:
         if not isinstance(ind, dict):
             print("警告: individualがdict型ではありません:", ind)
-            continue
-        if ind not in evaluate_population:
             continue
         if evaluate_num == 1:
             ind['fitness'] = calculate_Gaussian(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
@@ -89,15 +84,141 @@ def calculate_Gaussian(
     # total_score = (max(0, min(10, total_score)))  # 範囲外は補正
     return total_score
 
-    pass
-def calculate_Sphere():
-    pass
-def calculate_Gaussian_cos():
-    pass
-def calculate_Ackley():
-    pass
-def calculate_Gaussian_two_peak():
-    pass
+def calculate_Sphere(
+    individual: dict = None,
+    param_keys: List[str] = None,
+    target_params: List[float] = TARGET_PARAMS,
+    noise_is_added: bool = False
+):
+    scores = []
+    for key, target in zip(param_keys, target_params):
+        # ドット区切りでアクセス
+        val = individual
+        for k in key.split('.'):
+            val = val.get(k, None)
+            if val is None:
+                break
+        if val is None:
+            scores.append(0)
+        else:
+            # 正規分布の確率密度関数（最大値1）
+            score = -1 * (float(val) - target) ** 2
+            # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
+            scores.append(score)
+
+    # 統合
+    total_score = sum(scores)  if scores else 0
+    if noise_is_added:
+        total_score = add_noise(value=total_score, scale=1.0)  # ノイズを加えて
+
+    # total_score = total_score * 10  # 0～10にスケール
+    # total_score = int(round(total_score))  # 0～10の整数に丸める
+    # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
+    return total_score
+    
+def calculate_Gaussian_cos(
+    individual: dict,
+    param_keys: List[str] = None,
+    target_params: List[float] = TARGET_PARAMS,
+    noise_is_added: bool = False,
+    sigma: float = 75.0,
+    frequency: float = 0.02,
+):
+    """
+    param_keysで指定した各パラメータがtarget_paramsの値に近いほど高評価（正規分布に基づく）
+    id_listが指定された場合は、そのID（chromosomeId）を持つ個体のみfitnessを付与
+    統合手法は平均値
+    """
+    scores = []
+    for key, target in zip(param_keys, target_params):
+        # ドット区切りでアクセス
+        val = individual
+        for k in key.split('.'):
+            val = val.get(k, None)
+            if val is None:
+                break
+        if val is None:
+            scores.append(0)
+        else:
+            # 正規分布の確率密度関数（最大値1）
+            score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + 0.5 * np.cos(2 * np.pi * frequency * float(val))
+            # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
+            scores.append(score)
+
+    # 統合
+    total_score = sum(scores)  if scores else 0
+    if noise_is_added:
+        total_score = add_noise(value=total_score, scale=1.0)  # ノイズを加えて
+
+    # total_score = total_score * 10  # 0～10にスケール
+    # total_score = int(round(total_score))  # 0～10の整数に丸める
+    # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
+    return total_score
+    
+def calculate_Ackley(
+        individual: dict,
+        param_keys: List[str] = None,
+        target_params: List[float] = TARGET_PARAMS,
+        noise_is_added: bool = False,
+        A = 300,
+        B = 0.005,
+        C = 2*np.pi,
+):
+    values = []
+    for key in param_keys:
+        val = individual
+        for k in key.split('.'):
+            val = val.get(k, None)
+            if val is None:
+                break
+        if val is None:
+            values.append(0)
+        else:
+            values.append(float(val))
+
+    # 統合
+    fitness = 0
+    fitness -= -A * np.exp(-B * np.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - np.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + np.e
+    # 必要に応じてスケーリングやノイズ付与も可能
+    fitness = -fitness
+    fitness = fitness / 50.0
+    if noise_is_added:
+        fitness = add_noise(value=fitness, scale=1.0)
+    return fitness
+
+def calculate_Gaussian_two_peak(
+    individual: dict,
+    param_keys: List[str] = None,
+    target_params: List[float] = TARGET_PARAMS_1,
+    target_params_2: List[float] = TARGET_PARAMS_2,
+    noise_is_added: bool = False,
+    sigma: float = 30.0,
+):
+    scores = []
+    for key, target, target_2 in zip(param_keys, target_params, target_params_2):
+        # ドット区切りでアクセス
+        val = individual
+        for k in key.split('.'):
+            val = val.get(k, None)
+            if val is None:
+                break
+        if val is None:
+            scores.append(0)
+        else:
+            # 正規分布の確率密度関数（最大値1）
+            score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + np.exp(-((float(val) - target_2) ** 2) / (2 * sigma ** 2))
+            # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
+            scores.append(score)
+
+    # 統合
+    total_score = sum(scores)  if scores else 0
+    if noise_is_added:
+        total_score = add_noise(value=total_score, scale=1.0)  # ノイズを加えて
+
+    # total_score = total_score * 10  # 0～10にスケール
+    # total_score = int(round(total_score))  # 0～10の整数に丸める
+    # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
+    return total_score
 
 # FMパラメータに基づいた評価（例：operator1のfrequencyに基づく）
 def evaluate_fitness_by_param(
@@ -395,6 +516,7 @@ def evaluate_fitness_gaussian_two_peak(
         # total_score = int(round(total_score))  # 0～10の整数に丸める
         # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
         individual['fitness'] = total_score
+
 
 def evaluate_fitness_gaussian_cos(
     population: List[dict],
