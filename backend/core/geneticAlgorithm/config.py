@@ -1,0 +1,69 @@
+# 遺伝子型の最小値、最大値を保持
+# 報知のイメージが強い音の群 での，立ち上がり時間の平均は143ms
+# ATTACK_RANGE = (0, 0.25)
+# DECAY_RANGE = (0, 0.25)
+# SUSTAIN_RANGE = (0, 1)
+# SUSTAIN_TIME_RANGE = (0, 0.3)
+# # 4kHzでは0〜100msがチッ、100〜200msがチン、300ms以上がチーン
+# RELEASE_RANGE = (0, 0.35)
+# FREQUENCY_RANGE = (0.200, 1.300)
+
+
+# ATTACK_RANGE = (0, 0.25)
+# DECAY_RANGE = (0, 0.25)
+# SUSTAIN_RANGE = (0, 1)
+# SUSTAIN_TIME_RANGE = (0, 0.30)
+# # 4kHzでは0〜100msがチッ、100〜200msがチン、300ms以上がチーン
+# RELEASE_RANGE = (0, 0.35)
+# FREQUENCY_RANGE = (0.200, 1.300)
+
+
+# RELEASE_RANGE:4kHzでは0〜100msがチッ、100〜200msがチン、300ms以上がチーン
+
+# "[1,2,3,4]の出現確率が等しくなるように(0.5,4,5)と調整"
+# RATIO_TO_CARRIER_FREQUENCY_RANGE = (0.5, 4.5)
+# RATIO_TO_CARRIER_FREQUENCY_RANGE = (1.0, 6.0)
+RATIO_TO_CARRIER_FREQUENCY_RANGE = (0.75, 6.0)
+MODULATION_INDEX_RANGE = (0, 300)
+ALGORITHM_NUM: int = 1
+
+
+
+# 元のパラメータ群
+# ATTACK_RANGE = (0, 250)
+# DECAY_RANGE = (0, 250)
+# SUSTAIN_RANGE = (0, 100)
+# SUSTAIN_TIME_RANGE = (0, 300)
+# RELEASE_RANGE = (0, 350)
+# 元のパラメータ群
+# ATTACK_RANGE = (0, 250)
+# DECAY_RANGE = (0, 250)
+# SUSTAIN_RANGE = (0, 100)
+# SUSTAIN_TIME_RANGE = (0, 300)
+# RELEASE_RANGE = (0, 350)
+# FREQUENCY_RANGE = (200, 1300)
+
+ATTACK_RANGE = (0, 500)
+DECAY_RANGE = (0, 500)
+SUSTAIN_RANGE = (0, 500)
+SUSTAIN_TIME_RANGE = (0, 500)
+RELEASE_RANGE = (0, 500)
+FREQUENCY_RANGE = (0, 500)
+PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustainTime", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
+FITNESS_KEY = ["fitness", "pre_evaluation"]
+TARGET_PARAMS = [250, 250, 250, 250, 250, 250]
+TARGET_PARAMS_1 = [150, 150, 150, 150, 150, 150]
+TARGET_PARAMS_2 = [350, 350, 350, 350, 350, 350]
+# TARGET_PARAMS = [0.03, 0.16, 0.89, 0.29, 0.06, 0.31690]
+# TARGET_PARAMS = [3, 160, 89, 29, 6, 316.90]
+IGNORE_RANGE = (200,300)
+
+NUM_GENERATIONS = 9
+POPULATION_SIZE = 10
+PROPOSAL_POPULATION_SIZE = 200
+EVALUATE_SIZE = 10
+EXPERIMENT_TIMES = 20
+
+
+GENERATION_CHROMOSOME_NUM: int = 10
+NUM_PARAM = 8
