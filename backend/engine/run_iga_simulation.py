@@ -5,7 +5,7 @@ from ..core.geneticAlgorithm import BLX_alpha
 from ..core.geneticAlgorithm.repair import repair_fm_params as repair_gene
 from ..core.geneticAlgorithm.mutate import mutate 
 from ..core.geneticAlgorithm import make_chromosome_params
-from ..core.geneticAlgorithm.interpolation import interpolate_by_distance, interpolate_by_Gaussian, interpolate_by_RBF, get_evaluated_individuals
+from ..core.geneticAlgorithm.interpolation import interpolation, interpolate_by_distance, interpolate_by_Gaussian, interpolate_by_RBF, get_evaluated_individuals
 from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_pre_evaluation
 from ..core.geneticAlgorithm.config import TARGET_PARAMS, PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2
 from ..core.log import log, log_fitness, plot_individual_params, log_average_fitness
@@ -155,24 +155,16 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
     # 初期個体の事前評価(補間)
     if interpolate_num == 0:
-        interpolate_by_distance(
-            population,
-            param_keys=PARAMS,
-            target_key="pre_evaluation"
-            )
+        interpolate = "linear"
     elif interpolate_num == 1:
         interpolate = "Gauss"
-        interpolate_by_Gaussian(
-            population,
-            param_keys=PARAMS,
-            target_key="pre_evaluation"
-            )
     elif interpolate_num == 2:
         interpolate = "RBF"
-        interpolate_by_RBF(
+    interpolation(
             population,
+            method_num=interpolate_num,
             param_keys=PARAMS,
-            target_key="pre_evaluation"
+            target_key="pre_evaluation",
             )
     # 評価個体の選択
     evaluate_id = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE)
@@ -189,14 +181,12 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         )
         # ベスト・ワースト個体の取得
         best, worst = get_best_and_worst_individuals_by_id(evaluate_population)
+        print(best['fitness'])
         # ほかの個体の評価を補間
-        if interpolate_num == 0:
-            interpolate_by_distance(population, best, worst, param_keys=PARAMS, target_key='fitness')
-        elif interpolate_num == 1:
-            interpolate_by_Gaussian(population, best, worst, param_keys=PARAMS, target_key="fitness")
-        elif interpolate_num == 2:
-            interpolate_by_RBF(population, evaluate_population, param_keys=PARAMS, target_key="fitness")
+        interpolation(population=population, evaluated_population=evaluate_population , best=best, worst=worst, method_num=interpolate_num, target_key="fitness")
+
         # 評価の平均値を表示
+        print(best['fitness'])
         average = get_average_fitness(population)
         print(f"average fitness:", average)
         print(f"\t Best fitness = {best['fitness']}\n \tWorst fitness = {worst['fitness']}")
@@ -251,28 +241,15 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
 
         population = next_generation
         #事前評価(補間)
-        if interpolate_num == 0:
-            interpolate_by_distance(
-            population,
-            best,
-            worst,
-            target_key="pre_evaluation"
-            )
-        elif interpolate_num == 1:
-            interpolate_by_Gaussian(
-                population,
-                best,
-                worst,
-                param_keys=PARAMS,
-                target_key="pre_evaluation"
-                )
-        elif interpolate_num == 2:
-            interpolate_by_RBF(
-                population,
-                evaluated_ind=evaluate_population,
-                param_keys=PARAMS,
-                target_key="pre_evaluation"
-                )
+        interpolation(
+            population = population,
+            evaluated_population = evaluate_population,
+            best = best, 
+            worst = worst,
+            method_num=interpolate_num,
+            param_keys=PARAMS,
+            target_key="pre_evaluation",
+        )
         # 評価個体の選択
         evaluate_id = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE)
         evaluate_population = get_evaluated_individuals(population, evaluate_id)
@@ -288,12 +265,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         )
     # ベスト・ワースト個体の取得
     best, worst = get_best_and_worst_individuals_by_id(evaluate_population)
-    if interpolate_num == 0:
-        interpolate_by_distance(population, best, worst, target_key='fitness')
-    elif interpolate_num == 1:
-        interpolate_by_Gaussian(population, best, worst, param_keys=PARAMS, target_key="fitness")
-    elif interpolate_num == 2:
-        interpolate_by_RBF(population, evaluate_population, param_keys=PARAMS, target_key="fitness")
+    # ほかの個体の評価を補間
+    interpolation(population=population,evaluated_population=evaluate_population , best=best, worst=worst, method_num=interpolate_num, target_key="fitness")
     # 評価の平均値を表示
     average = get_average_fitness(population)
     print(f"Generation {NUM_GENERATIONS}\n average fitness:", average)

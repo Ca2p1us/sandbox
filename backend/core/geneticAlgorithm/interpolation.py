@@ -17,7 +17,6 @@ def interpolation(
   worst: dict = None,
   method_num: int = 0,
   param_keys: List[str] = PARAMS,
-  fitness_key: List[str] = FITNESS_KEY,
   target_key: str = "pre_evaluation",      
 ):
     print(f"補間を開始します。")
@@ -36,8 +35,8 @@ def interpolation(
 
     if any(p is None for p in best_params) or any(p is None for p in worst_params):
         raise ValueError("best/worst に param_keys が存在しません。")
-    best_val = float(best.get(fitness_key[0], 1.0))
-    worst_val = float(worst.get(fitness_key[0], 1.0))
+    best_val = float(best.get(target_key, 1.0))
+    worst_val = float(worst.get(target_key, 1.0))
     #パラメータの事前計算
     if method_num == 0:
         #距離補間用のパラメータ計算
@@ -50,10 +49,10 @@ def interpolation(
         # ratio for sigma estimation（数値安定化）
         denom = (best_val - C)
         if denom == 0:
-            raise ValueError("best の target が C と等しい。sigma を推定できません。")
+            raise ValueError(f"best の target が C と等しい。sigma を推定できません。\nbest: {best_val}, C: {C}")
         ratio = (worst_val - C) / denom
         if not (0 < ratio < 1):
-            raise ValueError("ratio が (0,1) の範囲にない。best/worst の target を確認してください。")
+            raise ValueError(f"ratio が (0,1) の範囲にない。best/worst の target を確認してください。\nratio: {ratio}")
         sigma = get_sigma(best_params=best_params, worst_params=worst_params,ratio=ratio)
     if method_num ==2:
         # RBF補間用の学習データの計算
@@ -65,6 +64,7 @@ def interpolation(
         print(f"学習データの次元数: {np.shape(np.array(train_X))}, ラベル数: {len(train_Y)}")
         interpolator = RBFInterpolator(np.array(train_X), np.array(train_Y), kernel='gaussian', epsilon=1.5)
         
+    print(f"best_val: {best_val}, worst_val: {worst_val}")
     for ind in population:
         if method_num == 0:
             ind[target_key] = calculate_by_distance(
@@ -75,7 +75,6 @@ def interpolation(
                 best_val=best_val,
                 worst_val=worst_val,
                 best_params=best_params,
-                sigma=sigma,
             )
         elif method_num == 1:
             ind[target_key] = calculate_by_Gaussian(
@@ -113,7 +112,7 @@ def calculate_by_distance(
         value = best_val
         individual[target_key] = float(value)
         print(f"距離が同一です。\nbest {best_val}, worst {worst_val}")        
-        return
+        return value
     ind_params = to_vec(individual, param_keys=param_keys)
     dist_best = euclidean(ind_params, best_params)
     ratio = dist_best / max_dist
@@ -150,12 +149,11 @@ def calculate_by_Gaussian(
     A: float = 1.0,
     sigma: List[float] = None,
 ):
-    print(f"best_val: {best_val}, worst_val: {worst_val}")
     mu = best_params
     ind_params = [get_param(individual, k) for k in param_keys]
     if any(p is None for p in ind_params):
         individual[target_key] = RNG.uniform(1.0, 10.0)
-        return
+        return individual[target_key]
     # compute normalized squared distance
     dist_sq = 0.0
     for xj, muj, sj in zip(ind_params, mu, sigma):
@@ -170,10 +168,11 @@ def calculate_by_RBF(
     individual:dict= None,
     evaluated_population: List[dict] = None,
     param_keys: List[str] = None,
+    target_key: str = "pre_evaluation",
     interpolater = None,
 ):
     if individual in evaluated_population:
-        return
+        return float(individual.get(target_key, 0.0))
     x_vec = np.array([to_vec(individual, param_keys=param_keys)])
     est_value = interpolater(x_vec)[0]
     return float(est_value)
@@ -271,10 +270,10 @@ def interpolate_by_Gaussian(
     # ratio for sigma estimation（数値安定化）
     denom = (best.get("fitness", 1e-12) - C)
     if denom == 0:
-        raise ValueError("best の target が C と等しい。sigma を推定できません。")
+        raise ValueError(f"best の target が C と等しい。sigma を推定できません。best: {best.get('fitness', 1e-12)}, C: {C}")
     ratio = (worst.get("fitness", 1e-12) - C) / denom
     if not (0 < ratio < 1):
-        raise ValueError("ratio が (0,1) の範囲にない。best/worst の target を確認してください。")
+        raise ValueError(f"ratio が (0,1) の範囲にない。best/worst の target を確認してください。ratio: {ratio}")
 
     sigma = []
     for b, w in zip(best_params, worst_params):
