@@ -11,10 +11,10 @@ RNG = np.random.default_rng(seed=10)
 EPS_RATIO = 0.02  # ガウス補間のeps計算用割合
 
 def interpolation(
-  population: List[dict],
-  evaluated_population: List[dict],
-  best: dict,
-  worst: dict,
+  population: List[dict] = None,
+  evaluated_population: List[dict] = None,
+  best: dict = None,
+  worst: dict = None,
   method_num: int = 0,
   param_keys: List[str] = PARAMS,
   fitness_key: List[str] = FITNESS_KEY,
