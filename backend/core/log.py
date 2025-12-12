@@ -72,9 +72,13 @@ def log_fitness(method: str = None, file_path: str = None, best_fitness_history=
     ax.set_title("")  # グラフタイトル
     ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
     if method == "Gaussian":
-        ax.set_ylim(0,6)
+        ax.set_ylim(0,6.5)
     if method == "Ackley":
-        ax.set_ylim(3.0,4.5)
+        ax.set_ylim(2.0,4.5)
+    if method == "Gaussian_two_peak":
+        ax.set_ylim(0,6.5)
+    if method == "Gaussian_cos":
+        ax.set_ylim(-1.5,7.5)
     ax.grid(True)
     ax.plot(generations, fitness_values,
              marker='o', linestyle='-', color='blue', label='Best Fitness')
@@ -135,9 +139,13 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     ax.set_title(method+' Best Fitness Histories')
     ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
     if method == "Gaussian":
-        ax.set_ylim(0,6)
+        ax.set_ylim(0,6.5)
     if method == "Ackley":
-        ax.set_ylim(3.0,4.5)
+        ax.set_ylim(2.0,4.5)
+    if method == "Gaussian_two_peak":
+        ax.set_ylim(0,6.5)
+    if method == "Gaussian_cos":
+        ax.set_ylim(-1.5,7.5)
     ax.grid(True)
     # fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
@@ -193,11 +201,13 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best
     ax.set_title("")
     ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
     if method == "Gaussian":
-        ax.set_ylim(0,6)
+        ax.set_ylim(0,6.5)
     if method == "Ackley":
         ax.set_ylim(2.0,4.5)
     if method == "Gaussian_two_peak":
-        ax.set_ylim(0,6)
+        ax.set_ylim(0,6.5)
+    if method == "Gaussian_cos":
+        ax.set_ylim(-1.5,7.5)
     ax.grid(True)
     ax.legend(["補間なし9個体","補間なし200個体","補間あり"],prop={"family":"MS Gothic"},loc=0)
     # fig.tight_layout()

@@ -17,7 +17,8 @@ def interpolation(
   worst: dict = None,
   method_num: int = 0,
   param_keys: List[str] = PARAMS,
-  target_key: str = "pre_evaluation",      
+  target_key: str = "pre_evaluation",
+  refernce_key = "fitness",      
 ):
     print(f"補間を開始します。")
     if not best or not worst:
@@ -35,8 +36,8 @@ def interpolation(
 
     if any(p is None for p in best_params) or any(p is None for p in worst_params):
         raise ValueError("best/worst に param_keys が存在しません。")
-    best_val = float(best.get(target_key, 1.0))
-    worst_val = float(worst.get(target_key, 1.0))
+    best_val = float(best.get(refernce_key, 1.0))
+    worst_val = float(worst.get(refernce_key, 1.0))
     #パラメータの事前計算
     if method_num == 0:
         #距離補間用のパラメータ計算
