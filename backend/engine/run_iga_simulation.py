@@ -5,7 +5,7 @@ from ..core.geneticAlgorithm import BLX_alpha
 from ..core.geneticAlgorithm.repair import repair_fm_params as repair_gene
 from ..core.geneticAlgorithm.mutate import mutate 
 from ..core.geneticAlgorithm import make_chromosome_params
-from ..core.geneticAlgorithm.interpolation import interpolation, interpolate_by_distance, interpolate_by_Gaussian, interpolate_by_RBF, get_evaluated_individuals
+from ..core.geneticAlgorithm.interpolation import interpolation, get_evaluated_individuals, get_total_error
 from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_pre_evaluation
 from ..core.geneticAlgorithm.config import TARGET_PARAMS, PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2
 from ..core.log import log, log_fitness, plot_individual_params, log_average_fitness
@@ -21,7 +21,6 @@ def make_initial_population(num_individuals=10):
 
 def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_num=0, times:int=1, noise_is_added: bool = False, look: bool = False):
     best_fitness_history = []
-    average_fitness_history = []
     average_fitness_history = []
     bests = []
     if evaluate_num == 1:
@@ -108,7 +107,6 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
 
     # ベスト・ワースト個体の取得
     best, worst = get_best_and_worst_individuals(population)
-    interpolate_by_distance(population, best, worst, target_key='fitness')
     # 評価の平均値を表示
     average = get_average_fitness(population)
     print(f"Generation {NUM_GENERATIONS}\n average fitness:", average)
@@ -132,7 +130,7 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
 def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200, EVALUATE_SIZE=9, evaluate_num=0, interpolate_num=0, times:int=1, noise_is_added:bool=False, look: bool = False):
     best_fitness_history = []
     average_fitness_history = []
-    MSE_history = []
+    error_history = []
     bests = []
     evaluate_method = ""
     interpolate = "linear"
@@ -197,6 +195,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             bests.append(best)
         if average is not None:
             average_fitness_history.append((generation + 1, float(average)))
+        error_history.append((generation + 1, float(get_total_error(population=population, evaluate_num=evaluate_num))))
         if look and times == 1:
             plot_individual_params(population=population,best=best,worst=worst, param_keys=PARAMS, generation=generation + 1, file_path=f'./result/proposal/graph/{evaluate_method}/{interpolate}/scatter/{evaluate_method}_noise{str(noise_is_added)}_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}_individuals_{str(generation + 1)}gens')
         next_generation:List[Chromosomes]  = []
@@ -276,6 +275,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     best_fitness_history.append((NUM_GENERATIONS, float(best["fitness"])))
     average_fitness_history.append((NUM_GENERATIONS, float(average)))
     bests.append(best)
+    error_history.append((NUM_GENERATIONS, float(get_total_error(population=population, evaluate_num=evaluate_num))))
     if look and times == 1:
         plot_individual_params(population=population,best=best,worst=worst, param_keys=PARAMS, generation=NUM_GENERATIONS, file_path=f'./result/proposal/graph/{evaluate_method}/{interpolate}/scatter/{evaluate_method}_noise{str(noise_is_added)}_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}_individuals_{str(NUM_GENERATIONS)}gens')
     print(f"------------------------------------")
@@ -284,4 +284,4 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     log("result/proposal/best/"+evaluate_method+"/"+interpolate+"/best_individual_"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(times)+".json", bests,times = times)
     log_fitness(method=evaluate_method, file_path="result/proposal/graph/"+evaluate_method+"/"+interpolate+"/best_fitnesses/"+evaluate_method+"_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_"+str(times)+"_best_fitness_history.png", best_fitness_history=best_fitness_history, average_fitness_history=average_fitness_history)
     log_average_fitness(method=evaluate_method, interpolate_method=interpolate, file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_"+str(times)+"_average_fitness_history.json", average_fitness_history=average_fitness_history, times=times)
-    return best_fitness_history, average_fitness_history
+    return best_fitness_history, average_fitness_history, error_history

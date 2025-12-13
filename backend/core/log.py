@@ -10,6 +10,7 @@ import uuid
 from .geneticAlgorithm.config import ATTACK_RANGE, NUM_GENERATIONS
 from typing import List
 import japanize_matplotlib
+from pathlib import Path
 
 
 def log(file_path: str, answer,times: int):
@@ -25,10 +26,61 @@ def log(file_path: str, answer,times: int):
             return obj
 
     save_data = convert_uuid_to_str(answer)
-    with open(file_path, "w", encoding="utf-8") as f:
+    file_path = Path(file_path)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    with file_path.open(mode="w", encoding="utf-8") as f:
         json.dump({f"{times}_results": save_data}, f, indent=2)
 
     return
+
+def log_error_history(method: str = None, file_path: str = None, error_history=None, evaluate_num: int = None, interpolate_num: int = None, ver: str = None, title: str = None):
+    """
+    世代ごとのbest個体のfitness履歴をグラフ表示する
+    best_fitness_history: [(世代番号, fitness値), ...] のリスト
+    """
+    if evaluate_num == 1:
+        method = "Gaussian"
+    elif evaluate_num == 2:
+        method = "Sphere"
+    elif evaluate_num == 3:
+        method = "Gaussian_cos"
+    elif evaluate_num == 4:
+        method = "Ackley"
+    elif evaluate_num == 5:
+        method = "Gaussian_two_peak"
+    if interpolate_num == 0:
+        interpolate = "linear"
+    elif interpolate_num == 1:
+        interpolate = "Gauss"
+    elif interpolate_num == 2:
+        interpolate = "RBF"
+    if isinstance(evaluate_num, int):
+        if isinstance(interpolate_num, int):
+            file_path = f'./result/{ver}/graph/{method}/{interpolate}/error_histories/{method}{file_path}'
+            file_path = Path(file_path)
+        else:
+            file_path = f'./result/{ver}/graph/{method}/error_histories/{method}{file_path}'
+            file_path = Path(file_path)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    fig, ax = plt.subplots()
+    if not error_history:
+        print("履歴データがありません。")
+        return
+
+    generations = [item[0] for item in error_history]
+    error_values = [item[1] for item in error_history]
+
+    ax.set_xlabel('Generation')  # x軸ラベル
+    ax.set_ylabel('Error')  # y軸ラベル
+    ax.set_title("")  # グラフタイトル
+    ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
+    ax.grid(True)
+    ax.plot(generations, error_values,
+             marker='o', linestyle='-', color='blue', label='Error')
+    ax.legend(loc=0)
+    plt.savefig(file_path)
+    plt.close()
 
 
 def log_fitness(method: str = None, file_path: str = None, best_fitness_history=None, average_fitness_history=None, evaluate_num: int = None, interpolate_num: int = None, ver: str = None, title: str = None):
@@ -57,6 +109,8 @@ def log_fitness(method: str = None, file_path: str = None, best_fitness_history=
             file_path = f'./result/{ver}/graph/{method}/{interpolate}/best_fitnesses/{method}{file_path}'
         else:
             file_path = f'./result/{ver}/graph/{method}/best_fitnesses/{method}{file_path}'
+    file_path = Path(file_path)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
     
     fig, ax = plt.subplots()
     if not best_fitness_history:
@@ -145,14 +199,16 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     if method == "Gaussian_two_peak":
         ax.set_ylim(0,6.5)
     if method == "Gaussian_cos":
-        ax.set_ylim(-1.5,7.5)
+        ax.set_ylim(2.0,9.5)
     ax.grid(True)
     # fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
     if interpolate_num == 100:
-        plt.savefig(f'./result/{ver}/graph/{method}/best_fitnesses/{method}{file_path}')
+        file_path = Path(f'./result/{ver}/graph/{method}/best_fitnesses/{method}{file_path}')
     else:
-        plt.savefig(f'./result/{ver}/graph/{method}/{interpolate}/best_fitnesses/{method}{file_path}')
+        file_path = Path(f'./result/{ver}/graph/{method}/{interpolate}/best_fitnesses/{method}{file_path}')
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(file_path)
     plt.show()
     plt.close()
     return
@@ -207,15 +263,17 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best
     if method == "Gaussian_two_peak":
         ax.set_ylim(0,6.5)
     if method == "Gaussian_cos":
-        ax.set_ylim(-1.5,7.5)
+        ax.set_ylim(2.0,9.5)
     ax.grid(True)
     ax.legend(["補間なし9個体","補間なし200個体","補間あり"],prop={"family":"MS Gothic"},loc=0)
     # fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
     if interpolate_num == 100:
-        plt.savefig(f'./result/comparison/{method}{file_path}')
+        file_path = Path(f'./result/comparison/{method}{file_path}')
     else:
-        plt.savefig(f'./result/comparison/{method}/{interpolate}/{method}{file_path}')
+        file_path = Path(f'./result/comparison/{method}/{interpolate}/{method}{file_path}')
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(file_path)
     plt.show()
     plt.close()
     return
@@ -348,34 +406,6 @@ def sound_check(file_path=None):
     else:
         print("音声の再生をスキップします。")
 
-# def plot_individual_params(population: list[dict], param_keys: list[str], generation: int, file_path: str = None):
-#     """
-#     個体群の指定されたパラメータをプロットする関数
-#     param_key: "fmParamsList.operator1.frequency" のようなドット区切りで指定
-#     """
-#     def get_param(ind, key):
-#         # "fmParamsList.operator1.frequency" のようなドット区切りでアクセス
-#         val = ind
-#         for k in key.split('.'):
-#             val = val.get(k, None)
-#             if val is None:
-#                 break
-#         return val
-
-#     param_values1 = [get_param(ind, param_keys[0]) for ind in population]
-#     param_values2 = [get_param(ind, param_keys[1]) for ind in population]
-
-#     plt.xlim(-50,ATTACK_RANGE[1]+50)
-#     plt.ylim(-50,ATTACK_RANGE[1]+50)
-#     plt.title(f"Generation {generation} - individuals'")
-#     plt.xlabel("1st parameter")
-#     plt.ylabel("2nd parameter")
-#     plt.grid(True)
-#     plt.scatter(param_values1, param_values2)
-#     plt.savefig(file_path)
-#     plt.close()
-#     return
-
 def plot_individual_params(population: list[dict],best: dict,worst: dict, param_keys: list[str], generation: int, file_path: str):
     """
     個体群の指定されたパラメータを3つのペアでプロットし、1枚の画像にまとめる関数
@@ -430,7 +460,9 @@ def plot_individual_params(population: list[dict],best: dict,worst: dict, param_
         plt.tight_layout()
         
         # ファイル保存
-        plt.savefig(f"{file_path}_pair{i+1}.png")
+        file_path = Path(f"{file_path}_pair{i+1}.png")
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(file_path)
         plt.close() # メモリ解放
     return
 def log_average_fitness(method: str = None, interpolate_method:str = None,file_path: str = None, average_fitness_history=None, times: int = None):
@@ -459,8 +491,11 @@ def log_average_fitness(method: str = None, interpolate_method:str = None,file_p
     if isinstance(method_num, int):
         if isinstance(interpolate_num, int):
             file_path = f'./result/proposal/average/{method}/{interpolate_method}/{method}{file_path}'
+            file_path = Path(file_path)
         else:
             file_path = f'./result/conventional/average/{method}/{method}{file_path}'
+            file_path = Path(file_path)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
     
     # JSONファイルに保存
     with open(file_path, 'w', encoding='utf-8') as f:

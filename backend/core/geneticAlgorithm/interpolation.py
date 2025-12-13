@@ -387,3 +387,39 @@ def to_vec(ind,param_keys):
 # 距離計算
 def euclidean(vec1, vec2):
     return math.sqrt(sum((float(a) - float(b)) ** 2 for a, b in zip(vec1, vec2) if a is not None and b is not None))
+
+def get_total_error(
+    population: List[dict],
+    target_param: str = "fitness",
+    param_keys: List[str] = PARAMS,
+    evaluate_num: int = None,
+):
+    total_error = 0.0
+    if evaluate_num is None:
+        raise ValueError("evaluate_num が指定されていません。")
+    elif evaluate_num == 1:
+        for ind in population:
+            true_val = float(evaluate.calculate_Gaussian(ind, param_keys))
+            error = np.abs(true_val - ind[target_param])
+            total_error += error**2
+    elif evaluate_num == 2:
+        for ind in population:
+            true_val = float(evaluate.calculate_Sphere(ind, param_keys))
+            error = np.abs(true_val - ind[target_param])
+            total_error += error**2
+    elif evaluate_num == 3:
+        for ind in population:
+            true_val = float(evaluate.calculate_Gaussian_cos(ind, param_keys))
+            error = np.abs(true_val - ind[target_param])
+            total_error += error**2
+    elif evaluate_num == 4:
+        for ind in population:
+            true_val = float(evaluate.calculate_Ackley(ind, param_keys))
+            error = np.abs(true_val - ind[target_param])
+            total_error += error**2
+    elif evaluate_num == 5:
+        for ind in population:
+            true_val = float(evaluate.calculate_Gaussian_two_peak(ind, param_keys))
+            error = np.abs(true_val - ind[target_param])
+            total_error += error**2
+    return total_error
