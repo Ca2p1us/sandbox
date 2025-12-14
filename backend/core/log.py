@@ -460,9 +460,7 @@ def plot_individual_params(population: list[dict],best: dict,worst: dict, param_
         plt.tight_layout()
         
         # ファイル保存
-        file_path = Path(f"{file_path}_pair{i+1}.png")
-        file_path.parent.mkdir(parents=True, exist_ok=True)
-        plt.savefig(file_path)
+        plt.savefig(f"{file_path}_pair{i+1}.png")
         plt.close() # メモリ解放
     return
 def log_average_fitness(method: str = None, interpolate_method:str = None,file_path: str = None, average_fitness_history=None, times: int = None):
