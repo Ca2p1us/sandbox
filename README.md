@@ -209,6 +209,10 @@ uv run python -m backend.core.geneticAlgorithm.interpolation
     - GA単体で何とかする研究は少ないんだなぁ
     - ほかの最適化手法やシンプルなGAに特殊な処理を加えるとよりよくなる(当たり前)
 
-- やること
+- やること/やったこと
     - evaluate.pyの大規模改修
         - 評価関数の分岐をrun_iga_simulationではなく、method_numで管理してevaluate.pyで行う
+    - 12/16のやったこと
+        - トーナメントサイズを変えても今のガウス補間だとうまくいかなさそうであることがわかった
+        - Geminiに聞いてみて出てきたIDW補間ってやつを使ってみた、補間に使うのが評価個体すべてだったので、pre_evaluationを参照して選択する評価個体を上位n個体にした。
+        - 下位個体によって必要以上に性能が下がっていたのかもしてない
