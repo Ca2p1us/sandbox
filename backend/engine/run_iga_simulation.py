@@ -202,8 +202,11 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         # for _ in range(PROPOSAL_POPULATION_SIZE):
         while len(next_generation) < PROPOSAL_POPULATION_SIZE:
             # 3. 選択
+            # if generation > NUM_GENERATIONS // 2:
+            #     selected = tournament.exec_tournament_selection(chromosomes_params=population, participants_num=30)
+            # else:
+            #     selected = tournament.exec_tournament_selection(chromosomes_params=population, participants_num=tournament_size)
             selected = tournament.exec_tournament_selection(chromosomes_params=population, participants_num=tournament_size)
-            # selected = tournament.exec_tournament_selection(chromosomes_params=population, participants_num=6)
             # 4. 交叉&突然変異
             offspring = BLX_alpha.exec_blx_alpha(
                 parents_chromosomes=selected,

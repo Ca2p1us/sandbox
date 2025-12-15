@@ -263,7 +263,9 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best
     if method == "Gaussian_two_peak":
         ax.set_ylim(0,6.5)
     if method == "Gaussian_cos":
-        ax.set_ylim(2.0,9.5)
+        ax.set_ylim(0,9.5)
+    if method == "Sphere":
+        ax.set_ylim(-100000,0.5)
     ax.grid(True)
     ax.legend(["補間なし9個体","補間なし200個体","補間あり"],prop={"family":"MS Gothic"},loc=0)
     # fig.tight_layout()
@@ -499,4 +501,67 @@ def log_average_fitness(method: str = None, interpolate_method:str = None,file_p
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump({f"{times}_average_fitness":average_fitness_history}, f, indent=2)
 
+    return
+
+
+def log_compare(fitness_histories: list[list], tornament_sizes: list[int], evaluate_num: int, interpolate_num:int, file_path: str):
+    """
+    複数のシミュレーション結果を1枚の画像にまとめる関数
+    param_keys: 少なくとも6つのキーが必要
+    """
+    if evaluate_num == 1:
+        method = "Gaussian"
+    elif evaluate_num == 2:
+        method = "Sphere"
+    elif evaluate_num == 3:
+        method = "Gaussian_cos"
+    elif evaluate_num == 4:
+        method = "Ackley"
+    elif evaluate_num == 5:
+        method = "Gaussian_two_peak"
+    if interpolate_num == 0:
+        interpolate = "linear"
+    elif interpolate_num == 1:
+        interpolate = "Gauss"
+    elif interpolate_num == 2:
+        interpolate = "RBF"
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+
+
+    for history in fitness_histories:
+        if not history.any():
+            print("評価データがありません。")
+            return
+        generations = [item[0] for item in history]
+        values = [item[1] for item in history]
+        ax.plot(generations, values, marker='o', linestyle='-', label='Fitness')
+    ax.set_xlabel('Generation',fontsize=18)
+    ax.set_ylabel('Fitness',fontsize=18)
+    ax.set_title("")
+    ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
+    if method == "Gaussian":
+        ax.set_ylim(3,6.5)
+    if method == "Ackley":
+        ax.set_ylim(2.0,4.5)
+    if method == "Gaussian_two_peak":
+        ax.set_ylim(0,6.5)
+    if method == "Gaussian_cos":
+        ax.set_ylim(2.0,9.5)
+    if method == "Sphere":
+        ax.set_ylim(-100000,0.5)
+    ax.grid(True)
+    ax.legend([f"トーナメントサイズ:{size}" for size in tornament_sizes],prop={"family":"MS Gothic"},loc=0)
+    # fig.tight_layout()
+    if interpolate_num == 100:
+        file_path = Path(f'./result/comparison/{method}/{method}{file_path}')
+    else:
+        file_path = Path(f'./result/comparison/{method}/{interpolate}/{method}{file_path}')
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(file_path)
+    plt.show()
+    plt.close()
+    return
+
+    
     return
