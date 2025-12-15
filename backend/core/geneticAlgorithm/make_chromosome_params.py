@@ -61,6 +61,7 @@ def make_chromosome_params():
         # "algorithmNum": ALGORITHM_NUM,
         "fitness": 0.0,
         "pre_evaluation": 0.0,  # 事前評価値（デフォルト0、型や初期値は用途に応じて変更
+        "true_fitness": 0.0,  # 真の評価値（デフォルト0、型や初期値は用途に応じて変更）補間や交叉には使用しない
         "generation": 1,  # 世代数（デフォルト0、用途に応じて変更）
         "chromosomeId": uuid.uuid4()
     }

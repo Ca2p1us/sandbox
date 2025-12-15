@@ -19,7 +19,7 @@ choice = input("実行するシミュレーションを選択 (1/4): ")
 if choice == "2":
     print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Gauss関数+cos関数\n4: Ackley関数\n5: Gaussian_two_peak関数")
     evaluate_num = input("評価関数の番号を入力してください: ")
-    print(f"補間方法を選択してください。\n0: 距離に基づく線形補間\n1: ガウス関数に基づく補間\n2: RBF補間")
+    print(f"補間方法を選択してください。\n0: 距離に基づく線形補間\n1: ガウス関数に基づく補間\n2: RBF補間\n3: IDW補間")
     interpolate_num = input("補間方法の番号を入力してください: ")
     print(f"ノイズを追加しますか？\n0: 追加しない\n1: 追加する")
     TF = input("ノイズを追加しますか？ (0/1): ")
@@ -66,7 +66,7 @@ elif choice == "3":
         evaluate_size = EVALUATE_SIZE
     print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Gauss関数+cos関数\n4: Ackley関数\n5: Gaussian_two_peak関数")
     evaluate_num = input("評価関数の番号を入力してください: ")
-    print(f"補間方法を選択してください。\n0: 距離に基づく線形補間\n1: ガウス関数に基づく補間\n2: RBF補間")
+    print(f"補間方法を選択してください。\n0: 距離に基づく線形補間\n1: ガウス関数に基づく補間\n2: RBF補間\n3: IDW補間")
     interpolate_num = input("補間方法の番号を入力してください: ")
     print(f"ノイズを追加しますか？\n0: 追加しない\n1: 追加する")
     TF = input("ノイズを追加しますか？ (0/1): ")
@@ -77,11 +77,11 @@ elif choice == "3":
     if TF2 == "1":
         look = True
     for i in range(EXPERIMENT_TIMES):
-        print(f"{evaluate_num}個体のIGAシミュレーション"+str(i+1)+"回目を実行")
+        print(f"{evaluate_size}個体のIGAシミュレーション"+str(i+1)+"回目を実行")
         best_fitness, average_fitness = iga.run_simulation_normal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, POPULATION_SIZE=evaluate_size, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=3)
         best_fitness_histories_few.append(best_fitness)
         average_fitness_histories_few.append(average_fitness)
-        print(f"{evaluate_num}個体のIGAシミュレーション"+str(i+1)+"回目が完了")
+        print(f"{evaluate_size}個体のIGAシミュレーション"+str(i+1)+"回目が完了")
     best_fitness_histories_few_ave = np.mean(best_fitness_histories_few, axis=0)
     best_fitness_histories_few_ave = [tuple(row) for row in best_fitness_histories_few_ave]
     average_fitness_histories_few_ave = np.mean(average_fitness_histories_few, axis=0)
@@ -126,7 +126,7 @@ elif choice == "4":
         evaluate_size = EVALUATE_SIZE
     print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Gauss関数+cos関数\n4: Ackley関数\n5: Gaussian_two_peak関数")
     evaluate_num = input("評価関数の番号を入力してください: ")
-    print(f"補間方法を選択してください。\n0: 距離に基づく線形補間\n1: ガウス関数に基づく補間\n2: RBF補間")
+    print(f"補間方法を選択してください。\n0: 距離に基づく線形補間\n1: ガウス関数に基づく補間\n2: RBF補間\n3: IDW補間")
     interpolate_num = input("補間方法の番号を入力してください: ")
     print(f"ノイズを追加しますか？\n0: 追加しない\n1: 追加する")
     TF = input("ノイズを追加しますか？ (0/1): ")
@@ -150,4 +150,4 @@ elif choice == "4":
                 best_fitness, average_fitness, error_history = iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=population_size, EVALUATE_SIZE=evaluate_size, evaluate_num = int(evaluate_num), interpolate_num = int(interpolate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=ts)
             best_fitness_history.append(best_fitness)
         best_fitness_histories_all.append(np.mean(best_fitness_history, axis=0))
-    log_compare(best_fitness_histories_all, tornament_sizes,evaluate_num=int(evaluate_num), interpolate_num=int(interpolate_num), file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_tornament_size_comparison.png")
+    log_compare(best_fitness_histories_all, tornament_sizes,evaluate_num=int(evaluate_num), interpolate_num=int(interpolate_num), population_size=population_size, file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_tornament_size_comparison.png")

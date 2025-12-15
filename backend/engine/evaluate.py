@@ -29,6 +29,7 @@ def evaluate_fitness(
     evaluate_num: int = 1,
     param_keys: List[str] = PARAMS,
     noise_is_added: bool = False,
+    target_key: str = "fitness"
     ):
     """"
     評価関数の振り分け
@@ -40,15 +41,15 @@ def evaluate_fitness(
             print("警告: individualがdict型ではありません:", ind)
             continue
         if evaluate_num == 1:
-            ind['fitness'] = calculate_Gaussian(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
+            ind[target_key] = calculate_Gaussian(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
         elif evaluate_num == 2:
-            ind['fitness'] = calculate_Sphere(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
+            ind[target_key] = calculate_Sphere(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
         elif evaluate_num == 3:
-            ind['fitness'] = calculate_Gaussian_cos(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
+            ind[target_key] = calculate_Gaussian_cos(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
         elif evaluate_num == 4:
-            ind['fitness'] = calculate_Ackley(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
+            ind[target_key] = calculate_Ackley(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
         elif evaluate_num == 5:
-            ind['fitness'] = calculate_Gaussian_two_peak(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS_1, target_params_2=TARGET_PARAMS_2, noise_is_added=noise_is_added)
+            ind[target_key] = calculate_Gaussian_two_peak(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS_1, target_params_2=TARGET_PARAMS_2, noise_is_added=noise_is_added)
     return None
 
 def calculate_Gaussian(

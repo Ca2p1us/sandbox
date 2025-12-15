@@ -13,7 +13,7 @@ import japanize_matplotlib
 from pathlib import Path
 
 
-def log(file_path: str, answer,times: int):
+def log(file_path: str, answer,times: int = 1):
     # UUID型をstr型に変換するヘルパー関数
     def convert_uuid_to_str(obj):
         if isinstance(obj, dict):
@@ -54,6 +54,8 @@ def log_error_history(method: str = None, file_path: str = None, error_history=N
         interpolate = "Gauss"
     elif interpolate_num == 2:
         interpolate = "RBF"
+    elif interpolate_num == 3:
+        interpolate = "IDW"
     if isinstance(evaluate_num, int):
         if isinstance(interpolate_num, int):
             file_path = f'./result/{ver}/graph/{method}/{interpolate}/error_histories/{method}{file_path}'
@@ -104,6 +106,8 @@ def log_fitness(method: str = None, file_path: str = None, best_fitness_history=
         interpolate = "Gauss"
     elif interpolate_num == 2:
         interpolate = "RBF"
+    elif interpolate_num == 3:
+        interpolate = "IDW"
     if isinstance(evaluate_num, int):
         if isinstance(interpolate_num, int):
             file_path = f'./result/{ver}/graph/{method}/{interpolate}/best_fitnesses/{method}{file_path}'
@@ -179,6 +183,8 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
         interpolate = "Gauss"
     elif interpolate_num == 2:
         interpolate = "RBF"
+    elif interpolate_num == 3:
+        interpolate = "IDW"
 
     fig, ax = plt.subplots(figsize=(8, 5))
 
@@ -237,6 +243,8 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best
         interpolate = "Gauss"
     elif interpolate_num == 2:
         interpolate = "RBF"
+    elif interpolate_num == 3:
+        interpolate = "IDW"
 
     fig, ax = plt.subplots(figsize=(8, 5))
 
@@ -462,7 +470,9 @@ def plot_individual_params(population: list[dict],best: dict,worst: dict, param_
         plt.tight_layout()
         
         # ファイル保存
-        plt.savefig(f"{file_path}_pair{i+1}.png")
+        file_path_save = Path(f"{file_path}_pair{i+1}.png")
+        file_path_save.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(file_path_save)
         plt.close() # メモリ解放
     return
 def log_average_fitness(method: str = None, interpolate_method:str = None,file_path: str = None, average_fitness_history=None, times: int = None):
@@ -488,6 +498,8 @@ def log_average_fitness(method: str = None, interpolate_method:str = None,file_p
         interpolate_num = 1
     elif interpolate_method == "RBF":
         interpolate_num = 2
+    elif interpolate_method == "IDW":
+        interpolate_num = 3
     if isinstance(method_num, int):
         if isinstance(interpolate_num, int):
             file_path = f'./result/proposal/average/{method}/{interpolate_method}/{method}{file_path}'
@@ -504,7 +516,7 @@ def log_average_fitness(method: str = None, interpolate_method:str = None,file_p
     return
 
 
-def log_compare(fitness_histories: list[list], tornament_sizes: list[int], evaluate_num: int, interpolate_num:int, file_path: str):
+def log_compare(fitness_histories: list[list], tornament_sizes: list[int], evaluate_num: int, interpolate_num:int, population_size: int, file_path: str):
     """
     複数のシミュレーション結果を1枚の画像にまとめる関数
     param_keys: 少なくとも6つのキーが必要
@@ -525,6 +537,8 @@ def log_compare(fitness_histories: list[list], tornament_sizes: list[int], evalu
         interpolate = "Gauss"
     elif interpolate_num == 2:
         interpolate = "RBF"
+    elif interpolate_num == 3:
+        interpolate = "IDW"
 
     fig, ax = plt.subplots(figsize=(8, 5))
 
@@ -538,7 +552,10 @@ def log_compare(fitness_histories: list[list], tornament_sizes: list[int], evalu
         ax.plot(generations, values, marker='o', linestyle='-', label='Fitness')
     ax.set_xlabel('Generation',fontsize=18)
     ax.set_ylabel('Fitness',fontsize=18)
-    ax.set_title("")
+    if interpolate_num == 100:
+        ax.set_title(f"{population_size}個体 補間なし",fontsize=18)
+    else:
+        ax.set_title(f"{population_size}個体 補間あり",fontsize=18)
     ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
     if method == "Gaussian":
         ax.set_ylim(3,6.5)
@@ -551,7 +568,7 @@ def log_compare(fitness_histories: list[list], tornament_sizes: list[int], evalu
     if method == "Sphere":
         ax.set_ylim(-100000,0.5)
     ax.grid(True)
-    ax.legend([f"トーナメントサイズ:{size}" for size in tornament_sizes],prop={"family":"MS Gothic"},loc=0)
+    ax.legend([f"k={size}" for size in tornament_sizes],prop={"family":"MS Gothic"},loc=0)
     # fig.tight_layout()
     if interpolate_num == 100:
         file_path = Path(f'./result/comparison/{method}/{method}{file_path}')

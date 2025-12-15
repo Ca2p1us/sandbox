@@ -3,7 +3,11 @@
 **config.py**には各パラメータの定義域を(最小値,最大値)の形式でタプルとして保存している
 ## appディレクトリに移動して下記のコマンドで実行
 ```tarminal
-python main.py
+uv run main.py
+```
+## interpolationモジュールのテスト実行
+```tarminal
+uv run python -m backend.core.geneticAlgorithm.interpolation
 ```
 # パラメータの検討
 - [Chatgptによる回答](https://chatgpt.com/s/t_68be5ddb84a08191a54ae9eadee2b8c5)
