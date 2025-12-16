@@ -132,7 +132,7 @@ uv run python -m backend.core.geneticAlgorithm.interpolation
     - 主に使っている論文、元の母集団は大量だけど実際に評価するのは一部の個体、残りは補間するやつ
 - ["An Experimental Study of Benchmarking Functions for Genetic Algorithms"](https://www.researchgate.net/publication/220662178_An_Experimental_Study_of_Benchmarking_Functions_for_Genetic_Algorithms)
     - F1～F5
-    - ["An analysis of the behaviour of a class of genetic adaptive systems"](https://deepblue.lib.umich.edu/handle/2027.42/4507)
+- ["An analysis of the behaviour of a class of genetic adaptive systems"](https://deepblue.lib.umich.edu/handle/2027.42/4507)
 - [最適化アルゴリズムを評価するベンチマーク関数まとめ](https://qiita.com/tomitomi3/items/d4318bf7afbc1c835dda)
 - ["Virtual Library of Simulation Experiments:Test Functions and Datasets"](https://www.sfu.ca/~ssurjano/optimization.html)
 - [Test Functions for Unconstrained Global Optimization](http://www-optima.amp.i.kyoto-u.ac.jp/member/student/hedar/Hedar_files/TestGO_files/Page364.htm)
@@ -150,6 +150,14 @@ uv run python -m backend.core.geneticAlgorithm.interpolation
     - 100個体の文字列の一様交叉
     - 2～4では大きくなるほど性能アップ
     - それ以降はほとんど変化なし
+- [遺伝的アルゴリズムの代表的な選択方式の紹介およびそれらの性質について](https://qiita.com/kanekanekaneko/items/1c563ece591fd2ba2127)
+    - トーナメントサイズは2～4までは変える意味あるけどそれ以降はないよ
+- ["Genetic Algorithms, Tournament Selection,and the Effects of Noise"](https://wpmedia.wolfram.com/sites/13/2018/02/09-3-2.pdf)
+    - 評価にノイズが入っているとトーナメントサイズの選択圧は薄くなるよ
+- ["STRUCTURAL OPTIMIZATION USING A MUTATION-BASED GENETIC ALGORITHM"](https://www.researchgate.net/profile/Sina-Kazemzadeh-Azad/publication/233779199_Structural_Optimization_Using_a_Mutation-Based_Genetic_Algorithm/links/09e4150b6833a2428a000000/Structural-Optimization-Using-a-Mutation-Based-Genetic-Algorithm.pdf)
+    - トーナメントサイズが大きいと収束が早くて多様性がなくて小さいと収束が遅くて多様性があるよのやつ
+- ["A Comparative Analysis of Selection Schemes Used in Genetic Algorithms"](https://www.cse.unr.edu/~sushil/class/gas/papers/Select.pdf)
+    - これもトーナメントサイズが大きいと収束が早くて多様性がなくて小さいと収束が遅くて多様性があるよのやつ
 
 
 
