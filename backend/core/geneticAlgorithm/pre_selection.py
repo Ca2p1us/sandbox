@@ -27,6 +27,7 @@ def select_top_individuals_by_pre_evaluation(population: List[dict], total_n: in
     # 降順ソート
     sorted_population = sorted(valid_population, key=lambda x: float(x["pre_evaluation"]), reverse=True)
 
+    # selected_inds = sorted_population[:total_n]
     # 上位と下位をそれぞれ選択
     half_top = total_n // 2 + (total_n % 2)  # 奇数なら上位を1つ多く
     half_bottom = total_n // 2
