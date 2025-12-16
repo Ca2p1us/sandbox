@@ -186,7 +186,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
 
         # 評価の平均値を表示
         average = get_average_fitness(population)
-
+        print(best["fitness"])
         # --- ここで履歴に追加 ---
         if best is not None and "fitness" in best:
             best_fitness_history.append((generation + 1, float(best["fitness"])))

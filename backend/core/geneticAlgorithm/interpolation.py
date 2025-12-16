@@ -28,20 +28,32 @@ def interpolation(
     if not best or not worst:
         print(f"bestまたはworstがNoneです。ランダムな{target_key}を付与します。")
         for ind in population:
-            ind[target_key] = RNG.uniform(1.0, 10.0)
+            ind[target_key] = RNG.uniform(0.0, 6.0)
         return
     if not evaluated_population:
         print(f"評価済み個体群がNoneです。ランダムな{target_key}を付与します。")
         for ind in population:
-            ind[target_key] = RNG.uniform(1.0, 10.0)
+            ind[target_key] = RNG.uniform(0.0, 6.0)
         return
     
     if param_keys is None:
         # デフォルトはoperator1のfrequencyのみ
         param_keys = ["fmParamsList.operator1.frequency"]
 
-    best_params = [get_param(best, k) for k in param_keys]
-    worst_params = [get_param(worst, k) for k in param_keys]
+    # 全個体（未評価 + 評価済み）からMin/Maxを取得
+    all_inds = population + evaluated_population
+    min_max_dict = get_min_max_dict(all_inds, param_keys)
+
+    # 評価済み個体を「正規化ベクトル」と「正解値」のペアリストに変換しておく
+    # 構造: [(normalized_vec, fitness_value), ...]
+    norm_eval_data = []
+    for ind in evaluated_population:
+        vec = to_normalized_vec(ind, param_keys, min_max_dict)
+        val = float(ind.get(refernce_key, 0.0))
+        norm_eval_data.append((vec, val))
+
+    best_params = to_normalized_vec(best, param_keys, min_max_dict)
+    worst_params = to_normalized_vec(worst, param_keys, min_max_dict)
 
     if any(p is None for p in best_params) or any(p is None for p in worst_params):
         raise ValueError("best/worst に param_keys が存在しません。")
@@ -69,10 +81,10 @@ def interpolation(
         train_X = []
         train_Y = []
         for individual in evaluated_population:
-            train_X.append(to_vec(individual, param_keys=param_keys))
-            train_Y.append(float(individual.get(target_key, 0.0)))
-        print(f"学習データの次元数: {np.shape(np.array(train_X))}, ラベル数: {len(train_Y)}")
-        interpolator = RBFInterpolator(np.array(train_X), np.array(train_Y), kernel='gaussian', epsilon=1.5)
+            train_X.append(to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict))
+            train_Y.append(float(individual.get(refernce_key, 0.0)))
+        # print(f"学習データの次元数: {np.shape(np.array(train_X))}, ラベル数: {len(train_Y)}")
+        interpolator = RBFInterpolator(np.array(train_X), np.array(train_Y), kernel='linear',smoothing=0.1)
     elif method_num == 3:
         # 全個体（未評価 + 評価済み）からMin/Maxを取得
         all_inds = population + evaluated_population
@@ -98,6 +110,7 @@ def interpolation(
                 best_val=best_val,
                 worst_val=worst_val,
                 best_params=best_params,
+                min_max_dict=min_max_dict,
             )
         elif method_num == 1:
             ind[target_key] = calculate_by_Gaussian(
@@ -105,12 +118,11 @@ def interpolation(
             param_keys=param_keys,
             target_key=target_key,
             best_params=best_params,
-            best_val=best_val,
-            worst_val=worst_val,
             C=C,
             A=A,
             sigma=[200,200,200,200,200,200],
             # sigma=sigma,
+            min_max_dict=min_max_dict,
             )
         elif method_num == 2:
             ind[target_key] = calculate_by_RBF(
@@ -118,6 +130,7 @@ def interpolation(
                 evaluated_population=evaluated_population,
                 param_keys=param_keys,
                 interpolater=interpolator,
+                min_max_dict=min_max_dict,
             )
         elif method_num == 3:
             # ターゲット個体を正規化ベクトルに変換
@@ -137,6 +150,7 @@ def calculate_by_distance(
     best_val: float = 1.0,
     worst_val: float = 1.0,
     best_params: List[float] = None,
+    min_max_dict: Dict[str, Tuple[float, float]] = None,
 ):
     if max_dist == 0:
         # 全員同じ場合
@@ -144,7 +158,7 @@ def calculate_by_distance(
         individual[target_key] = float(value)
         print(f"距離が同一です。\nbest {best_val}, worst {worst_val}")        
         return value
-    ind_params = to_vec(individual, param_keys=param_keys)
+    ind_params = to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict)
     dist_best = euclidean(ind_params, best_params)
     ratio = dist_best / max_dist
     value = best_val * (1 - ratio) + worst_val * ratio
@@ -174,14 +188,13 @@ def calculate_by_Gaussian(
     param_keys: List[str] = None,
     target_key: str = "pre_evaluation",
     best_params: List[float] = None,
-    best_val: float = 1.0,
-    worst_val: float = 1.0,
     C: float = 0.0,
     A: float = 1.0,
     sigma: List[float] = None,
+    min_max_dict: Dict[str, Tuple[float, float]] = None,
 ):
     mu = best_params
-    ind_params = [get_param(individual, k) for k in param_keys]
+    ind_params = to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict)
     if any(p is None for p in ind_params):
         individual[target_key] = RNG.uniform(1.0, 10.0)
         return individual[target_key]
@@ -201,10 +214,11 @@ def calculate_by_RBF(
     param_keys: List[str] = None,
     target_key: str = "pre_evaluation",
     interpolater = None,
+    min_max_dict: Dict[str, Tuple[float, float]] = None,
 ):
     if individual in evaluated_population:
         return float(individual.get(target_key, 0.0))
-    x_vec = np.array([to_vec(individual, param_keys=param_keys)])
+    x_vec = np.array([to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict)])
     est_value = interpolater(x_vec)[0]
     return float(est_value)
 
