@@ -132,7 +132,7 @@ def log_fitness(method: str = None, file_path: str = None, best_fitness_history=
     if method == "Gaussian":
         ax.set_ylim(0,6.5)
     if method == "Ackley":
-        ax.set_ylim(2.0,4.5)
+        ax.set_ylim(0.0,0.15)
     if method == "Gaussian_two_peak":
         ax.set_ylim(0,6.5)
     if method == "Gaussian_cos":
@@ -201,7 +201,7 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     if method == "Gaussian":
         ax.set_ylim(0,6.5)
     if method == "Ackley":
-        ax.set_ylim(2.0,4.5)
+        ax.set_ylim(0.0,0.15)
     if method == "Gaussian_two_peak":
         ax.set_ylim(0,6.5)
     if method == "Gaussian_cos":
@@ -267,7 +267,7 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best
     if method == "Gaussian":
         ax.set_ylim(2,6.5)
     if method == "Ackley":
-        ax.set_ylim(2.0,4.5)
+        ax.set_ylim(0.0,0.15)
     if method == "Gaussian_two_peak":
         ax.set_ylim(0,6.5)
     if method == "Gaussian_cos":
@@ -558,9 +558,9 @@ def log_compare(fitness_histories: list[list], tornament_sizes: list[int], evalu
         ax.set_title(f"{population_size}個体 補間あり",fontsize=18)
     ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
     if method == "Gaussian":
-        ax.set_ylim(3,6.5)
+        ax.set_ylim(2,6.5)
     if method == "Ackley":
-        ax.set_ylim(2.0,4.5)
+        ax.set_ylim(0.0,0.15)
     if method == "Gaussian_two_peak":
         ax.set_ylim(0,6.5)
     if method == "Gaussian_cos":

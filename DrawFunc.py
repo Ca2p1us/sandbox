@@ -31,12 +31,12 @@ def plot_gauss_function():
     ax.plot(x, y, color='black', linewidth=1.5, label='Gaussian Curve')
     
     # 点のプロット (赤色、サイズ大きめ)
-    ax.scatter(points_x, points_y, color='blue', s=100, zorder=5, label='Points')
+    ax.scatter(points_x[0], points_y[0], color='blue', s=100, zorder=5, label='Points')
     
     # 点の座標を表示
     
-    ax.text(points_x[0], points_y[0] + 0.1, f'best', ha='center', fontsize=12)
-    ax.text(points_x[1]+20, points_y[1] + 0.2, f'worst', ha='center', fontsize=12)
+    ax.text(points_x[0], points_y[0] + 0.1, f'Ans', ha='center', fontsize=12)
+    # ax.text(points_x[1]+20, points_y[1] + 0.2, f'worst', ha='center', fontsize=12)
 
     # 軸（枠線）の太さを変える
     axis_width = 1.5  # 太さの設定
@@ -86,16 +86,22 @@ def plot_gauss_func_two_peak():
     y_min, y_max = 0, 6    # 値域 (y軸の範囲)
     
     # ガウス関数のピーク（高さ）の設定
-    amplitude = 6.0 
+    amplitude1 = 6.0 
+    amplitude2 = 6.0
 
     # 2. データの生成
     x = np.linspace(x_min, x_max, 1000)
     
     # ガウス関数の計算: f(x) = A * [exp( - (x - μ1)^2 / (2σ^2) ) + exp( - (x - μ2)^2 / (2σ^2) )]
-    y = amplitude * (np.exp(-((x - mu1)**2) / (2 * sigma**2)) + np.exp(-((x - mu2)**2) / (2 * sigma**2)))
+    y = amplitude1 * np.exp(-((x - mu1)**2) / (2 * sigma**2)) + amplitude1 * 0.5 * np.exp(-((x - mu2)**2) / (2 * sigma**2))
 
     # 4. プロット設定
     fig, ax = plt.subplots(figsize=(8, 6)) # fig, ax を取得するように変更
+    point_x = [150]
+    point_y = [amplitude1 * np.exp(-((px - mu1)**2) / (2 * sigma**2)) + amplitude1 * 0.5 * np.exp(-((px - mu2)**2) / (2 * sigma**2)) for px in point_x]
+    # 点のプロット (赤色、サイズ大きめ)
+    ax.scatter(point_x, point_y, color='blue', s=100, zorder=5, label='Point')
+    ax.text(point_x[0], point_y[0] + 0.1, f'Ans', ha='center', fontsize=12)
     
     # ガウス関数の描画
     ax.plot(x, y, color='black', linewidth=1.5, label='Gaussian Curve with Two Peaks')
@@ -112,7 +118,7 @@ def plot_gauss_func_two_peak():
     ax.set_xticks(np.arange(0, 501, 50)) 
     
     # y軸: 0, 1, 2, 3, 4, 5, 6
-    ax.set_yticks(np.arange(0, 7, 1))
+    ax.set_yticks(np.arange(0, 7.5, 1))
     # 軸の範囲設定
     ax.set_xlim(x_min-0.5, x_max+0.5)
     ax.set_ylim(y_min, y_max+0.5)
@@ -138,10 +144,10 @@ def plot_gauss_func_two_peak():
 def plot_gaussian_add_cosine():
     # 1. パラメータの設定
     mu = 250        # 平均 (μ)
-    sigma = 75      # 標準偏差 (σ)
+    sigma = 100      # 標準偏差 (σ)
     f = 0.02         # 周波数
     x_min, x_max = 0, 500  # 定義域 (x軸の範囲)
-    y_min, y_max = 0, 6    # 値域 (y軸の範囲)
+    y_min, y_max = 0, 7    # 値域 (y軸の範囲)
     
     # ガウス関数のピーク（高さ）の設定
     # 注意: 通常の確率密度関数のピークは約0.008と低いため、
@@ -165,12 +171,12 @@ def plot_gaussian_add_cosine():
     ax.plot(x, y, color='black', linewidth=1.5, label='Gaussian Curve')
     
     # 点のプロット (赤色、サイズ大きめ)
-    ax.scatter(points_x, points_y, color='blue', s=100, zorder=5, label='Points')
+    ax.scatter(points_x[0], points_y[0], color='blue', s=100, zorder=5, label='Points')
     
     # 点の座標を表示
     
-    ax.text(points_x[0], points_y[0] + 0.1, f'best', ha='center', fontsize=12)
-    ax.text(points_x[1]+20, points_y[1] + 0.2, f'worst', ha='center', fontsize=12)
+    ax.text(points_x[0], points_y[0] + 0.1, f'Ans', ha='center', fontsize=12)
+    # ax.text(points_x[1]+20, points_y[1] + 0.2, f'worst', ha='center', fontsize=12)
 
     # 軸（枠線）の太さを変える
     axis_width = 1.5  # 太さの設定
@@ -184,7 +190,7 @@ def plot_gaussian_add_cosine():
     ax.set_xticks(np.arange(0, 501, 50)) 
     
     # y軸: 0, 1, 2, 3, 4, 5, 6
-    ax.set_yticks(np.arange(0, 7, 1))
+    ax.set_yticks(np.arange(0, 7.5, 1))
     
     # 軸の範囲設定
     ax.set_xlim(x_min-0.5, x_max+0.5)
@@ -205,12 +211,86 @@ def plot_gaussian_add_cosine():
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
         
-    filename = os.path.join(save_dir, "gaussian_plot_styled.png")
+    filename = os.path.join(save_dir, "gaussian_cosine_plot_styled.png")
     plt.savefig(filename,bbox_inches='tight')
     print(f"グラフを {filename} として保存しました。")
     
     plt.show()
+
+def plot_Ackley_function():
+    A = 300
+    B = 0.00005
+    C = 0.0625 * np.pi
+    x_min, x_max = 0, 500
+    mu = 250
+
+    x = np.linspace(x_min, x_max, 400)
+    y = [A * np.exp(-B * np.sqrt(0.5 * ((xi - mu)**2))) + np.exp(0.5 * (np.cos(C * (xi - mu)))) - A - np.exp(1)
+         for xi in x ]
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    # 4. 指定された点の計算 (x=250, x=0)
+    points_x = [250, 0]
+    points_y = [A * np.exp(-B * np.sqrt(0.5 * ((px - mu)**2))) + np.exp(0.5 * (np.cos(C * (px - mu)))) - A - np.exp(1) for px in points_x]
+    
+    # ガウス関数の描画
+    ax.plot(x, y, color='black', linewidth=1.5, label='Gaussian Curve')
+    
+    # 点のプロット (赤色、サイズ大きめ)
+    ax.scatter(points_x[0], points_y[0], color='blue', s=100, zorder=5, label='Points')
+    
+    # 点の座標を表示
+    
+    ax.text(points_x[0]+ 20, points_y[0], f'Ans', ha='center', fontsize=12)
+    # ax.text(points_x[1]+20, points_y[1] + 0.2, f'worst', ha='center', fontsize=12)
+    ax.plot(x, y, color='black', linewidth=1.5)
+    ax.set_title("Ackley Function", fontsize=18)
+    ax.set_xlabel("x", fontsize=16)
+    ax.set_ylabel("f(x)", fontsize=16)
+    ax.set_xlim(x_min, x_max)
+    # plt.ylim(-10, 10)
+    ax.grid(False)
+    save_dir = "for_slide"
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    filename = os.path.join(save_dir, "Ackley_function_plot_styled.png")
+    plt.savefig(filename,bbox_inches='tight')
+    print(f"グラフを {filename} として保存しました。")
+    plt.show()
+
+
+def plot_sphere_function():
+    x_min, x_max = 0, 500
+    mu = 250
+    x = np.linspace(x_min, x_max, 400)
+    y = [-(xi - mu)**2 for xi in x ]
+    fig, ax = plt.subplots(figsize=(8, 6))
+    # 4. 指定された点の計算 (x=250, x=0)
+    points_x = [250, 0]
+    points_y = [-(px - mu)**2 for px in points_x]
+    # ガウス関数の描画
+    ax.scatter(points_x[0], points_y[0], color='blue', s=100, zorder=5, label='Points')
+    # 点の座標を表示
+    ax.text(points_x[0], points_y[0] - 3000, f'Ans', ha='center', fontsize=12)
+    ax.plot(x, y, color='black', linewidth=1.5)
+    ax.set_title("Sphere Function", fontsize=18)
+    ax.set_xlabel("x", fontsize=16)
+    ax.set_ylabel("f(x)", fontsize=16)
+    ax.set_xlim(x_min, x_max)
+    # plt.ylim(-10000, 0)
+    ax.grid(False)
+    save_dir = "for_slide"
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    filename = os.path.join(save_dir, "Sphere_function_plot_styled.png")
+    plt.savefig(filename,bbox_inches='tight')
+    print(f"グラフを {filename} として保存しました。")
+    plt.show()
+
+
 if __name__ == "__main__":
     plot_gauss_function()
     plot_gauss_func_two_peak()
     plot_gaussian_add_cosine()
+    plot_Ackley_function()
+    plot_sphere_function()

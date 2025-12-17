@@ -162,8 +162,8 @@ def calculate_Ackley(
         target_params: List[float] = TARGET_PARAMS,
         noise_is_added: bool = False,
         A = 300,
-        B = 0.005,
-        C = 2*np.pi,
+        B = 0.00005,
+        C = 0.0625 * np.pi
 ):
     values = []
     for key in param_keys:
@@ -375,8 +375,8 @@ def evaluate_fitness_Ackley(
         target_params: List[float] = TARGET_PARAMS,
         evaluate_population: List[dict] = None,
         A = 300,
-        B = 0.005,
-        C = 2*np.pi,
+        B = 0.00005,
+        C = 0.0625 * np.pi,
         noise_is_added: bool = False
 ):
     """
@@ -504,7 +504,7 @@ def evaluate_fitness_gaussian_two_peak(
                 scores.append(0)
             else:
                 # 正規分布の確率密度関数（最大値1）
-                score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + np.exp(-((float(val) - target_2) ** 2) / (2 * sigma ** 2))
+                score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + 0.5 * np.exp(-((float(val) - target_2) ** 2) / (2 * sigma ** 2))
                 # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
                 scores.append(score)
 
@@ -522,7 +522,7 @@ def evaluate_fitness_gaussian_two_peak(
 def evaluate_fitness_gaussian_cos(
     population: List[dict],
     target_params: List[float] = TARGET_PARAMS,
-    sigma: float = 75.0,
+    sigma: float = 100.0,
     frequency: float = 0.02,
     param_keys: List[str] = None,
     evaluate_population: List[dict] = None,
