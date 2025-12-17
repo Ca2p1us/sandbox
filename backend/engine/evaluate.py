@@ -161,9 +161,9 @@ def calculate_Ackley(
         param_keys: List[str] = None,
         target_params: List[float] = TARGET_PARAMS,
         noise_is_added: bool = False,
-        A = 600,
-        B = 0.00005,
-        C = 0.0625 * np.pi
+        A = 20,
+        B = 0.04,
+        C = 0.04
 ):
     values = []
     for key in param_keys:
@@ -179,10 +179,10 @@ def calculate_Ackley(
 
     # 統合
     fitness = 0
-    fitness -= -A * np.exp(-B * np.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - np.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + np.e
+    fitness = -A * np.exp(-B * np.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - np.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + np.e
     # 必要に応じてスケーリングやノイズ付与も可能
-    # fitness = -fitness
-    fitness = fitness / 50.0
+    max = A + np.e
+    fitness = 6.0 * (1.0 - fitness / max)
     if noise_is_added:
         fitness = add_noise(value=fitness, scale=1.0)
     return fitness

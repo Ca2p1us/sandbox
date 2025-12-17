@@ -52,6 +52,14 @@ if __name__ == "__main__":
                         'result/conventional/last_gen_individuals/Gaussian/combined/combined_fitness_log_200inds.json',
                         'result/conventional/last_gen_individuals/Gaussian/combined/combined_fitness_log_9inds.json'
                     ]
-    for input_folder, output_file in zip(RBF_input_folders, RBF_output_files):
+    Gauss_Ackley_input_folders = ['result/proposal/best/Ackley/Gauss/200inds_9eval',
+                        'result/conventional/best/Ackley/200inds',
+                        'result/conventional/best/Ackley/9inds'
+    ]
+    Gauss_Ackley_output_files = ['result/proposal/best/Ackley/Gauss/combined/combined_fitness_log_200inds_9eval.json',
+                        'result/conventional/best/Ackley/combined/combined_fitness_log_200inds.json',
+                        'result/conventional/best/Ackley/combined/combined_fitness_log_9inds.json'
+    ]
+    for input_folder, output_file in zip(Gauss_Ackley_input_folders, Gauss_Ackley_output_files):
         combine_json_files(input_folder, output_file)
         print(f"Combined JSON files from {input_folder} into {output_file}")

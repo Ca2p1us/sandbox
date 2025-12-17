@@ -218,20 +218,25 @@ def plot_gaussian_add_cosine():
     plt.show()
 
 def plot_Ackley_function():
-    A = 600
-    B = 0.00005
-    C = 0.0625 * np.pi
+    A = 20
+    B = 0.04
+    C = 0.04
     x_min, x_max = 0, 500
+    y_min, y_max = 0,6
     mu = 250
 
-    x = np.linspace(x_min, x_max, 400)
-    y = [A * np.exp(-B * np.sqrt(0.5 * ((xi - mu)**2))) + np.exp(0.5 * (np.cos(C * (xi - mu)))) - A - np.exp(1)
+    x = np.linspace(x_min, x_max, 1000)
+    ackley_val = [(-A * np.exp(-B * np.sqrt(0.5 * ((xi - mu)**2))) - np.exp(0.5 * (np.cos(C * (xi - mu)))) + A + np.exp(1))
          for xi in x ]
+    max_ackley_val = A + np.e
+    y = [6.0 * (1.0 - val / max_ackley_val) for val in ackley_val]
 
     fig, ax = plt.subplots(figsize=(8, 6))
     # 4. 指定された点の計算 (x=250, x=0)
     points_x = [250, 0]
-    points_y = [A * np.exp(-B * np.sqrt(0.5 * ((px - mu)**2))) + np.exp(0.5 * (np.cos(C * (px - mu)))) - A - np.exp(1) for px in points_x]
+    val = [(-A * np.exp(-B * np.sqrt(0.5 * ((px - mu)**2))) - np.exp(0.5 * (np.cos(C * (px - mu)))) + A + np.exp(1)) for px in points_x]
+
+    points_y = [6.0 * (1.0 - val / max_ackley_val) for val in val]
     
     # ガウス関数の描画
     ax.plot(x, y, color='black', linewidth=1.5, label='Gaussian Curve')
@@ -243,11 +248,21 @@ def plot_Ackley_function():
     
     ax.text(points_x[0]+ 20, points_y[0], f'Ans', ha='center', fontsize=12)
     # ax.text(points_x[1]+20, points_y[1] + 0.2, f'worst', ha='center', fontsize=12)
+    # 軸（枠線）の太さを変える
+    axis_width = 1.5  # 太さの設定
+    for spine in ax.spines.values():
+        spine.set_linewidth(axis_width)
     ax.plot(x, y, color='black', linewidth=1.5)
-    ax.set_title("Ackley Function", fontsize=18)
-    ax.set_xlabel("x", fontsize=16)
-    ax.set_ylabel("f(x)", fontsize=16)
-    ax.set_xlim(x_min, x_max)
+    ax.set_title("")
+    ax.set_xlabel('parameter value',fontsize=18)
+    ax.set_ylabel('fitness',fontsize=18)
+    plt.gca().spines['right'].set_visible(False)
+    plt.gca().spines['top'].set_visible(False)
+    # メモリ（数字）のフォントサイズと、メモリ自体の太さを変える
+    ax.tick_params(axis='both', which='major', labelsize=16, width=axis_width, length=6)
+    ax.set_xticks(np.arange(0, 501, 50)) 
+    ax.set_xlim(x_min-0.5, x_max)
+    ax.set_ylim(y_min, y_max+0.5)
     # plt.ylim(-10, 10)
     ax.grid(False)
     save_dir = "for_slide"
@@ -272,11 +287,19 @@ def plot_sphere_function():
     ax.scatter(points_x[0], points_y[0], color='blue', s=100, zorder=5, label='Points')
     # 点の座標を表示
     ax.text(points_x[0], points_y[0] - 3000, f'Ans', ha='center', fontsize=12)
+    # 軸（枠線）の太さを変える
+    axis_width = 1.5  # 太さの設定
+    for spine in ax.spines.values():
+        spine.set_linewidth(axis_width)
     ax.plot(x, y, color='black', linewidth=1.5)
-    ax.set_title("Sphere Function", fontsize=18)
-    ax.set_xlabel("x", fontsize=16)
-    ax.set_ylabel("f(x)", fontsize=16)
-    ax.set_xlim(x_min, x_max)
+    ax.set_title("")
+    ax.set_xlabel('parameter value',fontsize=18)
+    ax.set_ylabel('fitness',fontsize=18)
+    plt.gca().spines['right'].set_visible(False)
+    plt.gca().spines['top'].set_visible(False)
+    # メモリ（数字）のフォントサイズと、メモリ自体の太さを変える
+    ax.tick_params(axis='both', which='major', labelsize=16, width=axis_width, length=6)
+    ax.set_xlim(x_min-0.5, x_max)
     # plt.ylim(-10000, 0)
     ax.grid(False)
     save_dir = "for_slide"
