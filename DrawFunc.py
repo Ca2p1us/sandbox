@@ -218,7 +218,7 @@ def plot_gaussian_add_cosine():
     plt.show()
 
 def plot_Ackley_function():
-    A = 300
+    A = 600
     B = 0.00005
     C = 0.0625 * np.pi
     x_min, x_max = 0, 500

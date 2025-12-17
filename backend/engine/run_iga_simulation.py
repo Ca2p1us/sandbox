@@ -105,7 +105,6 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
     best, worst = get_best_and_worst_individuals(population)
     # 評価の平均値を表示
     average = get_average_fitness(population)
-    average = get_average_fitness(population)
     best_fitness_history.append((NUM_GENERATIONS, float(best["fitness"])))
     average_fitness_history.append((NUM_GENERATIONS, float(average)))
     bests.append(best)

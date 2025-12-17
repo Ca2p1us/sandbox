@@ -161,7 +161,7 @@ def calculate_Ackley(
         param_keys: List[str] = None,
         target_params: List[float] = TARGET_PARAMS,
         noise_is_added: bool = False,
-        A = 300,
+        A = 600,
         B = 0.00005,
         C = 0.0625 * np.pi
 ):
@@ -181,7 +181,7 @@ def calculate_Ackley(
     fitness = 0
     fitness -= -A * np.exp(-B * np.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - np.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + np.e
     # 必要に応じてスケーリングやノイズ付与も可能
-    fitness = -fitness
+    # fitness = -fitness
     fitness = fitness / 50.0
     if noise_is_added:
         fitness = add_noise(value=fitness, scale=1.0)
@@ -609,24 +609,26 @@ def get_average_fitness(population: List[dict], evaluate_population: List[dict] 
     population内のfitnessの平均値を返す（fitnessが未設定・不正な個体は除外）
     id_listが指定された場合は、そのID（chromosomeId）を持つ個体のみ対象
     """
+    target_ids = None
     if evaluate_population is not None:
-        fitness_values = [
-            float(ind["fitness"])
-            for ind in population
-            if "fitness" in ind
-            and "chromosomeId" in ind
-            and str(ind["chromosomeId"]) in [str(evaluated_ind["chromosomeId"]) for evaluated_ind in evaluate_population]
-            and str(ind["fitness"]).strip() not in ("", "None")
-            and str(ind["fitness"]).replace('.', '', 1).isdigit()
-        ]
-    else:
-        fitness_values = [
-            float(ind["fitness"])
-            for ind in population
-            if "fitness" in ind
-            and str(ind["fitness"]).strip() not in ("", "None")
-            and str(ind["fitness"]).replace('.', '', 1).isdigit()
-        ]
-    if not fitness_values:
+        target_ids = {str(ind["chromosomeId"]) for ind in evaluate_population if "chromosomeId" in ind}
+   
+    valid_fitness_values = []
+   
+    for ind in population:
+        if "fitness" not in ind or ind["fitness"] is None:
+            continue
+
+        if target_ids is not None:
+            if "chromosomeId" not in ind or str(ind["chromosomeId"]) not in target_ids:
+                continue
+
+        try:
+            val = float(ind["fitness"])
+            valid_fitness_values.append(val)
+        except (ValueError, TypeError):
+            continue
+
+    if not valid_fitness_values:
         return 0.0
-    return sum(fitness_values) / len(fitness_values)
+    return sum(valid_fitness_values) / len(valid_fitness_values)
