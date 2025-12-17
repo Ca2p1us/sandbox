@@ -90,7 +90,7 @@ elif choice == "3":
     log_fitness(file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(evaluate_size)+"_average_fitness_histories.png", best_fitness_history= best_fitness_histories_few_ave, average_fitness_history=average_fitness_histories_few_ave,evaluate_num=int(evaluate_num),ver="conventional",title=f"mean of {EXPERIMENT_TIMES} times")
     for i in range(EXPERIMENT_TIMES):
         print(f"{population_size}個体のIGAシミュレーション"+str(i+1)+"回目を実行")
-        best_fitness, average_fitness = iga.run_simulation_normal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, POPULATION_SIZE=population_size, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added, look=look,tournament_size=4)
+        best_fitness, average_fitness = iga.run_simulation_normal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, POPULATION_SIZE=population_size, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added, look=look,tournament_size=3)
         best_fitness_histories_many.append(best_fitness)
         average_fitness_histories_many.append(average_fitness)
         print(f"{population_size}個体のIGAシミュレーション"+str(i+1)+"回目が完了")
