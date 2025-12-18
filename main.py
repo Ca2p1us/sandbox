@@ -137,7 +137,7 @@ elif choice == "4":
     if TF2 == "1":
         look = True
     # tornament_sizes = [2,4,6,8,10,20,30,40]
-    tornament_sizes = [2,3,4,5,6,7,8]
+    tornament_sizes = [2,3,4,5,6]
     best_fitness_histories_all = []
     for ts in tornament_sizes:
         best_fitness_history = []
