@@ -275,7 +275,7 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best
     if method == "Sphere":
         ax.set_ylim(-100000,0.5)
     ax.grid(True)
-    ax.legend(["補間なし9個体","補間なし200個体","補間あり"],prop={"family":"MS Gothic"},loc=0)
+    ax.legend(["補間なし9個体","補間なし200個体","補間あり"],prop={"family":"MS Gothic", "size": 14},loc=0)
     # fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
     if interpolate_num == 100:
@@ -568,7 +568,7 @@ def log_compare(fitness_histories: list[list], tornament_sizes: list[int], evalu
     if method == "Sphere":
         ax.set_ylim(-100000,0.5)
     ax.grid(True)
-    ax.legend([f"k={size}" for size in tornament_sizes],prop={"family":"MS Gothic"},loc=0)
+    ax.legend([f"k={size}" for size in tornament_sizes],prop={"family":"MS Gothic","size":14},loc=0)
     # fig.tight_layout()
     if interpolate_num == 100:
         file_path = Path(f'./result/comparison/{method}/{method}{file_path}')

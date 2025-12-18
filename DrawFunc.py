@@ -35,7 +35,7 @@ def plot_gauss_function():
     
     # 点の座標を表示
     
-    ax.text(points_x[0], points_y[0] + 0.1, f'Ans', ha='center', fontsize=12)
+    ax.text(points_x[0], points_y[0] + 0.1, f'Ans', ha='center', fontsize=16)
     # ax.text(points_x[1]+20, points_y[1] + 0.2, f'worst', ha='center', fontsize=12)
 
     # 軸（枠線）の太さを変える
@@ -101,7 +101,7 @@ def plot_gauss_func_two_peak():
     point_y = [amplitude1 * np.exp(-((px - mu1)**2) / (2 * sigma**2)) + amplitude1 * 0.5 * np.exp(-((px - mu2)**2) / (2 * sigma**2)) for px in point_x]
     # 点のプロット (赤色、サイズ大きめ)
     ax.scatter(point_x, point_y, color='blue', s=100, zorder=5, label='Point')
-    ax.text(point_x[0], point_y[0] + 0.1, f'Ans', ha='center', fontsize=12)
+    ax.text(point_x[0], point_y[0] + 0.1, f'Ans', ha='center', fontsize=16)
     
     # ガウス関数の描画
     ax.plot(x, y, color='black', linewidth=1.5, label='Gaussian Curve with Two Peaks')
@@ -175,7 +175,7 @@ def plot_gaussian_add_cosine():
     
     # 点の座標を表示
     
-    ax.text(points_x[0], points_y[0] + 0.1, f'Ans', ha='center', fontsize=12)
+    ax.text(points_x[0], points_y[0] + 0.1, f'Ans', ha='center', fontsize=16)
     # ax.text(points_x[1]+20, points_y[1] + 0.2, f'worst', ha='center', fontsize=12)
 
     # 軸（枠線）の太さを変える
@@ -246,7 +246,7 @@ def plot_Ackley_function():
     
     # 点の座標を表示
     
-    ax.text(points_x[0]+ 20, points_y[0], f'Ans', ha='center', fontsize=12)
+    ax.text(points_x[0]+ 20, points_y[0], f'Ans', ha='center', fontsize=16)
     # ax.text(points_x[1]+20, points_y[1] + 0.2, f'worst', ha='center', fontsize=12)
     # 軸（枠線）の太さを変える
     axis_width = 1.5  # 太さの設定
@@ -286,7 +286,7 @@ def plot_sphere_function():
     # ガウス関数の描画
     ax.scatter(points_x[0], points_y[0], color='blue', s=100, zorder=5, label='Points')
     # 点の座標を表示
-    ax.text(points_x[0], points_y[0] - 3000, f'Ans', ha='center', fontsize=12)
+    ax.text(points_x[0], points_y[0] - 3000, f'Ans', ha='center', fontsize=16)
     # 軸（枠線）の太さを変える
     axis_width = 1.5  # 太さの設定
     for spine in ax.spines.values():
