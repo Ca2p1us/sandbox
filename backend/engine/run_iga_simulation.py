@@ -159,7 +159,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             target_key="pre_evaluation",
             )
     # 評価個体の選択
-    evaluate_id = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE)
+    evaluate_id = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE,gen = 1)
     evaluate_population = get_evaluated_individuals(population, evaluate_id)
 
     for generation in range(NUM_GENERATIONS - 1):
@@ -252,7 +252,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             target_key="pre_evaluation",
         )
         # 評価個体の選択
-        evaluate_id = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE)
+        evaluate_id = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE, gen=generation+1)
         evaluate_population = get_evaluated_individuals(population, evaluate_id)
 
     # --- ここで最終世代の評価値を再計算 ---

@@ -14,7 +14,7 @@ average_fitness_histories_many = []
 noise_is_added = False
 look = False
 interpolate_num = 100
-print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション\n3: 3種比較\n4: トーナメントサイズの比較")
+print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション\n3: 比較\n4: トーナメントサイズの比較")
 choice = input("実行するシミュレーションを選択 (1/4): ")
 if choice == "2":
     print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Gauss関数+cos関数\n4: Ackley関数\n5: Gaussian_two_peak関数")
@@ -110,11 +110,79 @@ elif choice == "3":
     best_fitness_histories_ave = [tuple(row) for row in best_fitness_histories_ave]
     average_fitness_histories_ave = np.mean(average_fitness_histories, axis=0)
     average_fitness_histories_ave = [tuple(row) for row in average_fitness_histories_ave]
+
+    best_fitness_list = [
+    {
+        'label': '補間なし9個体', 
+        'data': best_fitness_histories_few_ave, 
+        'marker': 'o', 
+        'linestyle': '--'
+    },
+    {
+        'label': '補間なし200個体', 
+        'data': best_fitness_histories_many_ave, 
+        'marker': '^', 
+        'linestyle': ':'
+    },
+    {
+        'label': '補間あり(提案)', 
+        'data': best_fitness_histories_ave, 
+        'marker': 'o', 
+        'linestyle': '-'
+    },
+    # # 追加のデータも辞書を足すだけ
+    # {
+    #     'label': '参考データ',
+    #     'data': data_new,
+    #     'marker': 'x',
+    #     'linestyle': '-.'
+    # }
+    ]
+    ave_fitness_list = [
+    {
+        'label': '補間なし9個体', 
+        'data': average_fitness_histories_few_ave, 
+        'marker': 'o', 
+        'linestyle': '--'
+    },
+    {
+        'label': '補間なし200個体', 
+        'data': average_fitness_histories_many_ave, 
+        'marker': '^', 
+        'linestyle': ':'
+    },
+    {
+        'label': '補間あり(提案)', 
+        'data': average_fitness_histories_ave, 
+        'marker': 'o', 
+        'linestyle': '-'
+    },
+    # # 追加のデータも辞書を足すだけ
+    # {
+    #     'label': '参考データ',
+    #     'data': data_new,
+    #     'marker': 'x',
+    #     'linestyle': '-.'
+    # }
+]
+
     log_fitness_histories(int(evaluate_num), int(interpolate_num), "_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_best_fitness_histories.png", best_fitness_histories, ver="proposal")
     log_fitness(file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_average_fitness_histories.png", best_fitness_history= best_fitness_histories_ave, average_fitness_history=average_fitness_histories_ave,evaluate_num=int(evaluate_num), interpolate_num=int(interpolate_num), ver="proposal",title=f"mean of {EXPERIMENT_TIMES} times")
     log_error_history(file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_error_history.png", error_history= error_history, evaluate_num=int(evaluate_num), interpolate_num=int(interpolate_num), ver="proposal",title=f"Total Error mean of {EXPERIMENT_TIMES} times")
-    log_comparison(int(evaluate_num), int(interpolate_num), "_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison.png", best_fitness_histories_few_ave, best_fitness_histories_many_ave, best_fitness_histories_ave, "Best ")
-    log_comparison(int(evaluate_num), int(interpolate_num), "_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison_average.png", average_fitness_histories_few_ave, average_fitness_histories_many_ave, average_fitness_histories_ave, "Average ")
+    log_comparison(
+        evaluate_num=int(evaluate_num),
+        interpolate_num=int(interpolate_num),
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison.png",
+        plot_series_list=best_fitness_list,
+        indicator="Best "
+    )
+    log_comparison(
+        evaluate_num=int(evaluate_num),
+        interpolate_num=int(interpolate_num),
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison_average.png",
+        plot_series_list=ave_fitness_list,
+        indicator="Average "
+    )
 
 elif choice == "4":
     proposal_or_conventional = input("提案型IGAを実行する場合は1、普通のIGAを実行する場合は0を入力してください (1/0): ")

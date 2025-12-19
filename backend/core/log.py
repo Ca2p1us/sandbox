@@ -12,6 +12,7 @@ from typing import List
 import japanize_matplotlib
 from pathlib import Path
 
+plt.rcParams['font.family'] = 'MS Gothic'
 
 def log(file_path: str, answer,times: int = 1):
     # UUID型をstr型に変換するヘルパー関数
@@ -218,64 +219,87 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
     plt.show()
     plt.close()
     return
-def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, best_fitness_histories_few_ave, best_fitness_histories_many_ave, best_fitness_histories_ave,indicator : str):
+def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, plot_series_list: list , indicator : str):
     """
     複数回のシミュレーションの世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_histories: [[(世代番号, fitness値), ...], ...] のリスト
+    Args:
+        evaluate_num (int): 評価関数のID
+        interpolate_num (int): 補間手法のID
+        file_path_suffix (str): 保存ファイル名のサフィックス (例: "_comparison.png")
+        plot_series_list (list): 描画するデータのリスト。
+            形式: [
+                {'label': '凡例名1', 'data': [(世代, fit), ...], 'marker': 'o', 'linestyle': '-'},
+                {'label': '凡例名2', 'data': [(世代, fit), ...], 'marker': 'x', 'linestyle': '--'},
+                ...
+            ]
+        indicator (str): Y軸ラベルの接頭辞
     """
 
-    if not best_fitness_histories_ave:
-        print("履歴データがありません。")
+    if not plot_series_list:
+        print("データがありません。")
         return
-    if evaluate_num == 1:
-        method = "Gaussian"
-    elif evaluate_num == 2:
-        method = "Sphere"
-    elif evaluate_num == 3:
-        method = "Gaussian_cos"
-    elif evaluate_num == 4:
-        method = "Ackley"
-    elif evaluate_num == 5:
-        method = "Gaussian_two_peak"
-    if interpolate_num == 0:
-        interpolate = "linear"
-    elif interpolate_num == 1:
-        interpolate = "Gauss"
-    elif interpolate_num == 2:
-        interpolate = "RBF"
-    elif interpolate_num == 3:
-        interpolate = "IDW"
+    # --- 1. マッピング定義（if-elifの代わり） ---
+    method_map = {
+        1: "Gaussian",
+        2: "Sphere",
+        3: "Gaussian_cos",
+        4: "Ackley",
+        5: "Gaussian_two_peak"
+    }
+    method = method_map.get(evaluate_num, "Unknown")
+
+    interpolate_map = {
+        0: "linear",
+        1: "Gauss",
+        2: "RBF",
+        3: "IDW"
+    }
+    interpolate = interpolate_map.get(interpolate_num, "Unknown")
+
+    # Y軸の範囲設定
+    ylim_settings = {
+        "Gaussian": (2, 6.5),
+        "Ackley": (0, 6.0),
+        "Gaussian_two_peak": (0, 6.5),
+        "Gaussian_cos": (0, 9.5),
+        "Sphere": (-100000, 0.5)
+    }
 
     fig, ax = plt.subplots(figsize=(8, 5))
 
-    generations = [item[0] for item in best_fitness_histories_ave]
-    fitness_values_few = [item[1] for item in best_fitness_histories_few_ave]
-    fitness_values_many = [item[1] for item in best_fitness_histories_many_ave]
-    fitness_values_proposal = [item[1] for item in best_fitness_histories_ave]
+    # リスト内のデータをループで描画
+    max_gen = 0
+    for series in plot_series_list:
+        data = series.get('data', [])
+        if not data:
+            continue
+            
+        generations = [item[0] for item in data]
+        fitness_values = [item[1] for item in data]
+        
+        # 軸の最大値更新用
+        if generations:
+            max_gen = max(max_gen, max(generations))
 
-    ax.plot(generations, fitness_values_few,
-             marker='o', linestyle='-', label='Normal IGA (few)')
-    ax.plot(generations, fitness_values_many,
-             marker='o', linestyle='-', label='Normal IGA (many)')
-    ax.plot(generations, fitness_values_proposal,
-             marker='o', linestyle='-', label='Proposed IGA')
-
+        ax.plot(
+            generations, 
+            fitness_values,
+            marker=series.get('marker', 'o'),  # 指定がなければ 'o'
+            linestyle=series.get('linestyle', '-'), # 指定がなければ '-'
+            label=series.get('label', 'No Label')
+        )
+    # --- 3. グラフ装飾 ---
     ax.set_xlabel('Generation',fontsize=18)
     ax.set_ylabel(indicator+'Fitness',fontsize=18)
     ax.set_title("")
-    ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
-    if method == "Gaussian":
-        ax.set_ylim(2,6.5)
-    if method == "Ackley":
-        ax.set_ylim(0,6.0)
-    if method == "Gaussian_two_peak":
-        ax.set_ylim(0,6.5)
-    if method == "Gaussian_cos":
-        ax.set_ylim(0,9.5)
-    if method == "Sphere":
-        ax.set_ylim(-100000,0.5)
+    # X軸範囲設定 (データに合わせて動的に設定、または定数NUM_GENERATIONSを使用)
+    # ax.set_xlim(0.5, NUM_GENERATIONS + 0.5) 
+    ax.set_xlim(0.5, max_gen + 0.5 if max_gen > 0 else NUM_GENERATIONS + 0.5)
+    if method in ylim_settings:
+        ax.set_ylim(*ylim_settings[method])
     ax.grid(True)
-    ax.legend(["補間なし9個体","補間なし200個体","補間あり"],prop={"family":"MS Gothic", "size": 14},loc=0)
+    ax.legend(prop={"family": "MS Gothic", "size": 14}, loc=0)
     # fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
     if interpolate_num == 100:

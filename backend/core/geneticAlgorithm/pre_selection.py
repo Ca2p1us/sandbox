@@ -1,9 +1,9 @@
 #評価する個体を選ぶプログラム
-
+from ..geneticAlgorithm.config import NUM_GENERATIONS
 from typing import List
 import numpy as np
 
-def select_top_individuals_by_pre_evaluation(population: List[dict], total_n: int = 10) -> List[str]:
+def select_top_individuals_by_pre_evaluation(population: List[dict], total_n: int = 10, gen:int = 1) -> List[str]:
     """
     pre_evaluation（事前評価済み）が整数・小数どちらでも対応し、降順ソートして上位top_n個体のIDリストを返す
     """
@@ -27,17 +27,19 @@ def select_top_individuals_by_pre_evaluation(population: List[dict], total_n: in
     # 降順ソート
     sorted_population = sorted(valid_population, key=lambda x: float(x["pre_evaluation"]), reverse=True)
 
-    selected_inds = sorted_population[:total_n]
+    if gen < int(NUM_GENERATIONS/2):
+        # 上位と下位をそれぞれ選択
+        half_top = total_n // 2 + (total_n % 2)  # 奇数なら上位を1つ多く
+        half_bottom = total_n // 2
 
-    # # 上位と下位をそれぞれ選択
-    # half_top = total_n // 2 + (total_n % 2)  # 奇数なら上位を1つ多く
-    # half_bottom = total_n // 2
+        top_inds = sorted_population[:half_top]
+        bottom_inds = sorted_population[-half_bottom:] if half_bottom > 0 else []
 
-    # top_inds = sorted_population[:half_top]
-    # bottom_inds = sorted_population[-half_bottom:] if half_bottom > 0 else []
+        # 合体（順序は上位→下位）
+        selected_inds = top_inds + bottom_inds
+    else:
+        selected_inds = sorted_population[:total_n]
 
-    # # 合体（順序は上位→下位）
-    # selected_inds = top_inds + bottom_inds
 
     # 重複を防止（極端に少ないpopulationでも安全）
     selected_ids = []
