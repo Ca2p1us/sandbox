@@ -79,9 +79,12 @@ def plot_gauss_function():
 
 def plot_gauss_func_peaks():
     # 1. パラメータの設定
-    mu1 = 150        # 平均1 (μ1)
-    mu2 = 350        # 平均2 (μ2)
-    sigma = 50      # 標準偏差 (σ)
+    mu1 = 250        # 平均1 (μ1)
+    mu2 = 100        # 平均2 (μ2)
+    mu3 = 400
+    sigma1 = 50      # 標準偏差 (σ)
+    sigma2 = 30
+    sigma3 = 30
     x_min, x_max = 0, 500  # 定義域 (x軸の範囲)
     y_min, y_max = 0, 6    # 値域 (y軸の範囲)
     
@@ -93,12 +96,12 @@ def plot_gauss_func_peaks():
     x = np.linspace(x_min, x_max, 1000)
     
     # ガウス関数の計算: f(x) = A * [exp( - (x - μ1)^2 / (2σ^2) ) + exp( - (x - μ2)^2 / (2σ^2) )]
-    y = amplitude1 * np.exp(-((x - mu1)**2) / (2 * sigma**2)) + amplitude1 * 0.5 * np.exp(-((x - mu2)**2) / (2 * sigma**2))
+    y = amplitude1 * np.exp(-((x - mu1)**2) / (2 * sigma1**2)) + amplitude1 * 0.5 * np.exp(-((x - mu2)**2) / (2 * sigma2**2)) + amplitude1 * 0.5 * np.exp(-((x - mu3)**2) / (2 * sigma3**2))
 
     # 4. プロット設定
     fig, ax = plt.subplots(figsize=(8, 6)) # fig, ax を取得するように変更
-    point_x = [150]
-    point_y = [amplitude1 * np.exp(-((px - mu1)**2) / (2 * sigma**2)) + amplitude1 * 0.5 * np.exp(-((px - mu2)**2) / (2 * sigma**2)) for px in point_x]
+    point_x = [250]
+    point_y = [amplitude1 * np.exp(-((px - mu1)**2) / (2 * sigma1**2)) + amplitude1 * 0.5 * np.exp(-((px - mu2)**2) / (2 * sigma2**2)) + amplitude1 * 0.5 * np.exp(-((px - mu3)**2) / (2 * sigma3**2)) for px in point_x]
     # 点のプロット (赤色、サイズ大きめ)
     ax.scatter(point_x, point_y, color='blue', s=100, zorder=5, label='Point')
     ax.text(point_x[0], point_y[0] + 0.1, f'Ans', ha='center', fontsize=16)

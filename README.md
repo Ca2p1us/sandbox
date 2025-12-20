@@ -234,3 +234,5 @@ uv run python -m backend.core.geneticAlgorithm.interpolation
     - 12/18
         - Ackley関数が良さげだな～って思ってたらどの手法でも性能出なくてびっくり
         - よく見てみたらカスみたいなパラメータ設定だった、Geminiに聞きながらパラメータを改善したよ
+    - 12/20
+        - 正規化の計算に個体群のmax,minを使っていたので、コンフィグファイルを見るように変えた、別にみればいいよね

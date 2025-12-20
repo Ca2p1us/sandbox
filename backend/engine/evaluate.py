@@ -4,7 +4,7 @@ import uuid
 import numpy as np
 from scipy.stats import norm
 from typing import List
-from ..core.geneticAlgorithm.config import PARAMS, TARGET_PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2
+from ..core.geneticAlgorithm.config import PARAMS, TARGET_PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2, SIGMA, RATE
 
 def add_noise(value: float, noise_sigma: float = 1.0, noise_mean = 0, scale = 1.0) -> float:
     # 平均0、標準偏差noise_sigmaの正規分布ノイズを加算
@@ -49,7 +49,7 @@ def evaluate_fitness(
         elif evaluate_num == 4:
             ind[target_key] = calculate_Ackley(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
         elif evaluate_num == 5:
-            ind[target_key] = calculate_Gaussian_two_peak(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS_1, target_params_2=TARGET_PARAMS_2, noise_is_added=noise_is_added)
+            ind[target_key] = calculate_Gaussian_two_peak(individual=ind, param_keys=param_keys, target_params=[TARGET_PARAMS,TARGET_PARAMS_1,TARGET_PARAMS_2], noise_is_added=noise_is_added)
     return None
 
 def calculate_Gaussian(
@@ -190,13 +190,13 @@ def calculate_Ackley(
 def calculate_Gaussian_two_peak(
     individual: dict,
     param_keys: List[str] = None,
-    target_params: List[float] = TARGET_PARAMS_1,
-    target_params_2: List[float] = TARGET_PARAMS_2,
+    target_params: list[list] = [TARGET_PARAMS,TARGET_PARAMS_1,TARGET_PARAMS_2],
+    sigmas:list = SIGMA,
+    rates:list = RATE,
     noise_is_added: bool = False,
-    sigma: float = 30.0,
 ):
     scores = []
-    for key, target, target_2 in zip(param_keys, target_params, target_params_2):
+    for i,key in enumerate(param_keys):
         # ドット区切りでアクセス
         val = individual
         for k in key.split('.'):
@@ -207,9 +207,13 @@ def calculate_Gaussian_two_peak(
             scores.append(0)
         else:
             # 正規分布の確率密度関数（最大値1）
-            score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + np.exp(-((float(val) - target_2) ** 2) / (2 * sigma ** 2))
-            # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
-            scores.append(score)
+            dim_score = 0.0
+            for j in range(len(rates)):
+                mu = target_params[j][i]
+                sigma = sigmas[j]
+                rate = rates[j]
+                dim_score += rate * np.exp(-((val - mu) ** 2) / (2 * sigma **2))
+            scores.append(dim_score)
 
     # 統合
     total_score = sum(scores)  if scores else 0

@@ -255,7 +255,7 @@ def log_fitness_histories(evaluate_num: int = None, interpolate_num: int = None,
 
     _setup_plot(ax,method,y_label='Best Fitness', title=f'{method} Best Fitness Histories')
     plt.savefig(save_path)
-    plt.show()
+    # plt.show()
     plt.close()
     return
 
