@@ -113,8 +113,19 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
     # 6. 最終結果の出力
     log(f"result/conventional/last_gen_individuals/{evaluate_method}/{str(POPULATION_SIZE)}inds/simulation_{evaluate_method}_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(times)}.json", population,times = times)
     log(f"result/conventional/best/{evaluate_method}/{str(POPULATION_SIZE)}inds/best_individual_{evaluate_method}_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(times)}.json", bests,times = times)
-    log_fitness(method=evaluate_method, file_path=f"result/conventional/graph/{evaluate_method}/best_fitnesses/{evaluate_method}_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(POPULATION_SIZE)}_{str(times)}_best_fitness_history.png", best_fitness_history=best_fitness_history, average_fitness_history=average_fitness_history)
-    log_average_fitness(method=evaluate_method, file_path=f"_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(POPULATION_SIZE)}_{str(times)}_average_fitness_history.json", average_fitness_history=average_fitness_history, times=times)
+    log_fitness(
+        evaluate_num=evaluate_num,
+        file_path=f"_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(POPULATION_SIZE)}_{str(times)}_best_fitness_history.png",
+        best_fitness_history=best_fitness_history,
+        average_fitness_history=average_fitness_history,
+        ver="conventional"
+    )
+    log_average_fitness(
+        evaluate_num=evaluate_num,
+        file_path=f"_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(POPULATION_SIZE)}_{str(times)}_average_fitness_history.json",
+        average_fitness_history=average_fitness_history,
+        times=times
+        )
     return best_fitness_history,average_fitness_history
 
 
@@ -152,8 +163,10 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         interpolate = "RBF"
     elif interpolate_num == 3:
         interpolate = "IDW"
+    elif interpolate_num == 4:
+        interpolate = "Hybrid"
     interpolation(
-            population,
+            population=population,
             method_num=interpolate_num,
             param_keys=PARAMS,
             target_key="pre_evaluation",
@@ -185,7 +198,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
 
         # 評価の平均値を表示
         average = get_average_fitness(population)
-        print(best["fitness"])
+        # print(best["fitness"])
         # --- ここで履歴に追加 ---
         if best is not None and "fitness" in best:
             best_fitness_history.append((generation + 1, float(best["fitness"])))
@@ -284,6 +297,19 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     # 6. 最終結果の出力
     log(f"result/proposal/last_gen_individuals/{evaluate_method}/{interpolate}/{str(PROPOSAL_POPULATION_SIZE)}inds_{str(EVALUATE_SIZE)}eval/simulation_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(times)}.json", population,times = times)
     log(f"result/proposal/best/{evaluate_method}/{interpolate}/{str(PROPOSAL_POPULATION_SIZE)}inds_{str(EVALUATE_SIZE)}eval/best_individual_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(times)}.json", bests,times = times)
-    log_fitness(method=evaluate_method, file_path=f"result/proposal/graph/{evaluate_method}/{interpolate}/best_fitnesses/{evaluate_method}_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}eval_{str(times)}_best_fitness_history.png", best_fitness_history=best_fitness_history, average_fitness_history=average_fitness_history)
-    log_average_fitness(method=evaluate_method, interpolate_method=interpolate, file_path=f"_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}eval_{str(times)}_average_fitness_history.json", average_fitness_history=average_fitness_history, times=times)
+    log_fitness(
+        evaluate_num=evaluate_num,
+        interpolate_num=interpolate_num,
+        file_path=f"_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}eval_{str(times)}_best_fitness_history.png",
+        best_fitness_history=best_fitness_history,
+        average_fitness_history=average_fitness_history,
+        ver="proposal"
+    )
+    log_average_fitness(
+        evaluate_num=evaluate_num,
+        interpolate_num=interpolate_num,
+        file_path=f"_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}eval_{str(times)}_average_fitness_history.json",
+        average_fitness_history=average_fitness_history,
+        times=times
+    )
     return best_fitness_history, average_fitness_history, error_history

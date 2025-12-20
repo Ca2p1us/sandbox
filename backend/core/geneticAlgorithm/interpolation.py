@@ -4,7 +4,7 @@ from typing import List, Dict, Tuple
 import math
 from scipy.interpolate import RBFInterpolator
 import numpy as np
-from ..geneticAlgorithm.config import PARAMS
+from ..geneticAlgorithm.config import PARAMS,NUM_GENERATIONS
 from ...engine import evaluate
 from .make_chromosome_params import make_chromosome_params
 from ...engine.evaluate import evaluate_fitness, get_best_and_worst_individuals
@@ -20,6 +20,7 @@ def interpolation(
   best: dict = None,
   worst: dict = None,
   method_num: int = 0,
+  gen:int = 0,
   param_keys: List[str] = PARAMS,
   target_key: str = "pre_evaluation",
   refernce_key = "fitness",      
@@ -41,7 +42,7 @@ def interpolation(
         param_keys = ["fmParamsList.operator1.frequency"]
 
     # 全個体（未評価 + 評価済み）からMin/Maxを取得
-    all_inds = population + evaluated_population
+    all_inds = population
     min_max_dict = get_min_max_dict(all_inds, param_keys)
 
     # 評価済み個体を「正規化ベクトル」と「正解値」のペアリストに変換しておく
@@ -63,7 +64,7 @@ def interpolation(
     if method_num == 0:
         #距離補間用のパラメータ計算
         max_dist = euclidean(best_params, worst_params)
-    elif method_num ==1:
+    elif method_num ==1 or (method_num == 4 and gen > int(NUM_GENERATIONS/2)):
         #ガウス補間用のパラメータ計算
         eps = (best_val - worst_val) * EPS_RATIO
         C = worst_val - eps
@@ -85,81 +86,68 @@ def interpolation(
             train_Y.append(float(individual.get(refernce_key, 0.0)))
         # print(f"学習データの次元数: {np.shape(np.array(train_X))}, ラベル数: {len(train_Y)}")
         interpolator = RBFInterpolator(np.array(train_X), np.array(train_Y), kernel='linear',smoothing=0.1)
-    elif method_num == 3:
-        # 全個体（未評価 + 評価済み）からMin/Maxを取得
-        all_inds = population + evaluated_population
-        min_max_dict = get_min_max_dict(all_inds, param_keys)
-
-        # 評価済み個体を「正規化ベクトル」と「正解値」のペアリストに変換しておく
-        # 構造: [(normalized_vec, fitness_value), ...]
-        norm_eval_data = []
-        for ind in evaluated_population:
-            vec = to_normalized_vec(ind, param_keys, min_max_dict)
-            val = float(ind.get(refernce_key, 0.0))
-            norm_eval_data.append((vec, val))
         
 
     # print(f"best_val: {best_val}, worst_val: {worst_val}")
     for ind in population:
+        target_vec = to_normalized_vec(ind, param_keys, min_max_dict)
         if method_num == 0:
             ind[target_key] = calculate_by_distance(
-                individual=ind,
-                param_keys=param_keys,
+                target_vec=target_vec,
                 target_key=target_key,
                 max_dist=max_dist,
                 best_val=best_val,
                 worst_val=worst_val,
                 best_params=best_params,
-                min_max_dict=min_max_dict,
             )
         elif method_num == 1:
             ind[target_key] = calculate_by_Gaussian(
-            individual=ind,
-            param_keys=param_keys,
-            target_key=target_key,
-            best_params=best_params,
-            C=C,
-            A=A,
-            sigma=[200,200,200,200,200,200],
-            # sigma=sigma,
-            min_max_dict=min_max_dict,
+                target_vec=target_vec,
+                best_params=best_params,
+                C=C,
+                A=A,
+                # sigma=[200,200,200,200,200,200],
+                sigma=sigma,
             )
         elif method_num == 2:
             ind[target_key] = calculate_by_RBF(
-                individual = ind,
-                evaluated_population=evaluated_population,
-                param_keys=param_keys,
+                target_vec=target_vec,
                 interpolater=interpolator,
-                min_max_dict=min_max_dict,
             )
         elif method_num == 3:
-            # ターゲット個体を正規化ベクトルに変換
-            target_vec = to_normalized_vec(ind, param_keys, min_max_dict)
             ind[target_key] = calculate_by_IDW(
                 target_vec=target_vec,
                 norm_eval_data=norm_eval_data
             )
-    
+        elif method_num == 4:
+            if gen <= int(NUM_GENERATIONS/2):
+                ind[target_key] = calculate_by_IDW(
+                    target_vec=target_vec,
+                    norm_eval_data=norm_eval_data
+                )
+            else:
+                ind[target_key] = calculate_by_Gaussian(
+                    individual=ind,
+                    best_params=best_params,
+                    C=C,
+                    A=A,
+                    # sigma=[200,200,200,200,200,200],
+                    sigma=sigma,
+                )
     return
 
 def calculate_by_distance(
-    individual:dict= None,
-    param_keys: List[str] = None,
-    target_key: str = "pre_evaluation",
+    target_vec: List[float] = None,
     max_dist: float = 0.0,
     best_val: float = 1.0,
     worst_val: float = 1.0,
     best_params: List[float] = None,
-    min_max_dict: Dict[str, Tuple[float, float]] = None,
-):
+) -> float:
     if max_dist == 0:
         # 全員同じ場合
-        value = best_val
-        individual[target_key] = float(value)
         print(f"距離が同一です。\nbest {best_val}, worst {worst_val}")        
-        return value
-    ind_params = to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict)
-    dist_best = euclidean(ind_params, best_params)
+        return best_val
+    dist_best = euclidean(target_vec, best_params)
     ratio = dist_best / max_dist
     value = best_val * (1 - ratio) + worst_val * ratio
     return value
@@ -170,7 +158,7 @@ def get_sigma(
     worst_params: List[float] = None,
     ratio: float = 0.5,
     eps_floor_ratio: float = 1e-6,
- ):
+ ) -> float:
     sigma = []
     for b, w in zip(best_params, worst_params):
         raw = abs(b - w)
@@ -184,23 +172,16 @@ def get_sigma(
 
 
 def calculate_by_Gaussian(
-    individual:dict= None,
-    param_keys: List[str] = None,
-    target_key: str = "pre_evaluation",
+    target_vec:List[float] = None,
     best_params: List[float] = None,
     C: float = 0.0,
     A: float = 1.0,
     sigma: List[float] = None,
-    min_max_dict: Dict[str, Tuple[float, float]] = None,
-):
+) -> float:
     mu = best_params
-    ind_params = to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict)
-    if any(p is None for p in ind_params):
-        individual[target_key] = RNG.uniform(1.0, 10.0)
-        return individual[target_key]
     # compute normalized squared distance
     dist_sq = 0.0
-    for xj, muj, sj in zip(ind_params, mu, sigma):
+    for xj, muj, sj in zip(target_vec, mu, sigma):
         z = (xj - muj) / sj
         dist_sq += z * z
     # note: DO NOT divide by N; the scale is already handled by sigma
@@ -209,16 +190,10 @@ def calculate_by_Gaussian(
 
 
 def calculate_by_RBF(
-    individual:dict= None,
-    evaluated_population: List[dict] = None,
-    param_keys: List[str] = None,
-    target_key: str = "pre_evaluation",
+    target_vec: List[float] = None,
     interpolater = None,
-    min_max_dict: Dict[str, Tuple[float, float]] = None,
-):
-    if individual in evaluated_population:
-        return float(individual.get(target_key, 0.0))
-    x_vec = np.array([to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict)])
+) -> float:
+    x_vec = np.array(target_vec)
     est_value = interpolater(x_vec)[0]
     return float(est_value)
 
@@ -256,171 +231,6 @@ def calculate_by_IDW(
         
     return weighted_val_sum / weights_sum
 
-
-def interpolate_by_distance(
-    population: List[dict],
-    best: dict = None,
-    worst: dict = None,
-    param_keys: List[str] = None,
-    target_key: str = "pre_evaluation"
-):
-    """
-    best, worstを基準に、個体群のtarget_key（pre_evaluationやfitnessなど）を距離に応じて線形補間で再評価する。
-    best/worstがNoneの場合はランダムな値を付与する。
-    param_keys: 距離計算に使うパラメータ名リスト（Noneならoperator1のfrequencyのみ）
-    target_key: 補間して格納するキー名（"pre_evaluation"または"fitness"など）
-    """
-    print(f"補間を開始します。")
-    if not best or not worst:
-        print(f"bestまたはworstがNoneです。ランダムな{target_key}を付与します。")
-        for ind in population:
-            ind[target_key] = RNG.uniform(1.0, 10.0)
-        return
-
-    if param_keys is None:
-        # デフォルトはoperator1のfrequencyのみ
-        param_keys = ["fmParamsList.operator1.frequency"]
-
-    best_params = to_vec(best, param_keys=param_keys)
-    worst_params = to_vec(worst, param_keys=param_keys)
-
-    max_dist = euclidean(best_params, worst_params)
-    if max_dist == 0:
-        # 全員同じ場合
-        for ind in population:
-            value = best.get(target_key, best.get("fitness", 1))
-            ind[target_key] = float(value)
-        print(f"距離が同一です。\nbest {best[target_key]}, worst {worst[target_key]}")
-        return
-
-    best_val = float(best.get("fitness", 1))
-    worst_val = float(worst.get("fitness", 1))
-
-    for ind in population:
-        ind_vec = to_vec(ind, param_keys=param_keys)
-        dist_best = euclidean(ind_vec, best_params)
-        # 距離が近いほどbest_valに近づく
-        ratio = dist_best / max_dist
-        value = best_val * (1 - ratio) + worst_val * ratio
-        ind[target_key] = value
-    print(f"{target_key}を補間しました。\nbest {best_val}, worst {worst_val}")
-    return
-
-
-def interpolate_by_Gaussian(
-    population: List[dict],
-    best: dict = None,
-    worst: dict = None,
-    param_keys: List[str] = None,
-    target_key: str = "pre_evaluation",
-    eps_ratio: float = 0.02,
-    eps_floor_ratio: float = 1e-6
-):
-    """
-    ガウス関数 f(x) = A exp(-(x-μ)^2/(2σ^2)) + C のパラメータ推定
-    C ≈ y2 として、わずかに ε を下げた近似で計算。
-    
-    eps_ratio: 全振幅に対する補正割合（例: 0.02 = 2%）
-    """
-    print(f"ガウス補間を開始します。")
-    if not best or not worst:
-        print(f"bestまたはworstがNoneです。ランダムな{target_key}を付与します。")
-        for ind in population:
-            ind[target_key] = RNG.uniform(1.0, 10.0)
-        return
-    if param_keys is None:
-        # デフォルトはoperator1のfrequencyのみ
-        param_keys = ["fmParamsList.operator1.frequency"]
-
-    best_params = [get_param(best, k) for k in param_keys]
-    worst_params = [get_param(worst, k) for k in param_keys]
-
-    if any(p is None for p in best_params) or any(p is None for p in worst_params):
-        raise ValueError("best/worst に param_keys が存在しません。")
-    
-    best_val = float(best.get("fitness", 1.0))
-    worst_val = float(worst.get("fitness", 1.0))
-    eps = (best_val - worst_val) * eps_ratio
-    C = worst_val - eps
-    A = best_val - C
-    print(f"best_val: {best_val}, worst_val: {worst_val}")
-    print(best[target_key] - C)
-
-    # ratio for sigma estimation（数値安定化）
-    denom = (best.get("fitness", 1e-12) - C)
-    if denom == 0:
-        raise ValueError(f"best の target が C と等しい。sigma を推定できません。best: {best.get('fitness', 1e-12)}, C: {C}")
-    ratio = (worst.get("fitness", 1e-12) - C) / denom
-    if not (0 < ratio < 1):
-        raise ValueError(f"ratio が (0,1) の範囲にない。best/worst の target を確認してください。ratio: {ratio}")
-
-    sigma = []
-    for b, w in zip(best_params, worst_params):
-        raw = abs(b - w)
-        # if raw == 0, we still need a meaningful scale; use relative floor
-        floor = max(abs(b), abs(w), 1.0) * eps_floor_ratio
-        raw = max(raw, floor)
-        s = raw / math.sqrt(-2.0 * math.log(ratio))
-        s = max(s, floor)  # avoid exact zero
-        sigma.append(s)
-    mu = best_params
-    print(f"ガウス補間のパラメータ: \n\tA={A}, \n\tmu={mu}, \n\tsigma={sigma}, \n\tC={C}")
-
-    # 個体群のガウス補間
-    for ind in population:
-        ind_params = [get_param(ind, k) for k in param_keys]
-        if any(p is None for p in ind_params):
-            ind[target_key] = RNG.uniform(1.0, 10.0)
-            continue
-        # compute normalized squared distance
-        dist_sq = 0.0
-        for xj, muj, sj in zip(ind_params, mu, sigma):
-            z = (xj - muj) / sj
-            dist_sq += z * z
-        # note: DO NOT divide by N; the scale is already handled by sigma
-        value = A * math.exp(-0.5 * dist_sq) + C
-        ind[target_key] = value
-    print(f"{target_key}をガウス補間しました。\nbest {best_val}, worst {worst_val}")
-    return
-
-
-def interpolate_by_RBF(
-    population: List[dict],        # {UUID: 個体オブジェクト} の辞書
-    evaluated_ind: List[dict] = None,      # 評価済み個体のリスト
-    param_keys: List[str] = None,
-    target_key: str = "pre_evaluation",
-):
-    """
-    UUIDリストで管理された評価済み個体の fitness を用いて、
-    pre_evaluation をRBF補間する。
-    カーネルはGaussianを使用する。
-    """
-    train_X = []
-    train_Y = []
-    print(f"RBF補間を開始します。")
-    if evaluated_ind is None or len(evaluated_ind) == 0:
-        print(f"事前評価がNoneです。ランダムな{target_key}を付与します。")
-        for ind in population:
-            ind[target_key] = RNG.uniform(1.0, 10.0)
-        return
-    if param_keys is None:
-        # デフォルトはoperator1のfrequencyのみ
-        param_keys = ["fmParamsList.operator1.frequency"]
-        
-    for individual in evaluated_ind:
-        train_X.append(to_vec(individual, param_keys=param_keys))
-        train_Y.append(float(individual.get(target_key, 0.0)))
-    print(f"学習データの次元数: {np.shape(np.array(train_X))}, ラベル数: {len(train_Y)}")
-    interpolator = RBFInterpolator(np.array(train_X), np.array(train_Y), kernel='gaussian', epsilon=1.5)
-
-    for individual in population:
-        if individual in evaluated_ind:
-            continue
-        x_vec = np.array([to_vec(individual)])
-        est_value = interpolator(x_vec)[0]
-        individual[target_key] = float(est_value)
-
-    return
 
 def get_evaluated_individuals(
         population: List[dict],

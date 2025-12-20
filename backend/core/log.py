@@ -8,11 +8,141 @@ import wave
 from scipy.signal import sawtooth
 import uuid
 from .geneticAlgorithm.config import ATTACK_RANGE, NUM_GENERATIONS
-from typing import List
+from typing import List, Optional, Union
 import japanize_matplotlib
 from pathlib import Path
 
 plt.rcParams['font.family'] = 'MS Gothic'
+
+# --- 定数・マッピング定義 ---
+
+# 評価関数 ID -> 名前
+EVALUATE_MAP = {
+    1: "Gaussian",
+    2: "Sphere",
+    3: "Gaussian_cos",
+    4: "Ackley",
+    5: "Gaussian_two_peak"
+}
+# 名前 -> 評価関数 ID (逆引き用)
+EVALUATE_NAME_TO_ID = {v: k for k, v in EVALUATE_MAP.items()}
+
+# 補間手法 ID -> 名前
+INTERPOLATE_MAP = {
+    0: "linear",
+    1: "Gauss",
+    2: "RBF",
+    3: "IDW",
+    4: "Hybrid",
+    100: None,  # 補間なし等の特別扱い
+    None: None
+}
+# 名前 -> 補間手法 ID (逆引き用、None除く)
+INTERPOLATE_NAME_TO_ID = {v: k for k, v in INTERPOLATE_MAP.items() if v is not None}
+
+# グラフのY軸範囲設定
+# 関数ごとに微妙に異なっていた値を統合的に管理します。
+# 必要に応じてここを調整してください。
+Y_LIM_SETTINGS = {
+    "Gaussian": (0, 6.5),
+    "Ackley": (0, 6.0),
+    "Gaussian_two_peak": (0, 6.5),
+    "Gaussian_cos": (0, 9.5), # 以前のコードで最大範囲だったものを採用
+    "Sphere": (-100000, 0.5)
+}
+
+# --- ヘルパー関数 ---
+
+def _get_method_name(evaluate_input: Union[int, str]) -> str:
+    """IDまたは名前から評価関数名を取得 (堅牢化)"""
+    # 整数IDの場合
+    if isinstance(evaluate_input, int):
+        return EVALUATE_MAP.get(evaluate_input, "Unknown")
+    # 文字列の場合 (例: "Ackley")
+    elif isinstance(evaluate_input, str):
+        if evaluate_input in EVALUATE_NAME_TO_ID:
+            return evaluate_input
+        # IDが文字列で渡された場合 ("4"など)
+        if evaluate_input.isdigit():
+             return EVALUATE_MAP.get(int(evaluate_input), "Unknown")
+    
+    return "Unknown"
+
+def _get_interpolate_name(interpolate_input: Union[int, str, None]) -> Optional[str]:
+    """IDまたは名前から補間手法名を取得 (堅牢化)"""
+    # Noneの場合
+    if interpolate_input is None:
+        return None
+        
+    # 整数IDの場合
+    if isinstance(interpolate_input, int):
+        return INTERPOLATE_MAP.get(interpolate_input, "Unknown")
+        
+    # 文字列の場合
+    elif isinstance(interpolate_input, str):
+        if interpolate_input in INTERPOLATE_NAME_TO_ID:
+            return interpolate_input
+        # "None" という文字列の場合
+        if interpolate_input == "None":
+            return None
+        if interpolate_input.isdigit():
+             return INTERPOLATE_MAP.get(int(interpolate_input), "Unknown")
+
+    return "Unknown"
+
+def _setup_plot(ax, method: str, x_label='Generation', y_label='Fitness', title=''):
+    """グラフの共通設定を適用するヘルパー関数"""
+    ax.set_xlabel(x_label, fontsize=18)
+    ax.set_ylabel(y_label, fontsize=18)
+    ax.set_title(title)
+    ax.set_xlim(0.5, NUM_GENERATIONS + 0.5)
+    
+    if method in Y_LIM_SETTINGS:
+        ax.set_ylim(*Y_LIM_SETTINGS[method])
+    
+    ax.grid(True)
+
+def _get_save_path(ver: str, method: str, interpolate: Optional[str], category: str, file_name: str) -> Path:
+    """保存パスを生成する共通関数"""
+    
+    
+    # 1. 比較グラフ (result/comparison/...)
+    if ver == "comparison":
+        if interpolate is None:
+             base_dir = Path(f'./result/comparison/{method}')
+        else:
+             base_dir = Path(f'./result/comparison/{method}/{interpolate}')
+        
+    # 2. 平均適応度 (result/{ver}/average/...)
+    elif category == "average":
+        if interpolate is None:
+            base_dir = Path(f'./result/{ver}/average/{method}')
+        else:
+            base_dir = Path(f'./result/{ver}/average/{method}/{interpolate}')
+
+    # 3. その他グラフ (result/{ver}/graph/...)
+    else:
+        # category: "best_fitnesses", "error_histories"
+        if interpolate is None:
+            base_dir = Path(f'./result/{ver}/graph/{method}/{category}')
+        else:
+            base_dir = Path(f'./result/{ver}/graph/{method}/{interpolate}/{category}')
+            
+    
+    # ディレクトリの作成 (ここが重要: 確実にフォルダを作る)
+    try:
+        base_dir.mkdir(parents=True, exist_ok=True)
+    except Exception as e:
+        print(f"ディレクトリ作成エラー: {e}")
+
+    # ファイル名の結合
+    # file_name が既にパス区切り文字を含んでいると意図しない挙動になるため、
+    # method名とfile_nameの結合をここで行う
+    full_path = base_dir / f"{method}{file_name}"
+    
+    print(f"保存先パス: {full_path}") # デバッグ用出力
+    return full_path
+
 
 def log(file_path: str, answer,times: int = 1):
     # UUID型をstr型に変換するヘルパー関数
@@ -34,42 +164,22 @@ def log(file_path: str, answer,times: int = 1):
 
     return
 
-def log_error_history(method: str = None, file_path: str = None, error_history=None, evaluate_num: int = None, interpolate_num: int = None, ver: str = None, title: str = None):
+def log_error_history(evaluate_num: int = None, interpolate_num: int = None, file_path: str = None, error_history: list = None, ver: str = None):
     """
     世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_history: [(世代番号, fitness値), ...] のリスト
     """
-    if evaluate_num == 1:
-        method = "Gaussian"
-    elif evaluate_num == 2:
-        method = "Sphere"
-    elif evaluate_num == 3:
-        method = "Gaussian_cos"
-    elif evaluate_num == 4:
-        method = "Ackley"
-    elif evaluate_num == 5:
-        method = "Gaussian_two_peak"
-    if interpolate_num == 0:
-        interpolate = "linear"
-    elif interpolate_num == 1:
-        interpolate = "Gauss"
-    elif interpolate_num == 2:
-        interpolate = "RBF"
-    elif interpolate_num == 3:
-        interpolate = "IDW"
-    if isinstance(evaluate_num, int):
-        if isinstance(interpolate_num, int):
-            file_path = f'./result/{ver}/graph/{method}/{interpolate}/error_histories/{method}{file_path}'
-            file_path = Path(file_path)
-        else:
-            file_path = f'./result/{ver}/graph/{method}/error_histories/{method}{file_path}'
-            file_path = Path(file_path)
-    file_path.parent.mkdir(parents=True, exist_ok=True)
-    
-    fig, ax = plt.subplots()
     if not error_history:
         print("履歴データがありません。")
         return
+    
+    method = _get_method_name(evaluate_num)
+    interpolate = _get_interpolate_name(interpolate_num)
+
+    save_path = _get_save_path(ver = ver, method=method, interpolate=interpolate, category="error_histories", file_name=file_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    fig, ax = plt.subplots()
 
     generations = [item[0] for item in error_history]
     error_values = [item[1] for item in error_history]
@@ -79,113 +189,61 @@ def log_error_history(method: str = None, file_path: str = None, error_history=N
     ax.set_title("")  # グラフタイトル
     ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
     ax.grid(True)
-    ax.plot(generations, error_values,
-             marker='o', linestyle='-', color='blue', label='Error')
+
+    ax.plot(generations, error_values,marker='o', linestyle='-', color='blue', label='Error')
     ax.legend(loc=0)
-    plt.savefig(file_path)
+
+    plt.savefig(save_path)
     plt.close()
 
 
-def log_fitness(method: str = None, file_path: str = None, best_fitness_history=None, average_fitness_history=None, evaluate_num: int = None, interpolate_num: int = None, ver: str = None, title: str = None):
+def log_fitness(evaluate_num: int = None, interpolate_num: int = None, file_path: str = None, best_fitness_history: list = None, average_fitness_history: list = None, ver: str = None):
     """
     世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_history: [(世代番号, fitness値), ...] のリスト
     """
-    if evaluate_num == 1:
-        method = "Gaussian"
-    elif evaluate_num == 2:
-        method = "Sphere"
-    elif evaluate_num == 3:
-        method = "Gaussian_cos"
-    elif evaluate_num == 4:
-        method = "Ackley"
-    elif evaluate_num == 5:
-        method = "Gaussian_two_peak"
-    if interpolate_num == 0:
-        interpolate = "linear"
-    elif interpolate_num == 1:
-        interpolate = "Gauss"
-    elif interpolate_num == 2:
-        interpolate = "RBF"
-    elif interpolate_num == 3:
-        interpolate = "IDW"
-    if isinstance(evaluate_num, int):
-        if isinstance(interpolate_num, int):
-            file_path = f'./result/{ver}/graph/{method}/{interpolate}/best_fitnesses/{method}{file_path}'
-        else:
-            file_path = f'./result/{ver}/graph/{method}/best_fitnesses/{method}{file_path}'
-    file_path = Path(file_path)
-    file_path.parent.mkdir(parents=True, exist_ok=True)
-    
-    fig, ax = plt.subplots()
     if not best_fitness_history:
         print("履歴データがありません。")
         return
+    
+    method = _get_method_name(evaluate_num)
+    interpolate = _get_interpolate_name(interpolate_num)
+
+    save_path = _get_save_path(ver, method, interpolate, "best_fitnesses", file_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    fig, ax = plt.subplots()
 
     generations = [item[0] for item in best_fitness_history]
     fitness_values = [item[1] for item in best_fitness_history]
     average_values = [item[1] for item in average_fitness_history] if average_fitness_history else None
 
-    ax.set_xlabel('Generation')  # x軸ラベル
-    ax.set_ylabel('Fitness')  # y軸ラベル
-    ax.set_title("")  # グラフタイトル
-    ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
-    if method == "Gaussian":
-        ax.set_ylim(0,6.5)
-    if method == "Ackley":
-        ax.set_ylim(0,6.0)
-    if method == "Gaussian_two_peak":
-        ax.set_ylim(0,6.5)
-    if method == "Gaussian_cos":
-        ax.set_ylim(-1.5,7.5)
-    ax.grid(True)
+    _setup_plot(ax,method,y_label='Fitness')
+
     ax.plot(generations, fitness_values,
              marker='o', linestyle='-', color='blue', label='Best Fitness')
     if average_values:
         ax.plot(generations, average_values,
                  marker='o', linestyle='--', color='orange', label='Average Fitness')
     ax.legend(loc=0)
-    # fig.tight_layout()
-    # plt.figure(figsize=(8, 5))
-    # plt.plot(generations, fitness_values,
-    #          marker='o', linestyle='-', color='blue')
-    # plt.xlabel('Generation')
-    # plt.ylabel('Best Fitness')
-    # plt.title(method+' Best Fitness History')
-    # plt.grid(True)
-    # plt.tight_layout()
-    # plt.savefig(f'./result/graph/{method}_fitness_history.png')
-    plt.savefig(file_path)
+    plt.savefig(save_path)
     # plt.show()
     plt.close()
 
-def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str, best_fitness_histories, ver: str):
+def log_fitness_histories(evaluate_num: int = None, interpolate_num: int = None, file_path: str = None, best_fitness_histories = None, ver: str = None):
     """
     複数回のシミュレーションの世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_histories: [[(世代番号, fitness値), ...], ...] のリスト
     """
-
     if not best_fitness_histories:
         print("履歴データがありません。")
         return
-    if method_num == 1:
-        method = "Gaussian"
-    elif method_num == 2:
-        method = "Sphere"
-    elif method_num == 3:
-        method = "Gaussian_cos"
-    elif method_num == 4:
-        method = "Ackley"
-    elif method_num == 5:
-        method = "Gaussian_two_peak"
-    if interpolate_num == 0:
-        interpolate = "linear"
-    elif interpolate_num == 1:
-        interpolate = "Gauss"
-    elif interpolate_num == 2:
-        interpolate = "RBF"
-    elif interpolate_num == 3:
-        interpolate = "IDW"
+
+    method = _get_method_name(evaluate_num)
+    interpolate = _get_interpolate_name(interpolate_num)
+
+    save_path = _get_save_path(ver, method, interpolate, "best_fitnesses", file_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
 
     fig, ax = plt.subplots(figsize=(8, 5))
 
@@ -195,31 +253,32 @@ def log_fitness_histories(method_num: int, interpolate_num: int, file_path: str,
         ax.plot(generations, fitness_values,
                  marker='o', linestyle='-', label=f'Run {idx+1}')
 
-    ax.set_xlabel('Generation',fontsize=18)
-    ax.set_ylabel('Best Fitness',fontsize=18)
-    ax.set_title(method+' Best Fitness Histories')
-    ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
-    if method == "Gaussian":
-        ax.set_ylim(0,6.5)
-    if method == "Ackley":
-        ax.set_ylim(0,6.0)
-    if method == "Gaussian_two_peak":
-        ax.set_ylim(0,6.5)
-    if method == "Gaussian_cos":
-        ax.set_ylim(2.0,9.5)
-    ax.grid(True)
-    # fig.tight_layout()
-    # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
-    if interpolate_num == 100 or interpolate == None:
-        file_path = Path(f'./result/{ver}/graph/{method}/best_fitnesses/{method}{file_path}')
-    else:
-        file_path = Path(f'./result/{ver}/graph/{method}/{interpolate}/best_fitnesses/{method}{file_path}')
-    file_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(file_path)
+    _setup_plot(ax,method,y_label='Best Fitness', title=f'{method} Best Fitness Histories')
+    plt.savefig(save_path)
     plt.show()
     plt.close()
     return
-def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, plot_series_list: list , indicator : str):
+
+def log_average_fitness(evaluate_num: int = None, interpolate_num:int = None,file_path: str = None, average_fitness_history=None, times: int = None):
+    """
+    世代ごとのaverage個体のfitness履歴をjsonファイルに保存する
+    average_fitness_history: [(世代番号, fitness値), ...] のリスト
+    """
+    method = _get_method_name(evaluate_num)
+    interpolate = _get_interpolate_name(interpolate_num)
+
+    # verの決定: 補間ありならproposal, なしならconventional
+    ver = "proposal" if interpolate is not None else "conventional"
+    
+    save_path = _get_save_path(ver, method, interpolate, "average", file_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    # JSONファイルに保存
+    with save_path.open('w', encoding='utf-8') as f:
+        json.dump({f"{times}_average_fitness":average_fitness_history}, f, indent=2)
+
+    return
+def log_comparison(evaluate_num: int = None, interpolate_num: int = None, file_path: str = None, plot_series_list: list = None , indicator : str = None):
     """
     複数回のシミュレーションの世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_histories: [[(世代番号, fitness値), ...], ...] のリスト
@@ -239,32 +298,13 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, plot
     if not plot_series_list:
         print("データがありません。")
         return
-    # --- 1. マッピング定義（if-elifの代わり） ---
-    method_map = {
-        1: "Gaussian",
-        2: "Sphere",
-        3: "Gaussian_cos",
-        4: "Ackley",
-        5: "Gaussian_two_peak"
-    }
-    method = method_map.get(evaluate_num, "Unknown")
+    method = _get_method_name(evaluate_num)
+    interpolate = _get_interpolate_name(interpolate_num)
 
-    interpolate_map = {
-        0: "linear",
-        1: "Gauss",
-        2: "RBF",
-        3: "IDW"
-    }
-    interpolate = interpolate_map.get(interpolate_num, "Unknown")
+    # 比較用パス生成 (ver="comparison" とする)
+    save_path = _get_save_path("comparison", method, interpolate, "", file_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Y軸の範囲設定
-    ylim_settings = {
-        "Gaussian": (2, 6.5),
-        "Ackley": (0, 6.0),
-        "Gaussian_two_peak": (0, 6.5),
-        "Gaussian_cos": (0, 9.5),
-        "Sphere": (-100000, 0.5)
-    }
 
     fig, ax = plt.subplots(figsize=(8, 5))
 
@@ -289,29 +329,50 @@ def log_comparison(evaluate_num: int, interpolate_num: int, file_path: str, plot
             linestyle=series.get('linestyle', '-'), # 指定がなければ '-'
             label=series.get('label', 'No Label')
         )
-    # --- 3. グラフ装飾 ---
-    ax.set_xlabel('Generation',fontsize=18)
-    ax.set_ylabel(indicator+'Fitness',fontsize=18)
-    ax.set_title("")
+    
+    _setup_plot(ax,method,y_label=indicator+'Fitness')
     # X軸範囲設定 (データに合わせて動的に設定、または定数NUM_GENERATIONSを使用)
-    # ax.set_xlim(0.5, NUM_GENERATIONS + 0.5) 
     ax.set_xlim(0.5, max_gen + 0.5 if max_gen > 0 else NUM_GENERATIONS + 0.5)
-    if method in ylim_settings:
-        ax.set_ylim(*ylim_settings[method])
-    ax.grid(True)
     ax.legend(prop={"family": "MS Gothic", "size": 14}, loc=0)
     # fig.tight_layout()
     # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
-    if interpolate_num == 100:
-        file_path = Path(f'./result/comparison/{method}{file_path}')
-    else:
-        file_path = Path(f'./result/comparison/{method}/{interpolate}/{method}{file_path}')
-    file_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(file_path)
+    plt.savefig(save_path)
     plt.show()
     plt.close()
     return
 
+def log_compare(evaluate_num: int = None, interpolate_num: int = None, file_path: str = None, fitness_histories: list = None, tornament_sizes: list = None, population_size: int = None):
+    """
+    複数のトーナメントサイズのシミュレーション結果を1枚の画像にまとめる関数
+    param_keys: 少なくとも6つのキーが必要
+    """
+    method = _get_method_name(evaluate_num)
+    interpolate = _get_interpolate_name(interpolate_num)
+
+    # タイトル設定
+    title_text = f"{population_size}個体 " + ("補間あり" if interpolate else "補間なし")
+    
+    save_path = _get_save_path("comparison", method, interpolate, "", file_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+
+
+    for history in fitness_histories:
+        if not history.any():
+            print("評価データがありません。")
+            return
+        generations = [item[0] for item in history]
+        values = [item[1] for item in history]
+        ax.plot(generations, values, marker='o', linestyle='-', label='Fitness')
+    
+    _setup_plot(ax,method,y_label='Fitness', title=title_text)
+
+    ax.legend([f"k={size}" for size in tornament_sizes],prop={"family":"MS Gothic","size":14},loc=0)
+    plt.savefig(save_path)
+    plt.show()
+    plt.close()
+    return
 
 # サンプリング周波数と再生時間の設定
 SAMPLE_RATE = 44100  # CD品質のサンプリングレート
@@ -499,110 +560,5 @@ def plot_individual_params(population: list[dict],best: dict,worst: dict, param_
         plt.savefig(file_path_save)
         plt.close() # メモリ解放
     return
-def log_average_fitness(method: str = None, interpolate_method:str = None,file_path: str = None, average_fitness_history=None, times: int = None):
-    """
-    世代ごとのaverage個体のfitness履歴をjsonファイルに保存する
-    average_fitness_history: [(世代番号, fitness値), ...] のリスト
-    """
-    method_num = None
-    interpolate_num = None
-    if method == "Gaussian":
-        method_num = 1
-    elif method == "Sphere":
-        method_num = 2
-    elif method == "Gaussian_cos":
-        method_num = 3
-    elif method == "Ackley":
-        method_num = 4
-    elif method == "Gaussian_two_peak":
-        method_num = 5
-    if interpolate_method == "linear":
-        interpolate_num = 0
-    elif interpolate_method == "Gauss":
-        interpolate_num = 1
-    elif interpolate_method == "RBF":
-        interpolate_num = 2
-    elif interpolate_method == "IDW":
-        interpolate_num = 3
-    if isinstance(method_num, int):
-        if isinstance(interpolate_num, int):
-            file_path = f'./result/proposal/average/{method}/{interpolate_method}/{method}{file_path}'
-            file_path = Path(file_path)
-        else:
-            file_path = f'./result/conventional/average/{method}/{method}{file_path}'
-            file_path = Path(file_path)
-    file_path.parent.mkdir(parents=True, exist_ok=True)
-    
-    # JSONファイルに保存
-    with open(file_path, 'w', encoding='utf-8') as f:
-        json.dump({f"{times}_average_fitness":average_fitness_history}, f, indent=2)
-
-    return
 
 
-def log_compare(fitness_histories: list[list], tornament_sizes: list[int], evaluate_num: int, interpolate_num:int, population_size: int, file_path: str):
-    """
-    複数のシミュレーション結果を1枚の画像にまとめる関数
-    param_keys: 少なくとも6つのキーが必要
-    """
-    if evaluate_num == 1:
-        method = "Gaussian"
-    elif evaluate_num == 2:
-        method = "Sphere"
-    elif evaluate_num == 3:
-        method = "Gaussian_cos"
-    elif evaluate_num == 4:
-        method = "Ackley"
-    elif evaluate_num == 5:
-        method = "Gaussian_two_peak"
-    if interpolate_num == 0:
-        interpolate = "linear"
-    elif interpolate_num == 1:
-        interpolate = "Gauss"
-    elif interpolate_num == 2:
-        interpolate = "RBF"
-    elif interpolate_num == 3:
-        interpolate = "IDW"
-
-    fig, ax = plt.subplots(figsize=(8, 5))
-
-
-    for history in fitness_histories:
-        if not history.any():
-            print("評価データがありません。")
-            return
-        generations = [item[0] for item in history]
-        values = [item[1] for item in history]
-        ax.plot(generations, values, marker='o', linestyle='-', label='Fitness')
-    ax.set_xlabel('Generation',fontsize=18)
-    ax.set_ylabel('Fitness',fontsize=18)
-    if interpolate_num == 100:
-        ax.set_title(f"{population_size}個体 補間なし",fontsize=18)
-    else:
-        ax.set_title(f"{population_size}個体 補間あり",fontsize=18)
-    ax.set_xlim(0.5,NUM_GENERATIONS+0.5)
-    if method == "Gaussian":
-        ax.set_ylim(2,6.5)
-    if method == "Ackley":
-        ax.set_ylim(0,6.0)
-    if method == "Gaussian_two_peak":
-        ax.set_ylim(0,6.5)
-    if method == "Gaussian_cos":
-        ax.set_ylim(2.0,9.5)
-    if method == "Sphere":
-        ax.set_ylim(-100000,0.5)
-    ax.grid(True)
-    ax.legend([f"k={size}" for size in tornament_sizes],prop={"family":"MS Gothic","size":14},loc=0)
-    # fig.tight_layout()
-    if interpolate_num == 100:
-        file_path = Path(f'./result/comparison/{method}/{method}{file_path}')
-    else:
-        file_path = Path(f'./result/comparison/{method}/{interpolate}/{method}{file_path}')
-    file_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(file_path)
-    plt.show()
-    plt.close()
-    return
-
-    
-    return
