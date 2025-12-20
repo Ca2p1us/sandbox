@@ -140,7 +140,7 @@ def _get_save_path(ver: str, method: str, interpolate: Optional[str], category: 
     # method名とfile_nameの結合をここで行う
     full_path = base_dir / f"{method}{file_name}"
     
-    print(f"保存先パス: {full_path}") # デバッグ用出力
+    # print(f"保存先パス: {full_path}") # デバッグ用出力
     return full_path
 
 

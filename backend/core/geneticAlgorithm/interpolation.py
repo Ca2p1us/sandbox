@@ -4,7 +4,7 @@ from typing import List, Dict, Tuple
 import math
 from scipy.interpolate import RBFInterpolator
 import numpy as np
-from ..geneticAlgorithm.config import PARAMS,NUM_GENERATIONS
+from ..geneticAlgorithm.config import PARAMS,NUM_GENERATIONS, ATTACK_RANGE, DECAY_RANGE, SUSTAIN_RANGE, SUSTAIN_TIME_RANGE, RELEASE_RANGE, FREQUENCY_RANGE
 from ...engine import evaluate
 from .make_chromosome_params import make_chromosome_params
 from ...engine.evaluate import evaluate_fitness, get_best_and_worst_individuals
@@ -13,6 +13,15 @@ import matplotlib.pyplot as plt
 
 RNG = np.random.default_rng(seed=10)
 EPS_RATIO = 0.02  # ガウス補間のeps計算用割合
+# パラメータ名と定義域のマッピングを作成
+PARAM_RANGES = {
+    "fmParamsList.operator1.attack": ATTACK_RANGE,
+    "fmParamsList.operator1.decay": DECAY_RANGE,
+    "fmParamsList.operator1.sustain": SUSTAIN_RANGE,
+    "fmParamsList.operator1.sustainTime": SUSTAIN_TIME_RANGE,
+    "fmParamsList.operator1.release": RELEASE_RANGE,
+    "fmParamsList.operator1.frequency": FREQUENCY_RANGE
+}
 
 def interpolation(
   population: List[dict] = None,
@@ -42,8 +51,8 @@ def interpolation(
         param_keys = ["fmParamsList.operator1.frequency"]
 
     # 全個体（未評価 + 評価済み）からMin/Maxを取得
-    all_inds = population
-    min_max_dict = get_min_max_dict(all_inds, param_keys)
+    # all_inds = population
+    min_max_dict = PARAM_RANGES
 
     # 評価済み個体を「正規化ベクトル」と「正解値」のペアリストに変換しておく
     # 構造: [(normalized_vec, fitness_value), ...]
@@ -194,7 +203,7 @@ def calculate_by_RBF(
     interpolater = None,
 ) -> float:
     x_vec = np.array(target_vec)
-    est_value = interpolater(x_vec)[0]
+    est_value = interpolater(x_vec.reshape(1,-1))[0]
     return float(est_value)
 
 
@@ -309,7 +318,8 @@ def to_normalized_vec(
             continue
         
         val = float(val)
-        min_v, max_v = min_max_dict[key]
+        # min_v, max_v = min_max_dict[key]
+        min_v, max_v = min_max_dict.get(key, (0.0, 1.0))
         
         # 正規化: (x - min) / (max - min)
         norm_val = (val - min_v) / (max_v - min_v)

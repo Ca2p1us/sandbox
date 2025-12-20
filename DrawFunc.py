@@ -77,7 +77,7 @@ def plot_gauss_function():
     
     plt.show()
 
-def plot_gauss_func_two_peak():
+def plot_gauss_func_peaks():
     # 1. パラメータの設定
     mu1 = 150        # 平均1 (μ1)
     mu2 = 350        # 平均2 (μ2)
@@ -313,7 +313,7 @@ def plot_sphere_function():
 
 if __name__ == "__main__":
     plot_gauss_function()
-    plot_gauss_func_two_peak()
+    plot_gauss_func_peaks()
     plot_gaussian_add_cosine()
     plot_Ackley_function()
     plot_sphere_function()
