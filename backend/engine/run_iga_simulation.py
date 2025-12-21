@@ -186,7 +186,14 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         # ベスト・ワースト個体の取得
         best, worst = get_best_and_worst_individuals_by_id(evaluate_population)
         # ほかの個体の評価を補間
-        interpolation(population=population, evaluated_population=evaluate_population , best=best, worst=worst, method_num=interpolate_num, target_key="fitness")
+        interpolation(
+            population=population,
+            evaluated_population=evaluate_population,
+            best=best,
+            worst=worst,
+            method_num=interpolate_num,
+            target_key="fitness"
+        )
         # 真値の取得
         evaluate_fitness(
             population=population,

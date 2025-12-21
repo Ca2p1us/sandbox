@@ -73,7 +73,7 @@ def interpolation(
     if method_num == 0:
         #距離補間用のパラメータ計算
         max_dist = euclidean(best_params, worst_params)
-    elif method_num ==1 or (method_num == 4 and gen > int(NUM_GENERATIONS/2)):
+    elif method_num ==1:
         #ガウス補間用のパラメータ計算
         eps = (best_val - worst_val) * EPS_RATIO
         C = worst_val - eps
@@ -95,6 +95,36 @@ def interpolation(
             train_Y.append(float(individual.get(refernce_key, 0.0)))
         # print(f"学習データの次元数: {np.shape(np.array(train_X))}, ラベル数: {len(train_Y)}")
         interpolator = RBFInterpolator(np.array(train_X), np.array(train_Y), kernel='linear',smoothing=0.1)
+    elif method_num == 4:
+        if gen > int(NUM_GENERATIONS/2):
+            # 評価済み個体をfitnessでソート (降順)
+            sorted_evaluated = sorted(
+                evaluated_population, 
+                key=lambda x: float(x.get(refernce_key, 0.0)), 
+                reverse=True
+            )
+            # 上位N個体を使用（ここでは3）
+            TOP_N = 3
+            top_inds = sorted_evaluated[:TOP_N]
+            
+            top_params_list = [to_normalized_vec(ind, param_keys, min_max_dict) for ind in top_inds]
+            top_vals_list = [float(ind.get(refernce_key, 0.0)) for ind in top_inds]
+            # マルチピーク用 (method_num=4の後半用)
+            # 各個体の評価値に合わせて山の高さを調整
+            A_list = [(val - C) for val in top_vals_list]
+
+            denom = (best_val - C)
+            if denom == 0:
+                # 安全策: 差がない場合はランダムなどで逃げるか、デフォルト値
+                sigma = [0.1] * len(best_params) # 仮
+            else:
+                ratio = (worst_val - C) / denom
+                if not (0 < ratio < 1):
+                    ratio = 0.5 # 安全策
+                
+                # sigmaは一番良い個体と一番悪い個体の距離をベースにする（従来通り）
+                sigma = get_sigma(best_params=best_params, worst_params=worst_params, ratio=ratio)
+
         
 
     # print(f"best_val: {best_val}, worst_val: {worst_val}")
@@ -129,20 +159,56 @@ def interpolation(
                 norm_eval_data=norm_eval_data
             )
         elif method_num == 4:
+            # 1. まずは純粋なガウス推定値（またはIDW）を計算
+            estimated_val = 0.0
+            
             if gen <= int(NUM_GENERATIONS/2):
-                ind[target_key] = calculate_by_IDW(
+                # 前半: IDW
+                estimated_val = calculate_by_IDW(
                     target_vec=target_vec,
                     norm_eval_data=norm_eval_data
                 )
             else:
-                ind[target_key] = calculate_by_Gaussian(
-                    individual=ind,
-                    best_params=best_params,
-                    C=C,
-                    A=A,
-                    # sigma=[200,200,200,200,200,200],
+                # 後半: マルチモーダルガウス
+                estimated_val = calculate_by_Multimodal_Gaussian(
+                    target_vec=target_vec,
+                    top_individuals_params=top_params_list,
+                    top_individuals_vals=top_vals_list,
+                    worst_val=worst_val,
                     sigma=sigma,
+                    C=C,
+                    A_list=A_list
                 )
+
+            # 2. pre_evaluation（次世代選択）のときだけ、探索ボーナスを加える
+            # これにより「地図（Fitness）」は汚さず、「行き先（Pre-eval）」だけ調整する
+            if target_key == "pre_evaluation":
+                
+                # 最寄りの評価個体までの距離を計算
+                min_dist = 1.0e9
+                for ref_vec, _ in norm_eval_data:
+                    d = euclidean(target_vec, ref_vec)
+                    if d < min_dist:
+                        min_dist = d
+                
+                # 1. 基本係数を下げる (0.5 は強すぎたため 0.1 ~ 0.2 程度に)
+                base_alpha = 0.2
+                
+                # 2. 世代経過率 (0.0 -> 1.0)
+                # NUM_GENERATIONS が import されている前提
+                progress = gen / NUM_GENERATIONS
+                if progress > 1.0: progress = 1.0
+                
+                # 3. 後半になるほどボーナスをゼロに近づける
+                # (1.0 - progress) で、最初は 1.0倍、最後は 0.0倍 になる
+                current_alpha = base_alpha * (1.0 - progress)
+                
+                # 最終スコア = 推定値 + 減衰付き距離ボーナス
+                ind[target_key] = estimated_val + (min_dist * current_alpha)
+            
+            else:
+                # fitness埋めなどの場合は、純粋な推定値をそのまま使う
+                ind[target_key] = estimated_val
     return
 
 def calculate_by_distance(
@@ -239,6 +305,32 @@ def calculate_by_IDW(
         return 0.0
         
     return weighted_val_sum / weights_sum
+
+def calculate_by_Multimodal_Gaussian(
+    target_vec: List[float],
+    top_individuals_params: List[List[float]], # 上位N個体の正規化パラメータリスト
+    top_individuals_vals: List[float],       # 上位N個体の評価値リスト
+    worst_val: float,
+    sigma: List[float], # sigmaは共通、あるいは個別に計算しても良い
+    C: float,
+    A_list: List[float] # 各山ごとの高さ係数
+) -> float:
+    
+    vals = []
+    # 複数の山(best1, best2, best3...)についてそれぞれ計算
+    for i, (mu, A) in enumerate(zip(top_individuals_params, A_list)):
+        dist_sq = 0.0
+        for xj, muj, sj in zip(target_vec, mu, sigma):
+            z = (xj - muj) / sj
+            dist_sq += z * z
+        
+        # 各山の高さ計算
+        val = A * math.exp(-0.5 * dist_sq) + C
+        vals.append(val)
+    
+    # 最も高い山の値を採用（MAX合成）
+    # ※ これにより、複数のピークを持つ地形ができる
+    return max(vals)
 
 
 def get_evaluated_individuals(
