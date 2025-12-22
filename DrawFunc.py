@@ -137,7 +137,7 @@ def plot_gauss_func_peaks():
     save_dir = "for_slide"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    filename = os.path.join(save_dir, "gaussian_two_peak_plot_styled.png")
+    filename = os.path.join(save_dir, "gaussian_peaks_plot_styled.png")
     plt.savefig(filename,bbox_inches='tight')
     print(f"グラフを {filename} として保存しました。")
     plt.show()

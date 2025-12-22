@@ -49,7 +49,7 @@ def evaluate_fitness(
         elif evaluate_num == 4:
             ind[target_key] = calculate_Ackley(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
         elif evaluate_num == 5:
-            ind[target_key] = calculate_Gaussian_two_peak(individual=ind, param_keys=param_keys, target_params=[TARGET_PARAMS,TARGET_PARAMS_1,TARGET_PARAMS_2], noise_is_added=noise_is_added)
+            ind[target_key] = calculate_Gaussian_peaks(individual=ind, param_keys=param_keys, target_params=[TARGET_PARAMS,TARGET_PARAMS_1,TARGET_PARAMS_2], noise_is_added=noise_is_added)
     return None
 
 def calculate_Gaussian(
@@ -187,7 +187,7 @@ def calculate_Ackley(
         fitness = add_noise(value=fitness, scale=1.0)
     return fitness
 
-def calculate_Gaussian_two_peak(
+def calculate_Gaussian_peaks(
     individual: dict,
     param_keys: List[str] = None,
     target_params: list[list] = [TARGET_PARAMS,TARGET_PARAMS_1,TARGET_PARAMS_2],
@@ -470,7 +470,7 @@ def evaluate_fitness_Schwefel(
         individual["fitness"] = fitness
 
 
-def evaluate_fitness_gaussian_two_peak(
+def evaluate_fitness_gaussian_peaks(
     population: List[dict],
     target_params: List[float] = TARGET_PARAMS_1,
     target_params_2: List[float] = TARGET_PARAMS_2,

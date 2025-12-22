@@ -22,7 +22,7 @@ EVALUATE_MAP = {
     2: "Sphere",
     3: "Gaussian_cos",
     4: "Ackley",
-    5: "Gaussian_two_peak"
+    5: "Gaussian_peaks"
 }
 # 名前 -> 評価関数 ID (逆引き用)
 EVALUATE_NAME_TO_ID = {v: k for k, v in EVALUATE_MAP.items()}
@@ -46,7 +46,7 @@ INTERPOLATE_NAME_TO_ID = {v: k for k, v in INTERPOLATE_MAP.items() if v is not N
 Y_LIM_SETTINGS = {
     "Gaussian": (0, 6.5),
     "Ackley": (0, 6.0),
-    "Gaussian_two_peak": (0, 6.5),
+    "Gaussian_peaks": (0, 6.5),
     "Gaussian_cos": (0, 9.5), # 以前のコードで最大範囲だったものを採用
     "Sphere": (-100000, 0.5)
 }
