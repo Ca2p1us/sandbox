@@ -20,16 +20,20 @@ uv run python -m backend.core.geneticAlgorithm.interpolation
     - 周波数 200～1300Hz
 
 # 評価関数
-1. $f(x) = \sum_{i}x_i^2 \quad -5.12<x_i<5.12$
-    - Sphere関数
-2. $f(x) = \sum_{i}exp(\frac{x_i^2}{2\sigma^2})$
+1. ~~ $f(x) = \sum_{i}x_i^2 \quad -5.12<x_i<5.12$ ~~
+    - ~~ Sphere関数 ~~辞めた
+2. $f(x) = \sum_{i}exp(\frac{(x_i- 250)^2}{2\sigma^2})$
     - ガウス関数
-3. $f(x) = 20A + \sum_{i}(x_i^2 - 10cos(2\pi x_i)) \quad A = 10,-5.12<x_i<5.12$
-    - Rastrigin関数
-4. $f(x) = 418.9829 * d - \sum_{i}(x_i sin(\sqrt(|x_i|))) \quad d:次元数,$
-    - Schwefel関数
-5. $f(x) = 20 - 20exp(-0.2\sqrt{}\frac{1}{n}\sum_{i}x_i^2) + e - exp(\frac{1}{n} \sum_{i} cos(2\pi x_i))$
-
+3. ~~ $f(x) = 20A + \sum_{i}(x_i^2 - 10cos(2\pi x_i)) \quad A = 10,-5.12<x_i<5.12$ ~~
+    - ~~ Rastrigin関数 ~~辞めた
+4. ~~ $f(x) = 418.9829 * d - \sum_{i}(x_i sin(\sqrt(|x_i|))) \quad d:次元数$ ~~
+    - ~~ Schwefel関数 ~~辞めた
+5. $f(x) = 20 - 20exp(-0.04\sqrt{\frac{1}{n}\sum_{i}x_i^2}) + e - exp(\frac{1}{n} \sum_{i} cos(0.04 x_i))$
+    - Ackley関数
+6. $f(x) = \sum_{i}exp(\frac{(x_i - 250)^2}{2\sigma^2} + 0.5exp(\frac{(x_i - 100)^2}{2\sigma^2} + 0.5exp(\frac{(x_i - 400)^2}{2\sigma^2})$
+    - ガウス関数(複数の山)
+7. $ f(x) = \sum_{i}exp(\frac{(x_i- 250)^2}{2\sigma^2}) + 0.5np.cos(0.02 x_i) $
+    - ガウス関数+コサイン関数
 各$`x_i`$を理想解の値だけずらせばOKか
 
 # 疑似ユーザモデルの代表的分類
@@ -186,6 +190,7 @@ uv run python -m backend.core.geneticAlgorithm.interpolation
     - 10/13 5回連続でシミュレータを動かしてグラフとかを表示するようにした。そのため5回分を重ねたグラフのみ実行時に表示させるようにした。
     - 11月末から？　シミュレータを動かす回数を20回にした。20試行の平均を3種類で比較するグラフを表示するようにした。
 - 評価関数のパラメータ
+    - **評価時のパラメータは正規化されていないため、スケールの異なるパラメータを扱う場合は変えるべし！！！！！！**
     - 10/15 定義域を変えた場合のパラメータ設定についてgeogebraで1次元の場合の関数を眺めながら変えた
     - 10/16 Rastrigin関数は定義域が小さいから成り立っている関数なんだなぁと思ったのででかくした
     - 11/10 ガウス関数の標準偏差を一括で設定できるのに各呼び出しで設定していてカス
