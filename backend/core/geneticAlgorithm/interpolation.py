@@ -95,36 +95,40 @@ def interpolation(
             train_X.append(to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict))
             train_Y.append(float(individual.get(refernce_key, 0.0)))
         # print(f"学習データの次元数: {np.shape(np.array(train_X))}, ラベル数: {len(train_Y)}")
-        interpolator = RBFInterpolator(np.array(train_X), np.array(train_Y), kernel='linear',smoothing=0.1)
-    elif method_num == 4:
-        if gen > switch_gen:
-            # 評価済み個体をfitnessでソート (降順)
-            sorted_evaluated = sorted(
-                evaluated_population, 
-                key=lambda x: float(x.get(refernce_key, 0.0)), 
-                reverse=True
+        interpolator = RBFInterpolator(
+                np.array(train_X),
+                np.array(train_Y),
+                kernel='thin_plate_spline',
+                smoothing=0.1
             )
-            # 上位N個体を使用（ここでは3）
-            TOP_N = 3
-            top_inds = sorted_evaluated[:TOP_N]
-            
-            top_params_list = [to_normalized_vec(ind, param_keys, min_max_dict) for ind in top_inds]
-            top_vals_list = [float(ind.get(refernce_key, 0.0)) for ind in top_inds]
-            # マルチピーク用 (method_num=4の後半用)
-            # 各個体の評価値に合わせて山の高さを調整
-            A_list = [(val - C) for val in top_vals_list]
-
-            denom = (best_val - C)
-            if denom == 0:
-                # 安全策: 差がない場合はランダムなどで逃げるか、デフォルト値
-                sigma = [0.1] * len(best_params) # 仮
-            else:
-                ratio = (worst_val - C) / denom
-                if not (0 < ratio < 1):
-                    ratio = 0.5 # 安全策
-                
-                # sigmaは一番良い個体と一番悪い個体の距離をベースにする（従来通り）
-                sigma = get_sigma(best_params=best_params, worst_params=worst_params, ratio=ratio)
+    elif method_num == 4:
+        # RBF補間用の学習データの計算
+        train_X = []
+        train_Y = []
+        balance_w = 0.0
+        # 重みの動的計算 (Linear Decay)
+        # Gen 1で最大2.0, Gen 12で最小0.5 になるように徐々に減らす例
+        # max_gen = 12 (全世代数)
+        start_w = 2.0
+        end_w = 0.5
+        
+        # 進行度 (0.0 ～ 1.0)
+        progress = min(gen / 12.0, 1.0) 
+        balance_w = start_w - (progress * (start_w - end_w))
+        # if gen <= switch_gen:
+        #     balance_w = 2.0
+        # else:
+        #     balance_w = 0.5
+        for individual in evaluated_population:
+            train_X.append(to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict))
+            train_Y.append(float(individual.get(refernce_key, 0.0)))
+        # print(f"学習データの次元数: {np.shape(np.array(train_X))}, ラベル数: {len(train_Y)}")
+        interpolator = RBFInterpolator(
+                np.array(train_X),
+                np.array(train_Y),
+                kernel='thin_plate_spline',
+                smoothing=0.01
+            )
 
         
 
@@ -162,24 +166,10 @@ def interpolation(
         elif method_num == 4:
             # 1. まずは純粋なガウス推定値（またはIDW）を計算
             estimated_val = 0.0
-            if gen <= switch_gen:
-                # 前半: IDW
-                estimated_val = calculate_by_IDW(
-                    target_vec=target_vec,
-                    norm_eval_data=norm_eval_data,
-                    p = 2.0
-                )
-            else:
-                # 後半: マルチモーダルガウス
-                estimated_val = calculate_by_Multimodal_Gaussian(
-                    target_vec=target_vec,
-                    top_individuals_params=top_params_list,
-                    top_individuals_vals=top_vals_list,
-                    worst_val=worst_val,
-                    sigma=sigma,
-                    C=C,
-                    A_list=A_list
-                )
+            estimated_val = calculate_by_RBF(
+                target_vec=target_vec,
+                interpolater=interpolator,
+            )
             if target_key == "pre_evaluation":
                 # 情報量（不確実性）の計算: Archive内の最も近い点との距離
                 # 距離が遠いほど、その場所の情報価値は高い
@@ -188,18 +178,6 @@ def interpolation(
                     d = euclidean(target_vec, ref_vec)
                     if d < min_dist:
                         min_dist = d
-                
-                # 重みづけ戦略 (Active Learning Strategy)
-                # 前半(IDW期)は「地図作り」が目的なので、距離の重みを大きくする
-                # 後半(Gaussian期)は「登頂」が目的なので、予測値の重みを大きくする
-                
-                # 後半: 収束を優先 (活用重視)
-                # ただし、完全に0にせず微小に残すことで局所解固着を防ぐ手もある
-                balance_w = 0.5
-                if gen <= switch_gen:
-                    # 前半: 情報獲得を優先 (探索重視)
-                    # 予測値も無視はしないが、空白地帯を埋めることを強く推奨
-                    balance_w = 2.0  # 強めの係数
                 
                 # 最終スコア = 予測Fitness + (距離情報 * 重み)
                 ind[target_key] = estimated_val + (min_dist * balance_w)
