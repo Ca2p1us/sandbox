@@ -4,7 +4,7 @@ import uuid
 import numpy as np
 from scipy.stats import norm
 from typing import List
-from ..core.geneticAlgorithm.config import PARAMS, TARGET_PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2
+from ..core.geneticAlgorithm.config import PARAMS, TARGET_PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2, SIGMA, RATE
 
 def add_noise(value: float, noise_sigma: float = 1.0, noise_mean = 0, scale = 1.0) -> float:
     # 平均0、標準偏差noise_sigmaの正規分布ノイズを加算
@@ -29,6 +29,7 @@ def evaluate_fitness(
     evaluate_num: int = 1,
     param_keys: List[str] = PARAMS,
     noise_is_added: bool = False,
+    target_key: str = "fitness"
     ):
     """"
     評価関数の振り分け
@@ -40,15 +41,15 @@ def evaluate_fitness(
             print("警告: individualがdict型ではありません:", ind)
             continue
         if evaluate_num == 1:
-            ind['fitness'] = calculate_Gaussian(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
+            ind[target_key] = calculate_Gaussian(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
         elif evaluate_num == 2:
-            ind['fitness'] = calculate_Sphere(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
+            ind[target_key] = calculate_Sphere(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
         elif evaluate_num == 3:
-            ind['fitness'] = calculate_Gaussian_cos(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
+            ind[target_key] = calculate_Gaussian_cos(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
         elif evaluate_num == 4:
-            ind['fitness'] = calculate_Ackley(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
+            ind[target_key] = calculate_Ackley(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
         elif evaluate_num == 5:
-            ind['fitness'] = calculate_Gaussian_two_peak(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS_1, target_params_2=TARGET_PARAMS_2, noise_is_added=noise_is_added)
+            ind[target_key] = calculate_Gaussian_two_peak(individual=ind, param_keys=param_keys, target_params=[TARGET_PARAMS,TARGET_PARAMS_1,TARGET_PARAMS_2], noise_is_added=noise_is_added)
     return None
 
 def calculate_Gaussian(
@@ -160,9 +161,9 @@ def calculate_Ackley(
         param_keys: List[str] = None,
         target_params: List[float] = TARGET_PARAMS,
         noise_is_added: bool = False,
-        A = 300,
-        B = 0.005,
-        C = 2*np.pi,
+        A = 20,
+        B = 0.04,
+        C = 0.04
 ):
     values = []
     for key in param_keys:
@@ -178,10 +179,10 @@ def calculate_Ackley(
 
     # 統合
     fitness = 0
-    fitness -= -A * np.exp(-B * np.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - np.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + np.e
+    fitness = -A * np.exp(-B * np.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - np.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + np.e
     # 必要に応じてスケーリングやノイズ付与も可能
-    fitness = -fitness
-    fitness = fitness / 50.0
+    max = A + np.e
+    fitness = 6.0 * (1.0 - fitness / max)
     if noise_is_added:
         fitness = add_noise(value=fitness, scale=1.0)
     return fitness
@@ -189,13 +190,13 @@ def calculate_Ackley(
 def calculate_Gaussian_two_peak(
     individual: dict,
     param_keys: List[str] = None,
-    target_params: List[float] = TARGET_PARAMS_1,
-    target_params_2: List[float] = TARGET_PARAMS_2,
+    target_params: list[list] = [TARGET_PARAMS,TARGET_PARAMS_1,TARGET_PARAMS_2],
+    sigmas:list = SIGMA,
+    rates:list = RATE,
     noise_is_added: bool = False,
-    sigma: float = 30.0,
 ):
     scores = []
-    for key, target, target_2 in zip(param_keys, target_params, target_params_2):
+    for i,key in enumerate(param_keys):
         # ドット区切りでアクセス
         val = individual
         for k in key.split('.'):
@@ -206,9 +207,13 @@ def calculate_Gaussian_two_peak(
             scores.append(0)
         else:
             # 正規分布の確率密度関数（最大値1）
-            score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + np.exp(-((float(val) - target_2) ** 2) / (2 * sigma ** 2))
-            # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
-            scores.append(score)
+            dim_score = 0.0
+            for j in range(len(rates)):
+                mu = target_params[j][i]
+                sigma = sigmas[j]
+                rate = rates[j]
+                dim_score += rate * np.exp(-((val - mu) ** 2) / (2 * sigma **2))
+            scores.append(dim_score)
 
     # 統合
     total_score = sum(scores)  if scores else 0
@@ -374,8 +379,8 @@ def evaluate_fitness_Ackley(
         target_params: List[float] = TARGET_PARAMS,
         evaluate_population: List[dict] = None,
         A = 300,
-        B = 0.005,
-        C = 2*np.pi,
+        B = 0.00005,
+        C = 0.0625 * np.pi,
         noise_is_added: bool = False
 ):
     """
@@ -503,7 +508,7 @@ def evaluate_fitness_gaussian_two_peak(
                 scores.append(0)
             else:
                 # 正規分布の確率密度関数（最大値1）
-                score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + np.exp(-((float(val) - target_2) ** 2) / (2 * sigma ** 2))
+                score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + 0.5 * np.exp(-((float(val) - target_2) ** 2) / (2 * sigma ** 2))
                 # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
                 scores.append(score)
 
@@ -521,7 +526,7 @@ def evaluate_fitness_gaussian_two_peak(
 def evaluate_fitness_gaussian_cos(
     population: List[dict],
     target_params: List[float] = TARGET_PARAMS,
-    sigma: float = 75.0,
+    sigma: float = 100.0,
     frequency: float = 0.02,
     param_keys: List[str] = None,
     evaluate_population: List[dict] = None,
@@ -608,24 +613,26 @@ def get_average_fitness(population: List[dict], evaluate_population: List[dict] 
     population内のfitnessの平均値を返す（fitnessが未設定・不正な個体は除外）
     id_listが指定された場合は、そのID（chromosomeId）を持つ個体のみ対象
     """
+    target_ids = None
     if evaluate_population is not None:
-        fitness_values = [
-            float(ind["fitness"])
-            for ind in population
-            if "fitness" in ind
-            and "chromosomeId" in ind
-            and str(ind["chromosomeId"]) in [str(evaluated_ind["chromosomeId"]) for evaluated_ind in evaluate_population]
-            and str(ind["fitness"]).strip() not in ("", "None")
-            and str(ind["fitness"]).replace('.', '', 1).isdigit()
-        ]
-    else:
-        fitness_values = [
-            float(ind["fitness"])
-            for ind in population
-            if "fitness" in ind
-            and str(ind["fitness"]).strip() not in ("", "None")
-            and str(ind["fitness"]).replace('.', '', 1).isdigit()
-        ]
-    if not fitness_values:
+        target_ids = {str(ind["chromosomeId"]) for ind in evaluate_population if "chromosomeId" in ind}
+   
+    valid_fitness_values = []
+   
+    for ind in population:
+        if "fitness" not in ind or ind["fitness"] is None:
+            continue
+
+        if target_ids is not None:
+            if "chromosomeId" not in ind or str(ind["chromosomeId"]) not in target_ids:
+                continue
+
+        try:
+            val = float(ind["fitness"])
+            valid_fitness_values.append(val)
+        except (ValueError, TypeError):
+            continue
+
+    if not valid_fitness_values:
         return 0.0
-    return sum(fitness_values) / len(fitness_values)
+    return sum(valid_fitness_values) / len(valid_fitness_values)

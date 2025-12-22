@@ -3,7 +3,11 @@
 **config.py**には各パラメータの定義域を(最小値,最大値)の形式でタプルとして保存している
 ## appディレクトリに移動して下記のコマンドで実行
 ```tarminal
-python main.py
+uv run main.py
+```
+## interpolationモジュールのテスト実行
+```tarminal
+uv run python -m backend.core.geneticAlgorithm.interpolation
 ```
 # パラメータの検討
 - [Chatgptによる回答](https://chatgpt.com/s/t_68be5ddb84a08191a54ae9eadee2b8c5)
@@ -128,7 +132,7 @@ python main.py
     - 主に使っている論文、元の母集団は大量だけど実際に評価するのは一部の個体、残りは補間するやつ
 - ["An Experimental Study of Benchmarking Functions for Genetic Algorithms"](https://www.researchgate.net/publication/220662178_An_Experimental_Study_of_Benchmarking_Functions_for_Genetic_Algorithms)
     - F1～F5
-    - ["An analysis of the behaviour of a class of genetic adaptive systems"](https://deepblue.lib.umich.edu/handle/2027.42/4507)
+- ["An analysis of the behaviour of a class of genetic adaptive systems"](https://deepblue.lib.umich.edu/handle/2027.42/4507)
 - [最適化アルゴリズムを評価するベンチマーク関数まとめ](https://qiita.com/tomitomi3/items/d4318bf7afbc1c835dda)
 - ["Virtual Library of Simulation Experiments:Test Functions and Datasets"](https://www.sfu.ca/~ssurjano/optimization.html)
 - [Test Functions for Unconstrained Global Optimization](http://www-optima.amp.i.kyoto-u.ac.jp/member/student/hedar/Hedar_files/TestGO_files/Page364.htm)
@@ -141,6 +145,19 @@ python main.py
     - 個体群から分布を推定して次世代を生成するEDAと個体群を選択交叉して次世代を生成するEAのハイブリッド
     - 基本はEAアルゴリズムで個体を生成したりする
     - エリート個体の推定のためにガウス過程回帰で今ある個体から分布の推定をする
+- [遺伝的アルゴリズムの代表的な選択方式の紹介およびそれらの性質について](https://qiita.com/kanekanekaneko/items/1c563ece591fd2ba2127)
+    - トーナメントサイズを決めるのに見た
+    - 100個体の文字列の一様交叉
+    - 2～4では大きくなるほど性能アップ
+    - それ以降はほとんど変化なし
+- [遺伝的アルゴリズムの代表的な選択方式の紹介およびそれらの性質について](https://qiita.com/kanekanekaneko/items/1c563ece591fd2ba2127)
+    - トーナメントサイズは2～4までは変える意味あるけどそれ以降はないよ
+- ["Genetic Algorithms, Tournament Selection,and the Effects of Noise"](https://wpmedia.wolfram.com/sites/13/2018/02/09-3-2.pdf)
+    - 評価にノイズが入っているとトーナメントサイズの選択圧は薄くなるよ
+- ["STRUCTURAL OPTIMIZATION USING A MUTATION-BASED GENETIC ALGORITHM"](https://www.researchgate.net/profile/Sina-Kazemzadeh-Azad/publication/233779199_Structural_Optimization_Using_a_Mutation-Based_Genetic_Algorithm/links/09e4150b6833a2428a000000/Structural-Optimization-Using-a-Mutation-Based-Genetic-Algorithm.pdf)
+    - トーナメントサイズが大きいと収束が早くて多様性がなくて小さいと収束が遅くて多様性があるよのやつ
+- ["A Comparative Analysis of Selection Schemes Used in Genetic Algorithms"](https://www.cse.unr.edu/~sushil/class/gas/papers/Select.pdf)
+    - これもトーナメントサイズが大きいと収束が早くて多様性がなくて小さいと収束が遅くて多様性があるよのやつ
 
 
 
@@ -188,7 +205,10 @@ python main.py
     - 12/5 トーナメント選択のトーナメントサイズが3固定であったため、性能が悪かった可能性があるという指摘をもらう。確かにそうだ。個体群の30%もしくは20%をトーナメントサイズに設定。これに合わせて、個体群サイズを200と10にした
     - 12/13 トーナメントサイズの差が顕著に性能の差として現れた
         - トーナメントサイズが同じ数の時は補間なし(少)の方が性能が高い＜－全体に対する割合が少の方が高いのは自明なのでなんか釈然としない
-        - 個体数に対するトーナメントサイズの割合が同じときは補間ありの方が性能が高い、＜－必要以上にほかんありのトーナメントサイズが大きいのかも
+        - 個体数に対するトーナメントサイズの割合が同じときは補間ありの方が性能が高い、＜－必要以上に補間ありのトーナメントサイズが大きいのかも
+    - 12/16 トーナメントサイズを以下のように決定
+        - 9個体 -> 3
+        - 200個体 -> 4
 - 交叉
     - 突然変異率を0.01にした
 - グラフ関連
@@ -200,6 +220,26 @@ python main.py
     - GA単体で何とかする研究は少ないんだなぁ
     - ほかの最適化手法やシンプルなGAに特殊な処理を加えるとよりよくなる(当たり前)
 
-- やること
+- やること/やったこと
     - evaluate.pyの大規模改修
         - 評価関数の分岐をrun_iga_simulationではなく、method_numで管理してevaluate.pyで行う
+    - 12/16のやったこと
+        - トーナメントサイズを変えても今のガウス補間だとうまくいかなさそうであることがわかった
+        - Geminiに聞いてみて出てきたIDW補間ってやつを使ってみた、補間に使うのが評価個体すべてだったので、pre_evaluationを参照して選択する評価個体を上位n個体にした。
+        - 下位個体によって必要以上に性能が下がっていたのかもしてない
+    - 12/17
+        - なんか思ってたのと違うファクターがありそう、選択方法は確かにファクターだった
+        - なぜか補間ありはトーナメントサイズによる変化が補間なしと比べて異常だった
+        - それでもトーナメントサイズは4が妥当だと思う
+    - 12/18
+        - Ackley関数が良さげだな～って思ってたらどの手法でも性能出なくてびっくり
+        - よく見てみたらカスみたいなパラメータ設定だった、Geminiに聞きながらパラメータを改善したよ
+    - 12/20
+        - 正規化の計算に個体群のmax,minを使っていたので、コンフィグファイルを見るように変えた、別にみればいいよね
+    - 12/21
+        - 2つの山の正規関数を3つの山の正規関数に変更した
+        - 世代数を9から12に変更した
+    - 12/22
+        - ハイブリッドで使うガウス補間を変えた
+        - 補間時に事前評価の上位3個体それぞれを頂上とする一つ山のガウス関数を考えてその中から最も値が高いものを採用する手法
+        - これってどういうこと？上位3個体が属する山が異なるときは効きそう

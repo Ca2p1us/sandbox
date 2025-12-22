@@ -52,17 +52,19 @@ FREQUENCY_RANGE = (0, 500)
 PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustainTime", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
 FITNESS_KEY = ["fitness", "pre_evaluation"]
 TARGET_PARAMS = [250, 250, 250, 250, 250, 250]
-TARGET_PARAMS_1 = [150, 150, 150, 150, 150, 150]
-TARGET_PARAMS_2 = [350, 350, 350, 350, 350, 350]
+TARGET_PARAMS_1 = [100, 100, 100, 100, 100, 100]
+TARGET_PARAMS_2 = [400, 400, 400, 400, 400, 400]
+SIGMA = [50,30,30]
+RATE = [1,0.5,0.5]
 # TARGET_PARAMS = [0.03, 0.16, 0.89, 0.29, 0.06, 0.31690]
 # TARGET_PARAMS = [3, 160, 89, 29, 6, 316.90]
 IGNORE_RANGE = (200,300)
 
-NUM_GENERATIONS = 9
-POPULATION_SIZE = 10
+NUM_GENERATIONS = 20
+POPULATION_SIZE = 9
 PROPOSAL_POPULATION_SIZE = 200
-EVALUATE_SIZE = 10
-EXPERIMENT_TIMES = 20
+EVALUATE_SIZE = 9
+EXPERIMENT_TIMES = 50
 
 
 GENERATION_CHROMOSOME_NUM: int = 10
