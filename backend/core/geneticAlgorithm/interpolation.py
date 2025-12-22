@@ -33,6 +33,7 @@ def interpolation(
   param_keys: List[str] = PARAMS,
   target_key: str = "pre_evaluation",
   refernce_key = "fitness",      
+  switch_gen = 5
 ):
     # print(f"補間を開始します。")
     if not best or not worst:
@@ -96,7 +97,7 @@ def interpolation(
         # print(f"学習データの次元数: {np.shape(np.array(train_X))}, ラベル数: {len(train_Y)}")
         interpolator = RBFInterpolator(np.array(train_X), np.array(train_Y), kernel='linear',smoothing=0.1)
     elif method_num == 4:
-        if gen > int(NUM_GENERATIONS/2):
+        if gen > switch_gen:
             # 評価済み個体をfitnessでソート (降順)
             sorted_evaluated = sorted(
                 evaluated_population, 
@@ -161,12 +162,12 @@ def interpolation(
         elif method_num == 4:
             # 1. まずは純粋なガウス推定値（またはIDW）を計算
             estimated_val = 0.0
-            
-            if gen <= int(NUM_GENERATIONS/2):
+            if gen <= switch_gen:
                 # 前半: IDW
                 estimated_val = calculate_by_IDW(
                     target_vec=target_vec,
-                    norm_eval_data=norm_eval_data
+                    norm_eval_data=norm_eval_data,
+                    p = 2.0
                 )
             else:
                 # 後半: マルチモーダルガウス
@@ -179,35 +180,30 @@ def interpolation(
                     C=C,
                     A_list=A_list
                 )
-
-            # 2. pre_evaluation（次世代選択）のときだけ、探索ボーナスを加える
-            # これにより「地図（Fitness）」は汚さず、「行き先（Pre-eval）」だけ調整する
             if target_key == "pre_evaluation":
-                
-                # 最寄りの評価個体までの距離を計算
+                # 情報量（不確実性）の計算: Archive内の最も近い点との距離
+                # 距離が遠いほど、その場所の情報価値は高い
                 min_dist = 1.0e9
                 for ref_vec, _ in norm_eval_data:
                     d = euclidean(target_vec, ref_vec)
                     if d < min_dist:
                         min_dist = d
                 
-                # 1. 基本係数を下げる (0.5 は強すぎたため 0.1 ~ 0.2 程度に)
-                base_alpha = 0.2
+                # 重みづけ戦略 (Active Learning Strategy)
+                # 前半(IDW期)は「地図作り」が目的なので、距離の重みを大きくする
+                # 後半(Gaussian期)は「登頂」が目的なので、予測値の重みを大きくする
                 
-                # 2. 世代経過率 (0.0 -> 1.0)
-                # NUM_GENERATIONS が import されている前提
-                progress = gen / NUM_GENERATIONS
-                if progress > 1.0: progress = 1.0
+                # 後半: 収束を優先 (活用重視)
+                # ただし、完全に0にせず微小に残すことで局所解固着を防ぐ手もある
+                balance_w = 0.5
+                if gen <= switch_gen:
+                    # 前半: 情報獲得を優先 (探索重視)
+                    # 予測値も無視はしないが、空白地帯を埋めることを強く推奨
+                    balance_w = 2.0  # 強めの係数
                 
-                # 3. 後半になるほどボーナスをゼロに近づける
-                # (1.0 - progress) で、最初は 1.0倍、最後は 0.0倍 になる
-                current_alpha = base_alpha * (1.0 - progress)
-                
-                # 最終スコア = 推定値 + 減衰付き距離ボーナス
-                ind[target_key] = estimated_val + (min_dist * current_alpha)
-            
+                # 最終スコア = 予測Fitness + (距離情報 * 重み)
+                ind[target_key] = estimated_val + (min_dist * balance_w)
             else:
-                # fitness埋めなどの場合は、純粋な推定値をそのまま使う
                 ind[target_key] = estimated_val
     return
 
@@ -449,7 +445,7 @@ def get_total_error(
             total_error += error**2
     elif evaluate_num == 5:
         for ind in population:
-            true_val = float(evaluate.calculate_Gaussian_two_peak(ind, param_keys))
+            true_val = float(evaluate.calculate_Gaussian_peaks(ind, param_keys))
             error = np.abs(true_val - ind[target_param])
             total_error += error**2
     return total_error

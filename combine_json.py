@@ -20,17 +20,19 @@ def combine_json_files(input_folder, output_file):
 if __name__ == "__main__":
     Gauss_input_folders = ['result/proposal/best/Gaussian/Gauss/200inds_9eval',
                         'result/conventional/best/Gaussian/200inds',
-                        'result/conventional/best/Gaussian/9inds']
+                        'result/conventional/best/Gaussian/9inds'
+                    ]
     Gauss_output_files = ['result/proposal/best/Gaussian/Gauss/combined/combined_fitness_log_200inds_9eval.json',
                         'result/conventional/best/Gaussian/combined/combined_fitness_log_200inds.json',
-                        'result/conventional/best/Gaussian/combined/combined_fitness_log_9inds.json']
+                        'result/conventional/best/Gaussian/combined/combined_fitness_log_9inds.json'
+                    ]
     IDW_input_folders = ['result/proposal/best/Gaussian/IDW/200inds_9eval',
                         'result/conventional/best/Gaussian/200inds',
                         'result/conventional/best/Gaussian/9inds',
                         'result/proposal/last_gen_individuals/Gaussian/IDW/200inds_9eval',
                         'result/conventional/last_gen_individuals/Gaussian/200inds',
                         'result/conventional/last_gen_individuals/Gaussian/9inds'
-                     ]
+                    ]
     IDW_output_files = ['result/proposal/best/Gaussian/IDW/combined/combined_fitness_log_200inds_9eval.json',
                         'result/conventional/best/Gaussian/combined/combined_fitness_log_200inds.json',
                         'result/conventional/best/Gaussian/combined/combined_fitness_log_9inds.json',
@@ -55,11 +57,25 @@ if __name__ == "__main__":
     Gauss_Ackley_input_folders = ['result/proposal/best/Ackley/Gauss/200inds_9eval',
                         'result/conventional/best/Ackley/200inds',
                         'result/conventional/best/Ackley/9inds'
-    ]
+                    ]
     Gauss_Ackley_output_files = ['result/proposal/best/Ackley/Gauss/combined/combined_fitness_log_200inds_9eval.json',
                         'result/conventional/best/Ackley/combined/combined_fitness_log_200inds.json',
                         'result/conventional/best/Ackley/combined/combined_fitness_log_9inds.json'
+                    ]
+    Hybrid_input_folders = ['result/proposal/best/Gaussian_peaks/Hybrid/200inds_9eval',
+                        'result/conventional/best/Gaussian_peaks/200inds',
+                        'result/conventional/best/Gaussian_peaks/9inds',
+                        'result/proposal/last_gen_individuals/Gaussian_peaks/Hybrid/200inds_9eval',
+                        'result/conventional/last_gen_individuals/Gaussian_peaks/200inds',
+                        'result/conventional/last_gen_individuals/Gaussian_peaks/9inds'
+                    ]
+    Hybrid_output_files = ['result/proposal/best/Gaussian_peaks/Hybrid/combined/combined_fitness_log_200inds_9eval.json',
+                        'result/conventional/best/Gaussian_peaks/combined/combined_fitness_log_200inds.json',
+                        'result/conventional/best/Gaussian_peaks/combined/combined_fitness_log_9inds.json',
+                        'result/proposal/last_gen_individuals/Gaussian_peaks/Hybrid/combined/combined_fitness_log_200inds_9eval.json',
+                        'result/conventional/last_gen_individuals/Gaussian_peaks/combined/combined_fitness_log_200inds.json',
+                        'result/conventional/last_gen_individuals/Gaussian_peaks/combined/combined_fitness_log_9inds.json'
     ]
-    for input_folder, output_file in zip(Gauss_Ackley_input_folders, Gauss_Ackley_output_files):
+    for input_folder, output_file in zip(Hybrid_input_folders, Hybrid_output_files):
         combine_json_files(input_folder, output_file)
         print(f"Combined JSON files from {input_folder} into {output_file}")

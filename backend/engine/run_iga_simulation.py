@@ -11,6 +11,7 @@ from ..core.geneticAlgorithm.config import TARGET_PARAMS, PARAMS, TARGET_PARAMS_
 from ..core.log import log, log_fitness, plot_individual_params, log_average_fitness
 from ..engine.evaluate import evaluate_fitness, get_best_and_worst_individuals, get_best_and_worst_individuals_by_id, get_average_fitness
 import uuid
+import copy
 
 
 Chromosomes = List[dict]
@@ -36,8 +37,8 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
     # 2-4. Ackley関数
         evaluate_method = "Ackley"
     elif evaluate_num == 5:
-    # 2-5. Gaussian_two_peak関数
-            evaluate_method = "Gaussian_two_peak"
+    # 2-5. Gaussian_peaks関数
+            evaluate_method = "Gaussian_peaks"
     # 1. 初期個体生成
     population = make_initial_population(POPULATION_SIZE)
     
@@ -135,6 +136,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     average_fitness_history = []
     error_history = []
     bests = []
+    archive = []
     evaluate_method = ""
     interpolate = "linear"
     if evaluate_num == 1:
@@ -150,8 +152,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     # 2-4. Ackley関数
         evaluate_method = "Ackley"
     elif evaluate_num == 5:
-    # 2-5. Gaussian_two_peak関数
-        evaluate_method = "Gaussian_two_peak"
+    # 2-5. Gaussian_peaks関数
+        evaluate_method = "Gaussian_peaks"
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
     # 初期個体の事前評価(補間)
@@ -183,12 +185,13 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             param_keys=PARAMS,
             noise_is_added=noise_is_added
         )
+        archive.extend([copy.deepcopy(ind) for ind in evaluate_population])
         # ベスト・ワースト個体の取得
-        best, worst = get_best_and_worst_individuals_by_id(evaluate_population)
+        best, worst = get_best_and_worst_individuals_by_id(archive)
         # ほかの個体の評価を補間
         interpolation(
             population=population,
-            evaluated_population=evaluate_population,
+            evaluated_population=archive,
             best=best,
             worst=worst,
             method_num=interpolate_num,
@@ -264,7 +267,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         #事前評価(補間)
         interpolation(
             population = population,
-            evaluated_population = evaluate_population,
+            evaluated_population = archive,
             best = best, 
             worst = worst,
             method_num=interpolate_num,
@@ -283,9 +286,17 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             noise_is_added=noise_is_added
         )
     # ベスト・ワースト個体の取得
-    best, worst = get_best_and_worst_individuals_by_id(evaluate_population)
+    archive.extend(copy.deepcopy(ind) for ind in evaluate_population)
+    best, worst = get_best_and_worst_individuals_by_id(archive)
     # ほかの個体の評価を補間
-    interpolation(population=population,evaluated_population=evaluate_population , best=best, worst=worst, method_num=interpolate_num, target_key="fitness")
+    interpolation(
+            population=population,
+            evaluated_population=archive,
+            best=best,
+            worst=worst,
+            method_num=interpolate_num,
+            target_key="fitness"
+        )
     evaluate_fitness(
             population=population,
             evaluate_num=evaluate_num,
