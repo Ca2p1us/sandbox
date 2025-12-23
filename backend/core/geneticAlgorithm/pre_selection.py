@@ -27,21 +27,21 @@ def select_top_individuals_by_pre_evaluation(population: List[dict], total_n: in
     # 降順ソート
     sorted_population = sorted(valid_population, key=lambda x: float(x["pre_evaluation"]), reverse=True)
 
-    if gen < int(NUM_GENERATIONS/2):
-        # 前半の世代なら上位と下位をそれぞれ選択
-        half_top = total_n // 2 + (total_n % 2)  # 奇数なら上位を1つ多く
-        half_bottom = total_n // 2
+    # if gen < int(NUM_GENERATIONS/2):
+    #     # 前半の世代なら上位と下位をそれぞれ選択
+    #     half_top = total_n // 2 + (total_n % 2)  # 奇数なら上位を1つ多く
+    #     half_bottom = total_n // 2
 
-        top_inds = sorted_population[:half_top]
-        bottom_inds = sorted_population[-half_bottom:] if half_bottom > 0 else []
+    #     top_inds = sorted_population[:half_top]
+    #     bottom_inds = sorted_population[-half_bottom:] if half_bottom > 0 else []
 
-        # 合体（順序は上位→下位）
-        selected_inds = top_inds + bottom_inds
-    else:
-        # 後半の世代なら上位の個体のみを選択
-        selected_inds = sorted_population[:total_n]
+    #     # 合体（順序は上位→下位）
+    #     selected_inds = top_inds + bottom_inds
+    # else:
+    #     # 後半の世代なら上位の個体のみを選択
+    #     selected_inds = sorted_population[:total_n]
 
-    # selected_inds = sorted_population[:total_n]
+    selected_inds = sorted_population[:total_n]
 
 
     # 重複を防止（極端に少ないpopulationでも安全）

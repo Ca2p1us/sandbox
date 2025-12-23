@@ -105,6 +105,7 @@ def interpolation(
         # RBF補間用の学習データの計算
         train_X = []
         train_Y = []
+        max_gen = NUM_GENERATIONS
         balance_w = 0.0
         # 重みの動的計算 (Linear Decay)
         # Gen 1で最大2.0, Gen 12で最小0.5 になるように徐々に減らす例
@@ -113,7 +114,8 @@ def interpolation(
         end_w = 0.5
         
         # 進行度 (0.0 ～ 1.0)
-        progress = min(gen / 12.0, 1.0) 
+        progress = (gen - 1) / (max_gen - 1)
+        progress = min(max(progress, 0.0), 1.0)
         balance_w = start_w - (progress * (start_w - end_w))
         # if gen <= switch_gen:
         #     balance_w = 2.0
