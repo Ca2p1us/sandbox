@@ -32,8 +32,7 @@ def interpolation(
   gen:int = 0,
   param_keys: List[str] = PARAMS,
   target_key: str = "pre_evaluation",
-  refernce_key = "fitness",      
-  switch_gen = 5
+  refernce_key = "fitness",
 ):
     # print(f"補間を開始します。")
     if not best or not worst:
@@ -102,11 +101,13 @@ def interpolation(
                 smoothing=0.1
             )
     elif method_num == 4:
+        # fill_distanceを計算
+        current_h = compute_fill_distance(norm_eval_data, population)
         # RBF補間用の学習データの計算
         train_X = []
         train_Y = []
         max_gen = NUM_GENERATIONS
-        balance_w = 0.0
+        w_local = 0.0
         # 重みの動的計算 (Linear Decay)
         # Gen 1で最大2.0, Gen 12で最小0.5 になるように徐々に減らす例
         # max_gen = 12 (全世代数)
@@ -116,11 +117,12 @@ def interpolation(
         # 進行度 (0.0 ～ 1.0)
         progress = (gen - 1) / (max_gen - 1)
         progress = min(max(progress, 0.0), 1.0)
-        balance_w = start_w - (progress * (start_w - end_w))
+        w_local = start_w - (progress * (start_w - end_w))
+        w_global = start_w - (progress * (start_w - end_w))
         # if gen <= switch_gen:
-        #     balance_w = 2.0
+        #     w_local = 2.0
         # else:
-        #     balance_w = 0.5
+        #     w_local = 0.5
         for individual in evaluated_population:
             train_X.append(to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict))
             train_Y.append(float(individual.get(refernce_key, 0.0)))
@@ -175,14 +177,16 @@ def interpolation(
             if target_key == "pre_evaluation":
                 # 情報量（不確実性）の計算: Archive内の最も近い点との距離
                 # 距離が遠いほど、その場所の情報価値は高い
-                min_dist = 1.0e9
-                for ref_vec, _ in norm_eval_data:
-                    d = euclidean(target_vec, ref_vec)
-                    if d < min_dist:
-                        min_dist = d
+                nn_dist = min(euclidean(target_vec, ref_vec) for ref_vec, ref_val in norm_eval_data)
+                h_after = compute_fill_distance_with_candidate(
+                    norm_eval_data=norm_eval_data,
+                    population=population,
+                    candidate_vec=target_vec
+                    )
+                delta_h = current_h - h_after
                 
                 # 最終スコア = 予測Fitness + (距離情報 * 重み)
-                ind[target_key] = estimated_val + (min_dist * balance_w)
+                ind[target_key] = estimated_val + (nn_dist * w_local) + (w_global * delta_h)
             else:
                 ind[target_key] = estimated_val
     return
@@ -285,8 +289,6 @@ def calculate_by_IDW(
 def calculate_by_Multimodal_Gaussian(
     target_vec: List[float],
     top_individuals_params: List[List[float]], # 上位N個体の正規化パラメータリスト
-    top_individuals_vals: List[float],       # 上位N個体の評価値リスト
-    worst_val: float,
     sigma: List[float], # sigmaは共通、あるいは個別に計算しても良い
     C: float,
     A_list: List[float] # 各山ごとの高さ係数
@@ -393,6 +395,35 @@ def to_normalized_vec(
         norm_val = (val - min_v) / (max_v - min_v)
         vec.append(norm_val)
     return vec
+
+def compute_fill_distance(
+        norm_eval_data:list = None,
+        population: List[dict] = None,
+        param_keys: List[str] = PARAMS,
+        min_max_dict: Dict[str, Tuple[float, float]] = PARAM_RANGES,
+) -> float:
+    max_min_dist = 0.0
+    for ind in population:
+        target_vec = to_normalized_vec(ind, param_keys, min_max_dict)
+        min_dist = min(euclidean(target_vec, ref_vec) for ref_vec,ref_val in norm_eval_data)
+        max_min_dist = max(max_min_dist, min_dist)
+    return max_min_dist
+
+def compute_fill_distance_with_candidate(
+        norm_eval_data:list = None,
+        population: List[dict] = None,
+        candidate_vec: dict = None,
+        param_keys: List[str] = PARAMS,
+        min_max_dict: Dict[str, Tuple[float, float]] = PARAM_RANGES,    
+):
+    max_min_dist = 0.0
+    for ind in population:
+        target_vec = to_normalized_vec(ind, param_keys, min_max_dict)
+        min_dist = min(euclidean(target_vec, ref_vec) for ref_vec,ref_val in norm_eval_data)
+        # x が新しい評価点として加わる
+        min_dist = min(min_dist, euclidean(target_vec, candidate_vec))
+        max_min_dist = max(max_min_dist, min_dist)
+    return max_min_dist
 
 def get_total_error(
     population: List[dict],
