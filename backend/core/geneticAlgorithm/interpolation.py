@@ -69,126 +69,64 @@ def interpolation(
         raise ValueError("best/worst に param_keys が存在しません。")
     best_val = float(best.get(refernce_key, 1.0))
     worst_val = float(worst.get(refernce_key, 1.0))
-    #パラメータの事前計算
-    if method_num == 0:
-        #距離補間用のパラメータ計算
-        max_dist = euclidean(best_params, worst_params)
-    elif method_num ==1:
-        #ガウス補間用のパラメータ計算
-        eps = (best_val - worst_val) * EPS_RATIO
-        C = worst_val - eps
-        A = best_val - C
-        # ratio for sigma estimation（数値安定化）
-        denom = (best_val - C)
-        if denom == 0:
-            raise ValueError(f"best の target が C と等しい。sigma を推定できません。\nbest: {best_val}, C: {C}")
-        ratio = (worst_val - C) / denom
-        if not (0 < ratio < 1):
-            raise ValueError(f"ratio が (0,1) の範囲にない。best/worst の target を確認してください。\nratio: {ratio}")
-        sigma = get_sigma(best_params=best_params, worst_params=worst_params,ratio=ratio)
-    elif method_num ==2:
-        # RBF補間用の学習データの計算
-        train_X = []
-        train_Y = []
-        for individual in evaluated_population:
-            train_X.append(to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict))
-            train_Y.append(float(individual.get(refernce_key, 0.0)))
-        # print(f"学習データの次元数: {np.shape(np.array(train_X))}, ラベル数: {len(train_Y)}")
-        interpolator = RBFInterpolator(
-                np.array(train_X),
-                np.array(train_Y),
-                kernel='thin_plate_spline',
-                smoothing=0.1
-            )
-    elif method_num == 4:
-        # fill_distanceを計算
-        current_h = compute_fill_distance(norm_eval_data, population)
-        # RBF補間用の学習データの計算
-        train_X = []
-        train_Y = []
-        max_gen = NUM_GENERATIONS
-        w_local = 0.0
-        # 重みの動的計算 (Linear Decay)
-        # Gen 1で最大2.0, Gen 12で最小0.5 になるように徐々に減らす例
-        # max_gen = 12 (全世代数)
-        start_w = 2.0
-        end_w = 0.5
-        
-        # 進行度 (0.0 ～ 1.0)
-        progress = (gen - 1) / (max_gen - 1)
-        progress = min(max(progress, 0.0), 1.0)
-        w_local = start_w - (progress * (start_w - end_w))
-        w_global = start_w - (progress * (start_w - end_w))
-        # if gen <= switch_gen:
-        #     w_local = 2.0
-        # else:
-        #     w_local = 0.5
-        for individual in evaluated_population:
-            train_X.append(to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict))
-            train_Y.append(float(individual.get(refernce_key, 0.0)))
-        # print(f"学習データの次元数: {np.shape(np.array(train_X))}, ラベル数: {len(train_Y)}")
-        interpolator = RBFInterpolator(
-                np.array(train_X),
-                np.array(train_Y),
-                kernel='thin_plate_spline',
-                smoothing=0.01
-            )
-
-        
+    # fill_distanceを計算
+    current_h = compute_fill_distance(norm_eval_data, population)
+    # RBF補間用の学習データの計算
+    train_X = []
+    train_Y = []
+    max_gen = NUM_GENERATIONS
+    w_local = 0.0
+    # 重みの動的計算 (Linear Decay)
+    # Gen 1で最大2.0, Gen 12で最小0.5 になるように徐々に減らす例
+    # max_gen = 12 (全世代数)
+    start_w = 2.0
+    end_w = 0.5
+    
+    # 進行度 (0.0 ～ 1.0)
+    progress = (gen - 1) / (max_gen - 1)
+    progress = min(max(progress, 0.0), 1.0)
+    w_local = start_w - (progress * (start_w - end_w))
+    w_global = start_w - (progress * (start_w - end_w))
+    # if gen <= switch_gen:
+    #     w_local = 2.0
+    # else:
+    #     w_local = 0.5
+    for individual in evaluated_population:
+        train_X.append(to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict))
+        train_Y.append(float(individual.get(refernce_key, 0.0)))
+    # print(f"学習データの次元数: {np.shape(np.array(train_X))}, ラベル数: {len(train_Y)}")
+    interpolator = RBFInterpolator(
+            np.array(train_X),
+            np.array(train_Y),
+            kernel='thin_plate_spline',
+            smoothing=0.01
+        )
 
     # print(f"best_val: {best_val}, worst_val: {worst_val}")
     for ind in population:
         target_vec = to_normalized_vec(ind, param_keys, min_max_dict)
-        if method_num == 0:
-            ind[target_key] = calculate_by_distance(
-                target_vec=target_vec,
-                target_key=target_key,
-                max_dist=max_dist,
-                best_val=best_val,
-                worst_val=worst_val,
-                best_params=best_params,
-            )
-        elif method_num == 1:
-            ind[target_key] = calculate_by_Gaussian(
-                target_vec=target_vec,
-                best_params=best_params,
-                C=C,
-                A=A,
-                # sigma=[200,200,200,200,200,200],
-                sigma=sigma,
-            )
-        elif method_num == 2:
-            ind[target_key] = calculate_by_RBF(
-                target_vec=target_vec,
-                interpolater=interpolator,
-            )
-        elif method_num == 3:
-            ind[target_key] = calculate_by_IDW(
-                target_vec=target_vec,
-                norm_eval_data=norm_eval_data
-            )
-        elif method_num == 4:
-            # 1. まずは純粋なガウス推定値（またはIDW）を計算
-            estimated_val = 0.0
-            estimated_val = calculate_by_RBF(
-                target_vec=target_vec,
-                interpolater=interpolator,
-            )
-            if target_key == "pre_evaluation":
-                # 情報量（不確実性）の計算: Archive内の最も近い点との距離
-                # 距離が遠いほど、その場所の情報価値は高い
-                nn_dist = min(euclidean(target_vec, ref_vec) for ref_vec, ref_val in norm_eval_data)
-                h_after = compute_fill_distance_with_candidate(
-                    norm_eval_data=norm_eval_data,
-                    population=population,
-                    candidate_vec=target_vec
-                    )
-                delta_h = current_h - h_after
-                
-                # 最終スコア = 予測Fitness + (距離情報 * 重み)
-                ind[target_key] = estimated_val + (nn_dist * w_local) + (w_global * delta_h)
-            else:
-                ind[target_key] = estimated_val
+        # 1. まずは純粋なガウス推定値（またはIDW）を計算
+        estimated_val = 0.0
+        estimated_val = calculate_by_RBF(
+            target_vec=target_vec,
+            interpolater=interpolator,
+        )
+        if target_key == "pre_evaluation":
+            print(f'被覆距離:{current_h}')
+            # 情報量（不確実性）の計算: Archive内の最も近い点との距離
+            # 距離が遠いほど、その場所の情報価値は高い
+            nn_dist = min(euclidean(target_vec, ref_vec) for ref_vec, ref_val in norm_eval_data)
+            h_after = compute_fill_distance_with_candidate(
+                norm_eval_data=norm_eval_data,
+                population=population,
+                candidate_vec=target_vec
+                )
+            delta_h = current_h - h_after
+            
+            # 最終スコア = 予測Fitness + (距離情報 * 重み)
+            ind[target_key] = estimated_val + (nn_dist * w_local) + (w_global * delta_h)
+        else:
+            ind[target_key] = estimated_val
     return
 
 def calculate_by_distance(
