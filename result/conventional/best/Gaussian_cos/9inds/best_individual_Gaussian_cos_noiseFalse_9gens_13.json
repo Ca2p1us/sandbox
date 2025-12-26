@@ -1,0 +1,141 @@
+{
+  "13_results": [
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 243.85931268941323,
+          "decay": 304.0743644133156,
+          "sustain": 179.00709658843235,
+          "sustainTime": 97.95056662911622,
+          "release": 259.09868569275113,
+          "frequency": 432.71922584053783
+        }
+      },
+      "fitness": 4.343312617005314,
+      "pre_evaluation": 0.0,
+      "true_fitness": 0.0,
+      "generation": 1,
+      "chromosomeId": "1675d3b8-3044-4a9f-be25-9f66107053ff"
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 0,
+          "decay": 0,
+          "sustain": 230.6491231334563,
+          "sustainTime": 365.34719709108117,
+          "release": 200.78989211949283,
+          "frequency": 358.4377713749811
+        }
+      },
+      "generation": 2,
+      "chromosomeId": "933c9e80-fc94-4b6a-96f2-ad00fe186a74",
+      "fitness": 3.6269195825510856
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 306.11678600045144,
+          "decay": 0,
+          "sustain": 191.46378232508908,
+          "sustainTime": 217.26827030060002,
+          "release": 273.8586491651815,
+          "frequency": 358.1479585330876
+        }
+      },
+      "generation": 3,
+      "chromosomeId": "b51878ff-4e19-45a3-8371-3d3c1bde55cf",
+      "fitness": 4.292012671553397
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 206.01001215595483,
+          "decay": 294.14319587459704,
+          "sustain": 245.55481756348706,
+          "sustainTime": 86.14183444762408,
+          "release": 263.81326505646916,
+          "frequency": 299.0309982021391
+        }
+      },
+      "generation": 4,
+      "chromosomeId": "371892e8-fb99-4d30-b6ae-af8bcecdbe50",
+      "fitness": 6.051766068046873
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 290.0858114740987,
+          "decay": 52.38783740697827,
+          "sustain": 313.91098135498544,
+          "sustainTime": 287.293007756194,
+          "release": 62.894162572281246,
+          "frequency": 149.09545451042698
+        }
+      },
+      "generation": 5,
+      "chromosomeId": "693ba6bc-5f3f-4066-b90b-7adb097eaa73",
+      "fitness": 3.934375428417903
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 411.6116830461541,
+          "decay": 500,
+          "sustain": 210.33418240215423,
+          "sustainTime": 0,
+          "release": 351.5458791851741,
+          "frequency": 212.8181270877001
+        }
+      },
+      "generation": 6,
+      "chromosomeId": "fd66a3bc-8f1d-40da-bbde-3e28140120eb",
+      "fitness": 3.920293877210415
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 205.75780548859478,
+          "decay": 44.776456348104,
+          "sustain": 216.5767659204908,
+          "sustainTime": 246.72196999050269,
+          "release": 176.60984956006493,
+          "frequency": 287.89798681869985
+        }
+      },
+      "generation": 7,
+      "chromosomeId": "5637cca8-2499-4709-b28d-dc775ce10b2e",
+      "fitness": 4.78728395026363
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 302.67421512378155,
+          "decay": 0,
+          "sustain": 304.0507840662592,
+          "sustainTime": 313.56740039126936,
+          "release": 500,
+          "frequency": 292.540853334086
+        }
+      },
+      "generation": 8,
+      "chromosomeId": "bf0ad6c3-022d-4fe7-8cd4-fcb9ee5a22a7",
+      "fitness": 5.247847550513956
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 207.0762147221016,
+          "decay": 500,
+          "sustain": 305.1746829474722,
+          "sustainTime": 252.06743071774787,
+          "release": 156.36789599181213,
+          "frequency": 293.33191961312406
+        }
+      },
+      "generation": 9,
+      "chromosomeId": "3f1d13c3-d5f9-4076-9c16-078486e44570",
+      "fitness": 6.2993220796006915
+    }
+  ]
+}

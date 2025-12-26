@@ -1,0 +1,141 @@
+{
+  "17_results": [
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 285.71287645486615,
+          "decay": 301.4942852002756,
+          "sustain": 385.5625937564833,
+          "sustainTime": 59.48253528753411,
+          "release": 159.25868289115996,
+          "frequency": 316.8342375517089
+        }
+      },
+      "fitness": 3.4544901914864763,
+      "pre_evaluation": 0.0,
+      "true_fitness": 0.0,
+      "generation": 1,
+      "chromosomeId": "e5b40b97-00d5-4397-87a7-5434cbd5a72d"
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 500,
+          "decay": 184.23979610559945,
+          "sustain": 40.186457403150456,
+          "sustainTime": 206.5649936349446,
+          "release": 500,
+          "frequency": 226.76659124662925
+        }
+      },
+      "generation": 2,
+      "chromosomeId": "44bc9641-51cc-41be-8458-79bcaaea590a",
+      "fitness": 3.325337470344067
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 249.65186058189965,
+          "decay": 371.61009497025645,
+          "sustain": 47.46819920030986,
+          "sustainTime": 500,
+          "release": 190.1586514263539,
+          "frequency": 0
+        }
+      },
+      "generation": 3,
+      "chromosomeId": "3eb0f5ff-c83f-4d01-8736-bdc720d337b5",
+      "fitness": 3.7128480234597254
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 351.28481492923316,
+          "decay": 287.70685146229886,
+          "sustain": 303.82648812755053,
+          "sustainTime": 440.1705130425437,
+          "release": 168.6395902973855,
+          "frequency": 211.83933634338203
+        }
+      },
+      "generation": 4,
+      "chromosomeId": "b2215f20-65b8-44dc-a136-9fa9c84d900e",
+      "fitness": 4.3372718696063215
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 500,
+          "decay": 449.34827705729714,
+          "sustain": 0,
+          "sustainTime": 500,
+          "release": 195.0854166042193,
+          "frequency": 196.63563507644673
+        }
+      },
+      "generation": 5,
+      "chromosomeId": "f8d8daa2-e74f-4fc4-98ed-0d0d9ff4eab9",
+      "fitness": 4.444002051080862
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 312.0999031032347,
+          "decay": 292.7646771437725,
+          "sustain": 265.93195372677064,
+          "sustainTime": 269.96346982147924,
+          "release": 451.34676844414247,
+          "frequency": 245.96036645180885
+        }
+      },
+      "generation": 6,
+      "chromosomeId": "480c39f0-bf40-47d1-b0d2-0e40f1fe8da4",
+      "fitness": 5.1783571283563665
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 344.7920068182529,
+          "decay": 255.05685137414972,
+          "sustain": 248.434373195297,
+          "sustainTime": 488.0499095910692,
+          "release": 349.5310928556318,
+          "frequency": 240.6506877822724
+        }
+      },
+      "generation": 7,
+      "chromosomeId": "75d7b83b-2b7e-4eb8-a14e-7f6eb26f188a",
+      "fitness": 5.876648424084216
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 344.7455498378423,
+          "decay": 386.955165087084,
+          "sustain": 244.28106367257928,
+          "sustainTime": 390.96378080366765,
+          "release": 247.02340220382231,
+          "frequency": 243.20847669863448
+        }
+      },
+      "generation": 8,
+      "chromosomeId": "5fd843b3-add9-4272-a67f-231d87315b5e",
+      "fitness": 5.544199989275047
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 348.0544876689844,
+          "decay": 388.31606119718026,
+          "sustain": 306.3316544192098,
+          "sustainTime": 52.6663209056739,
+          "release": 258.7333937403399,
+          "frequency": 251.1226778732338
+        }
+      },
+      "generation": 9,
+      "chromosomeId": "637905f8-2d62-4131-bc29-1641f3e9098f",
+      "fitness": 5.468133760824904
+    }
+  ]
+}

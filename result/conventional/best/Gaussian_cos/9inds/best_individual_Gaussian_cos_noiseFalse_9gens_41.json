@@ -1,0 +1,141 @@
+{
+  "41_results": [
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 194.5805984867978,
+          "decay": 260.0953570565135,
+          "sustain": 193.425596364408,
+          "sustainTime": 263.21658589461333,
+          "release": 224.9826544717804,
+          "frequency": 192.6841691868299
+        }
+      },
+      "fitness": 5.816026606413786,
+      "pre_evaluation": 0.0,
+      "true_fitness": 0.0,
+      "generation": 1,
+      "chromosomeId": "46b214e8-ff5d-48b7-b2ff-8b88d5dacc57"
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 349.1696896551821,
+          "decay": 136.90115088503697,
+          "sustain": 191.20534911370538,
+          "sustainTime": 201.952313698125,
+          "release": 345.3808711689955,
+          "frequency": 287.6762811942645
+        }
+      },
+      "generation": 2,
+      "chromosomeId": "9ef5b7ae-4a6b-4f72-b5f9-05f82223999f",
+      "fitness": 5.213206203557923
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 194.4091512590638,
+          "decay": 290.90755838883695,
+          "sustain": 0,
+          "sustainTime": 226.97841547964285,
+          "release": 234.17956933832167,
+          "frequency": 243.56577695834218
+        }
+      },
+      "generation": 3,
+      "chromosomeId": "4f7d1cf9-5bba-4ddb-bd11-ca49a75189b5",
+      "fitness": 5.300993203163877
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 191.43418766977265,
+          "decay": 201.45770602330663,
+          "sustain": 53.60460594795589,
+          "sustainTime": 192.8011529726713,
+          "release": 207.73482805538552,
+          "frequency": 176.2991596633533
+        }
+      },
+      "generation": 4,
+      "chromosomeId": "ea80b3cd-7fe4-46ec-9386-f8c543612b85",
+      "fitness": 5.074456136430243
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 500,
+          "decay": 254.2712212199487,
+          "sustain": 51.65079804101944,
+          "sustainTime": 0,
+          "release": 251.20795143204572,
+          "frequency": 192.96964470895617
+        }
+      },
+      "generation": 5,
+      "chromosomeId": "1dd507f5-b401-4269-9bab-1d71f93b7108",
+      "fitness": 5.515659925353991
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 500,
+          "decay": 247.47362653023168,
+          "sustain": 207.39656718903845,
+          "sustainTime": 0.029674817366501127,
+          "release": 250.3637351676913,
+          "frequency": 189.94344832514923
+        }
+      },
+      "generation": 6,
+      "chromosomeId": "7dda0be6-f64d-4348-943b-4befbdfb09f2",
+      "fitness": 6.00861184343342
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 168.18784876411843,
+          "decay": 195.63553748983122,
+          "sustain": 204.95730662920008,
+          "sustainTime": 500,
+          "release": 258.5508168150992,
+          "frequency": 156.9515586010773
+        }
+      },
+      "generation": 7,
+      "chromosomeId": "a7cde58b-d787-4f3f-bded-c580b01e4dbb",
+      "fitness": 5.180276561089686
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 300.4609293262073,
+          "decay": 180.80930948135546,
+          "sustain": 195.702192782402,
+          "sustainTime": 342.78389794309595,
+          "release": 256.91934271729775,
+          "frequency": 185.85870003722545
+        }
+      },
+      "generation": 8,
+      "chromosomeId": "30ec7a22-b6ce-4ccb-aeef-b38e917f78f6",
+      "fitness": 5.458767544272122
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 239.13178111337976,
+          "decay": 272.7191718982699,
+          "sustain": 0,
+          "sustainTime": 249.5872374543167,
+          "release": 254.04775777432474,
+          "frequency": 183.0384828414668
+        }
+      },
+      "generation": 9,
+      "chromosomeId": "1de4d92f-43fd-432a-b096-7695ad218821",
+      "fitness": 5.4107566304004795
+    }
+  ]
+}

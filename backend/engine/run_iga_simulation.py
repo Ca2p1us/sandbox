@@ -5,13 +5,14 @@ from ..core.geneticAlgorithm import BLX_alpha
 from ..core.geneticAlgorithm.repair import repair_fm_params as repair_gene
 from ..core.geneticAlgorithm.mutate import mutate 
 from ..core.geneticAlgorithm import make_chromosome_params
-from ..core.geneticAlgorithm.interpolation import interpolation, get_evaluated_individuals, get_total_error
+from ..core.geneticAlgorithm.interpolation import interpolation, get_evaluated_individuals, get_total_error,to_normalized_vec,PARAM_RANGES
 from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_pre_evaluation
 from ..core.geneticAlgorithm.config import TARGET_PARAMS, PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2
-from ..core.log import log, log_fitness, plot_individual_params, log_average_fitness
+from ..core.log import log, log_fitness, plot_individual_params, log_average_fitness, log_coverage_metrics
 from ..engine.evaluate import evaluate_fitness, get_best_and_worst_individuals, get_best_and_worst_individuals_by_id, get_average_fitness
 import uuid
 import copy
+import numpy as np
 
 
 Chromosomes = List[dict]
@@ -135,6 +136,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     best_fitness_history = []
     average_fitness_history = []
     error_history = []
+    coverage_history = []
     bests = []
     archive = []
     evaluate_method = ""
@@ -159,18 +161,10 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     # 初期個体の事前評価(補間)
     if interpolate_num == 0:
         interpolate = "linear"
-    elif interpolate_num == 1:
-        interpolate = "Gauss"
-    elif interpolate_num == 2:
-        interpolate = "RBF"
-    elif interpolate_num == 3:
-        interpolate = "IDW"
     elif interpolate_num == 4:
         interpolate = "Hybrid"
     interpolation(
             population=population,
-            method_num=interpolate_num,
-            param_keys=PARAMS,
             target_key="pre_evaluation",
             )
     # 評価個体の選択
@@ -186,17 +180,30 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             noise_is_added=noise_is_added
         )
         archive.extend([copy.deepcopy(ind) for ind in evaluate_population])
-        # ベスト・ワースト個体の取得
-        best, worst = get_best_and_worst_individuals_by_id(archive)
+        # 評価済み個体 (Xe) と 現在の個体群 (Xu) を正規化ベクトル(np.array)に変換
+        Xe_list = [to_normalized_vec(ind, PARAMS, PARAM_RANGES) for ind in archive]
+        Xu_list = [to_normalized_vec(ind, PARAMS, PARAM_RANGES) for ind in population]
+        Xe = np.array(Xe_list)
+        Xu = np.array(Xu_list)
+
+        log_coverage_metrics(
+            evaluate_num=evaluate_num,
+            interpolate_num=interpolate_num,
+            file_path=f"_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}eval_{str(times)}_coverage.json",
+            coverage_history=coverage_history,
+            generation=generation + 1,
+            Xe=Xe,
+            Xu=Xu,
+            times=times
+        )
+
         # ほかの個体の評価を補間
         interpolation(
             population=population,
             evaluated_population=archive,
-            best=best,
-            worst=worst,
-            method_num=interpolate_num,
             target_key="fitness"
         )
+        best, worst = get_best_and_worst_individuals(population=population)
         # 真値の取得
         evaluate_fitness(
             population=population,
@@ -268,9 +275,6 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         interpolation(
             population = population,
             evaluated_population = archive,
-            best = best, 
-            worst = worst,
-            method_num=interpolate_num,
             param_keys=PARAMS,
             target_key="pre_evaluation",
         )
@@ -292,9 +296,6 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     interpolation(
             population=population,
             evaluated_population=archive,
-            best=best,
-            worst=worst,
-            method_num=interpolate_num,
             target_key="fitness"
         )
     evaluate_fitness(

@@ -202,6 +202,19 @@ uv run python -m backend.core.geneticAlgorithm.interpolation
     - トーナメントサイズが大きいと収束が早くて多様性がなくて小さいと収束が遅くて多様性があるよのやつ
 - ["A Comparative Analysis of Selection Schemes Used in Genetic Algorithms"](https://www.cse.unr.edu/~sushil/class/gas/papers/Select.pdf)
     - これもトーナメントサイズが大きいと収束が早くて多様性がなくて小さいと収束が遅くて多様性があるよのやつ
+## 読まなければならない論文
+- ["Benchmarking Surrogate-Assisted Genetic Recommender Systems"](https://arxiv.org/pdf/1908.02880)
+    - サロゲートモデルのIGAを使って評価回数を減らす研究
+    - LSMとRBFによるサロゲート
+    - 予測最良個体のみの評価
+    - 最新評価のみをサロゲートに利用
+- ["A New Surrogate-Assisted Interactive Genetic Algorithm With Weighted Semisupervised Learning"](https://www.researchgate.net/publication/231214195_A_New_Surrogate-Assisted_Interactive_Genetic_Algorithm_With_Weighted_Semisupervised_Learning)
+    - RBFネットワークを2つ使って相補的に学習する重み付き半教師あり学習
+    - 履歴を使っている？
+- ["Interactive Multifactorial Evolutionary Optimization Algorithm with Multidimensional Preference Surrogate Models for Personalized Recommendation"](https://www.mdpi.com/2076-3417/13/4/2243)
+    - 複数のRBMと社会的知識(既存ルール)を組み合わせたモデル
+    - それぞれが特定の嗜好を担って学習
+    - 全履歴データを使う
 
 
 

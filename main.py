@@ -21,8 +21,8 @@ choice = input("実行するシミュレーションを選択 (1/5): ")
 if choice == "2":
     print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Gauss関数+cos関数\n4: Ackley関数\n5: Gaussian_peaks関数")
     evaluate_num = input("評価関数の番号を入力してください: ")
-    print(f"補間方法を選択してください。\n0: 距離に基づく線形補間\n1: ガウス関数に基づく補間\n2: RBF補間\n3: IDW補間\n4: 調整RBF(ハイブリッド)")
-    interpolate_num = input("補間方法の番号を入力してください: ")
+    print(f"補間方法: 調整RBF(ハイブリッド)")
+    interpolate_num = 4
     print(f"ノイズを追加しますか？\n0: 追加しない\n1: 追加する")
     TF = input("ノイズを追加しますか？ (0/1): ")
     if TF == "1":
@@ -32,7 +32,6 @@ if choice == "2":
     if TF2 == "1":
         look = True
     for i in range(EXPERIMENT_TIMES):
-        print(f"評価関数 {i}: {evaluate_num}")
         print("提案型IGAシミュレーション"+str(i+1)+"回目を実行")
         best_fitness, average_fitness, error_history = iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=PROPOSAL_POPULATION_SIZE, EVALUATE_SIZE=EVALUATE_SIZE, evaluate_num = int(evaluate_num), interpolate_num = int(interpolate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=4)
         best_fitness_histories.append(best_fitness)

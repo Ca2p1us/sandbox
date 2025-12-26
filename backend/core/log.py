@@ -11,6 +11,7 @@ from .geneticAlgorithm.config import ATTACK_RANGE, NUM_GENERATIONS
 from typing import List, Optional, Union
 import japanize_matplotlib
 from pathlib import Path
+from scipy.spatial.distance import cdist
 
 plt.rcParams['font.family'] = 'MS Gothic'
 
@@ -143,6 +144,101 @@ def _get_save_path(ver: str, method: str, interpolate: Optional[str], category: 
     # print(f"保存先パス: {full_path}") # デバッグ用出力
     return full_path
 
+def compute_dnn_and_cv(Xe):
+    """
+    Xe: np.ndarray shape (m, dim)
+        評価済み点集合（真の適応度あり）
+    """
+    if len(Xe) <= 1:
+        return {"dnn_mean": 0.0, "dnn_std": 0.0, "dnn_cv": 0.0}
+    # 距離行列
+    D = cdist(Xe, Xe)
+
+    # 自分自身との距離を無限大に
+    np.fill_diagonal(D, np.inf)
+
+    # 各点の最近傍距離
+    dnn = np.min(D, axis=1)
+
+    mean_dnn = np.mean(dnn)
+    std_dnn = np.std(dnn)
+
+    cv_dnn = std_dnn / mean_dnn if mean_dnn > 0 else 0.0
+
+    return {
+        "dnn_mean": mean_dnn,
+        "dnn_std": std_dnn,
+        "dnn_cv": cv_dnn
+    }
+
+def compute_fill_distance(Xe, population):
+    """
+    Xe: 評価済み点集合 (m, dim)
+    population: すべての点集合 (n, dim)
+    """
+    Xu = []
+    for p in population:
+        if np.min(cdist([p], Xe)) > 1e-12:
+            Xu.append(p)
+    if len(Xe) == 0 or len(Xu) == 0:
+        return {"fill_distance": 0.0}
+    # Xu → Xe の距離
+    D = cdist(Xu, Xe)
+
+    # 各未評価点の最近傍評価点距離
+    min_dists = np.min(D, axis=1)
+
+    # fill distance
+    h = np.max(min_dists)
+
+    return {
+        "fill_distance": h
+    }
+
+def log_coverage_metrics(
+    evaluate_num: int,
+    interpolate_num: int,
+    file_path: str,
+    coverage_history: list,
+    generation: int,
+    Xe: np.ndarray,
+    Xu: np.ndarray,
+    times: int = 1
+):
+    """
+    被覆指標を計算し、履歴リストに追加してファイルに保存する
+    Xe, Xu: 正規化済みの np.ndarray
+    coverage_history: 呼び出し元で管理しているリスト（破壊的に更新されます）
+    """
+    # 1. 指標の計算
+    dnn_info = compute_dnn_and_cv(Xe)
+    fill_info = compute_fill_distance(Xe, Xu)
+
+    # 2. ログエントリの作成
+    log_entry = {
+        "generation": generation,
+        "num_evaluated": int(Xe.shape[0]),
+        "fill_distance": float(fill_info["fill_distance"]),
+        "dnn_mean": float(dnn_info["dnn_mean"]),
+        "dnn_std": float(dnn_info["dnn_std"]),
+        "dnn_cv": float(dnn_info["dnn_cv"])
+    }
+    
+    # リストに追加
+    coverage_history.append(log_entry)
+
+    # 3. ファイルへの保存
+    method = _get_method_name(evaluate_num)
+    interpolate = _get_interpolate_name(interpolate_num)
+    
+    # 保存先: result/proposal/metrics/{method}/{interpolate}/...
+    save_path = _get_save_path("proposal", method, interpolate, "metrics", file_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with save_path.open('w', encoding='utf-8') as f:
+        json.dump({f"{times}_coverage_metrics": coverage_history}, f, indent=2)
+
+    return log_entry
 
 def log(file_path: str, answer,times: int = 1):
     # UUID型をstr型に変換するヘルパー関数

@@ -26,20 +26,12 @@ PARAM_RANGES = {
 def interpolation(
   population: List[dict] = None,
   evaluated_population: List[dict] = None,
-  best: dict = None,
-  worst: dict = None,
-  method_num: int = 0,
   gen:int = 0,
   param_keys: List[str] = PARAMS,
   target_key: str = "pre_evaluation",
   refernce_key = "fitness",
 ):
     # print(f"補間を開始します。")
-    if not best or not worst:
-        print(f"bestまたはworstがNoneです。ランダムな{target_key}を付与します。")
-        for ind in population:
-            ind[target_key] = RNG.uniform(0.0, 6.0)
-        return
     if not evaluated_population:
         print(f"評価済み個体群がNoneです。ランダムな{target_key}を付与します。")
         for ind in population:
@@ -50,8 +42,6 @@ def interpolation(
         # デフォルトはoperator1のfrequencyのみ
         param_keys = ["fmParamsList.operator1.frequency"]
 
-    # 全個体（未評価 + 評価済み）からMin/Maxを取得
-    # all_inds = population
     min_max_dict = PARAM_RANGES
 
     # 評価済み個体を「正規化ベクトル」と「正解値」のペアリストに変換しておく
@@ -62,20 +52,13 @@ def interpolation(
         val = float(ind.get(refernce_key, 0.0))
         norm_eval_data.append((vec, val))
 
-    best_params = to_normalized_vec(best, param_keys, min_max_dict)
-    worst_params = to_normalized_vec(worst, param_keys, min_max_dict)
-
-    if any(p is None for p in best_params) or any(p is None for p in worst_params):
-        raise ValueError("best/worst に param_keys が存在しません。")
-    best_val = float(best.get(refernce_key, 1.0))
-    worst_val = float(worst.get(refernce_key, 1.0))
-    # fill_distanceを計算
-    current_h = compute_fill_distance(norm_eval_data, population)
+    
     # RBF補間用の学習データの計算
     train_X = []
     train_Y = []
     max_gen = NUM_GENERATIONS
     w_local = 0.0
+    w_global = 0.0
     # 重みの動的計算 (Linear Decay)
     # Gen 1で最大2.0, Gen 12で最小0.5 になるように徐々に減らす例
     # max_gen = 12 (全世代数)
@@ -87,10 +70,7 @@ def interpolation(
     progress = min(max(progress, 0.0), 1.0)
     w_local = start_w - (progress * (start_w - end_w))
     w_global = start_w - (progress * (start_w - end_w))
-    # if gen <= switch_gen:
-    #     w_local = 2.0
-    # else:
-    #     w_local = 0.5
+
     for individual in evaluated_population:
         train_X.append(to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict))
         train_Y.append(float(individual.get(refernce_key, 0.0)))
@@ -112,7 +92,8 @@ def interpolation(
             interpolater=interpolator,
         )
         if target_key == "pre_evaluation":
-            print(f'被覆距離:{current_h}')
+            # fill_distanceを計算
+            current_h = compute_fill_distance(norm_eval_data, population)
             # 情報量（不確実性）の計算: Archive内の最も近い点との距離
             # 距離が遠いほど、その場所の情報価値は高い
             nn_dist = min(euclidean(target_vec, ref_vec) for ref_vec, ref_val in norm_eval_data)

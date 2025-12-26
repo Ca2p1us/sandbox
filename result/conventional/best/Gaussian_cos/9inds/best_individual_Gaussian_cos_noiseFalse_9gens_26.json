@@ -1,0 +1,141 @@
+{
+  "26_results": [
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 45.67940834583734,
+          "decay": 344.6164411145931,
+          "sustain": 144.61359862897456,
+          "sustainTime": 282.09967292581666,
+          "release": 201.83627836222107,
+          "frequency": 264.0899035183964
+        }
+      },
+      "fitness": 4.83835727306647,
+      "pre_evaluation": 0.0,
+      "true_fitness": 0.0,
+      "generation": 1,
+      "chromosomeId": "4135e686-6fe5-4a8e-ba19-2db451e754d9"
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 0,
+          "decay": 500,
+          "sustain": 253.8419691298149,
+          "sustainTime": 172.80198613127308,
+          "release": 205.9973013186638,
+          "frequency": 455.0848554065591
+        }
+      },
+      "generation": 2,
+      "chromosomeId": "512e8245-4a18-4969-be89-9497588ba096",
+      "fitness": 4.188607964719348
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 174.09132957668442,
+          "decay": 309.8789690617814,
+          "sustain": 292.5789551958226,
+          "sustainTime": 500,
+          "release": 266.1636500352639,
+          "frequency": 0
+        }
+      },
+      "generation": 3,
+      "chromosomeId": "53986e6e-3803-491b-b003-be6a54017315",
+      "fitness": 3.9029294259276903
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 263.8296405596283,
+          "decay": 246.20707368120333,
+          "sustain": 309.85441901068367,
+          "sustainTime": 237.08624742510028,
+          "release": 173.05814110249736,
+          "frequency": 0.1205643534861075
+        }
+      },
+      "generation": 4,
+      "chromosomeId": "5a653851-361f-4946-9758-50fefd4084e8",
+      "fitness": 4.802212392379367
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 247.33981930407725,
+          "decay": 359.2087219310372,
+          "sustain": 288.6000006501715,
+          "sustainTime": 205.15413593331752,
+          "release": 179.41300271521354,
+          "frequency": 379.7267928458439
+        }
+      },
+      "generation": 5,
+      "chromosomeId": "2259b8d0-c20c-4416-925c-b10ed5ff8ec8",
+      "fitness": 4.225737408802734
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 262.37266332093884,
+          "decay": 500,
+          "sustain": 231.17875323036046,
+          "sustainTime": 259.39227547329807,
+          "release": 297.6002542468061,
+          "frequency": 497.01411057402646
+        }
+      },
+      "generation": 6,
+      "chromosomeId": "199d2818-058b-458b-a555-85304bb34577",
+      "fitness": 5.0578218236580375
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 294.43506482262814,
+          "decay": 500,
+          "sustain": 318.1578636045173,
+          "sustainTime": 302.4989506533169,
+          "release": 155.0127836221233,
+          "frequency": 253.08765634605842
+        }
+      },
+      "generation": 7,
+      "chromosomeId": "7474a6a5-2611-4c12-8869-cc6484e4418a",
+      "fitness": 5.633664894209209
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 251.15907879092444,
+          "decay": 257.14145475420685,
+          "sustain": 500,
+          "sustainTime": 355.1687824224383,
+          "release": 246.23784562545455,
+          "frequency": 255.0343286193544
+        }
+      },
+      "generation": 8,
+      "chromosomeId": "f60a0c35-4588-4da2-a58e-e763082daf33",
+      "fitness": 6.922942236359232
+    },
+    {
+      "fmParamsList": {
+        "operator1": {
+          "attack": 256.88266592868604,
+          "decay": 295.6241940346699,
+          "sustain": 305.67107315410374,
+          "sustainTime": 286.30972156434785,
+          "release": 259.4120056689004,
+          "frequency": 450.3467323872717
+        }
+      },
+      "generation": 9,
+      "chromosomeId": "4d5b1cff-411f-43a9-bf13-35ce35aa8487",
+      "fitness": 6.239041831100375
+    }
+  ]
+}
