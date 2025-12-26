@@ -159,8 +159,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
     # 初期個体の事前評価(補間)
-    if interpolate_num == 0:
-        interpolate = "linear"
+    if interpolate_num == 2:
+        interpolate = "RBF"
     elif interpolate_num == 4:
         interpolate = "Hybrid"
     interpolation(
