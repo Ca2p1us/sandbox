@@ -5,10 +5,10 @@ from ..core.geneticAlgorithm import BLX_alpha
 from ..core.geneticAlgorithm.repair import repair_fm_params as repair_gene
 from ..core.geneticAlgorithm.mutate import mutate 
 from ..core.geneticAlgorithm import make_chromosome_params
-from ..core.geneticAlgorithm.interpolation import interpolation, get_evaluated_individuals, get_total_error
+from ..core.geneticAlgorithm.interpolation import interpolation, get_evaluated_individuals, get_total_error, build_interpolator
 from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_pre_evaluation
 from ..core.geneticAlgorithm.config import TARGET_PARAMS, PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2
-from ..core.log import log, log_fitness, plot_individual_params, log_average_fitness
+from ..core.log import log, log_fitness, plot_individual_params, log_average_fitness, plot_interpolated_heatmap
 from ..engine.evaluate import evaluate_fitness, get_best_and_worst_individuals, get_best_and_worst_individuals_by_id, get_average_fitness
 import uuid
 import copy
@@ -186,6 +186,12 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             noise_is_added=noise_is_added
         )
         archive.extend([copy.deepcopy(ind) for ind in evaluate_population])
+        interpolator = build_interpolator(
+            evaluated_population=archive,
+            method_num=interpolate_num,
+            param_keys=PARAMS,
+            refernce_key="fitness",
+        )
         # ベスト・ワースト個体の取得
         best, worst = get_best_and_worst_individuals_by_id(archive)
         # ほかの個体の評価を補間
@@ -195,7 +201,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             best=best,
             worst=worst,
             method_num=interpolate_num,
-            target_key="fitness"
+            target_key="fitness",
+            interpolator=interpolator
         )
         # 真値の取得
         evaluate_fitness(
@@ -217,7 +224,22 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             average_fitness_history.append((generation + 1, float(average)))
         error_history.append((generation + 1, float(get_total_error(population=population, evaluate_num=evaluate_num))))
         if look and times == 1:
-            plot_individual_params(population=population,best=best,worst=worst, param_keys=PARAMS, generation=generation + 1, file_path=f'./result/proposal/graph/{evaluate_method}/{interpolate}/scatter/{evaluate_method}_noise{str(noise_is_added)}_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}_individuals_{str(generation + 1)}gens')
+            plot_individual_params(
+                population=population,
+                best=best,worst=worst,
+                param_keys=PARAMS,
+                generation=generation + 1,
+                file_path=f'./result/proposal/graph/{evaluate_method}/{interpolate}/scatter/{evaluate_method}_noise{str(noise_is_added)}_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}_individuals_{str(generation + 1)}gens'
+            )
+            plot_interpolated_heatmap(
+                interpolator=interpolator,
+                evaluated_population=archive,
+                best=best,
+                param_keys=PARAMS,
+                pair_indices=[(0,1),(2,3),(4,5)],
+                generation=generation + 1,
+                file_path=f'./result/proposal/heatmap/{evaluate_method}/{interpolate}/{evaluate_method}_noise{str(noise_is_added)}_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}_individuals_{str(generation + 1)}gens'
+            )
         next_generation:List[Chromosomes]  = []
         # for _ in range(PROPOSAL_POPULATION_SIZE):
         while len(next_generation) < PROPOSAL_POPULATION_SIZE:
@@ -273,6 +295,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             method_num=interpolate_num,
             param_keys=PARAMS,
             target_key="pre_evaluation",
+            interpolator=interpolator
         )
         # 評価個体の選択
         evaluate_id = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE, gen=generation+1)
@@ -287,6 +310,12 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         )
     # ベスト・ワースト個体の取得
     archive.extend(copy.deepcopy(ind) for ind in evaluate_population)
+    interpolator = build_interpolator(
+            evaluated_population=archive,
+            method_num=interpolate_num,
+            param_keys=PARAMS,
+            refernce_key="fitness",
+        )
     best, worst = get_best_and_worst_individuals_by_id(archive)
     # ほかの個体の評価を補間
     interpolation(
@@ -295,7 +324,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             best=best,
             worst=worst,
             method_num=interpolate_num,
-            target_key="fitness"
+            target_key="fitness",
+            interpolator=interpolator
         )
     evaluate_fitness(
             population=population,
@@ -311,7 +341,22 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     bests.append(best)
     error_history.append((NUM_GENERATIONS, float(get_total_error(population=population, evaluate_num=evaluate_num))))
     if look and times == 1:
-        plot_individual_params(population=population,best=best,worst=worst, param_keys=PARAMS, generation=NUM_GENERATIONS, file_path=f'./result/proposal/graph/{evaluate_method}/{interpolate}/scatter/{evaluate_method}_noise{str(noise_is_added)}_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}_individuals_{str(NUM_GENERATIONS)}gens')
+        plot_individual_params(
+            population=population,
+            best=best,worst=worst,
+            param_keys=PARAMS,
+            generation=NUM_GENERATIONS,
+            file_path=f'./result/proposal/graph/{evaluate_method}/{interpolate}/scatter/{evaluate_method}_noise{str(noise_is_added)}_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}_individuals_{str(NUM_GENERATIONS)}gens'
+            )
+        plot_interpolated_heatmap(
+                interpolator=interpolator,
+                evaluated_population=archive,
+                best=best,
+                param_keys=PARAMS,
+                pair_indices=[(0,1),(2,3),(4,5)],
+                generation=NUM_GENERATIONS,
+                file_path=f'./result/proposal/heatmap/{evaluate_method}/{interpolate}/{evaluate_method}_noise{str(noise_is_added)}_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}_individuals_{str(NUM_GENERATIONS)}gens'
+            )
     # 6. 最終結果の出力
     log(f"result/proposal/last_gen_individuals/{evaluate_method}/{interpolate}/{str(PROPOSAL_POPULATION_SIZE)}inds_{str(EVALUATE_SIZE)}eval/simulation_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(times)}.json", population,times = times)
     log(f"result/proposal/best/{evaluate_method}/{interpolate}/{str(PROPOSAL_POPULATION_SIZE)}inds_{str(EVALUATE_SIZE)}eval/best_individual_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(times)}.json", bests,times = times)

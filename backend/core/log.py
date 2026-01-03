@@ -143,7 +143,18 @@ def _get_save_path(ver: str, method: str, interpolate: Optional[str], category: 
     # print(f"保存先パス: {full_path}") # デバッグ用出力
     return full_path
 
+def individual_to_vector(ind: dict, param_keys: list[str]) -> np.ndarray:
+    vec = []
+    for key in param_keys:
+        val = ind
+        for k in key.split('.'):
+            val = val[k]
+        vec.append(val)
+    return np.array(vec, dtype=float)
 
+
+
+# ---ログ関数---
 def log(file_path: str, answer,times: int = 1):
     # UUID型をstr型に変換するヘルパー関数
     def convert_uuid_to_str(obj):
@@ -562,3 +573,80 @@ def plot_individual_params(population: list[dict],best: dict,worst: dict, param_
     return
 
 
+def plot_interpolated_heatmap(
+    interpolator,                  # 学習済み補間器
+    evaluated_population: list[dict],
+    best: dict,
+    param_keys: list[str],
+    pair_indices: list[tuple[int, int]],
+    generation: int,
+    file_path: str,
+    grid_size: int = 50,
+    param_range: tuple[float, float] = ATTACK_RANGE
+):
+    """
+    高次元評価関数の2次元断面を heatmap として可視化
+    """
+
+    best_vec = individual_to_vector(best, param_keys)
+    best_vec = np.array(best_vec)
+
+    for i, j in pair_indices:
+        # --- グリッド生成 ---
+        x = np.linspace(param_range[0], param_range[1], grid_size)
+        y = np.linspace(param_range[0], param_range[1], grid_size)
+        X, Y = np.meshgrid(x, y)
+        Z = np.zeros_like(X)
+
+        # --- 補間値計算 ---
+        for r in range(grid_size):
+            for c in range(grid_size):
+                vec = best_vec.copy()
+                vec[i] = X[r, c]
+                vec[j] = Y[r, c]
+                Z[r, c] = interpolator(vec.reshape(1, -1))[0]
+
+        # --- 評価済み点の抽出 ---
+        eval_vecs = np.array([
+            individual_to_vector(ind, param_keys)
+            for ind in evaluated_population
+        ])
+
+        eval_x = eval_vecs[:, i]
+        eval_y = eval_vecs[:, j]
+
+        # --- 描画 ---
+        fig, ax = plt.subplots(figsize=(6, 6))
+
+        im = ax.imshow(
+            Z,
+            extent=(param_range[0], param_range[1],
+                    param_range[0], param_range[1]),
+            origin="lower",
+            aspect="auto",
+        )
+
+        plt.colorbar(im, ax=ax, label="Interpolated Fitness")
+
+        # 評価点を重ねる
+        ax.scatter(
+            eval_x, eval_y,
+            c="white",
+            edgecolors="black",
+            s=30,
+            label="Evaluated"
+        )
+
+        ax.set_xlabel(f"param {i+1}")
+        ax.set_ylabel(f"param {j+1}")
+        ax.set_title(f"Generation {generation} Heatmap ({i+1},{j+1})")
+        ax.legend()
+
+        ax.grid(False)
+
+        # --- 保存 ---
+        save_path = Path(f"{file_path}_heatmap_pair{i+1}_{j+1}.png")
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        plt.tight_layout()
+        plt.savefig(save_path)
+        plt.close()

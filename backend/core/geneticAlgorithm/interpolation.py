@@ -22,6 +22,8 @@ PARAM_RANGES = {
     "fmParamsList.operator1.release": RELEASE_RANGE,
     "fmParamsList.operator1.frequency": FREQUENCY_RANGE
 }
+# パラメータの定義域からMin/Maxを取得
+min_max_dict = PARAM_RANGES
 
 def interpolation(
   population: List[dict] = None,
@@ -33,6 +35,7 @@ def interpolation(
   param_keys: List[str] = PARAMS,
   target_key: str = "pre_evaluation",
   refernce_key = "fitness",
+  interpolator: RBFInterpolator = None,
 ):
     # print(f"補間を開始します。")
     if not best or not worst:
@@ -45,14 +48,15 @@ def interpolation(
         for ind in population:
             ind[target_key] = RNG.uniform(0.0, 6.0)
         return
-    
+    if not interpolator:
+        print(f"interpolatorがNoneです。ランダムな{target_key}を付与します。")
+        for ind in population:
+            ind[target_key] = RNG.uniform(0.0, 6.0)
+        return
     if param_keys is None:
         # デフォルトはoperator1のfrequencyのみ
         param_keys = ["fmParamsList.operator1.frequency"]
 
-    # 全個体（未評価 + 評価済み）からMin/Maxを取得
-    # all_inds = population
-    min_max_dict = PARAM_RANGES
 
     # 評価済み個体を「正規化ベクトル」と「正解値」のペアリストに変換しておく
     # 構造: [(normalized_vec, fitness_value), ...]
@@ -86,53 +90,23 @@ def interpolation(
         if not (0 < ratio < 1):
             raise ValueError(f"ratio が (0,1) の範囲にない。best/worst の target を確認してください。\nratio: {ratio}")
         sigma = get_sigma(best_params=best_params, worst_params=worst_params,ratio=ratio)
-    elif method_num ==2:
-        # RBF補間用の学習データの計算
-        train_X = []
-        train_Y = []
-        for individual in evaluated_population:
-            train_X.append(to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict))
-            train_Y.append(float(individual.get(refernce_key, 0.0)))
-        # print(f"学習データの次元数: {np.shape(np.array(train_X))}, ラベル数: {len(train_Y)}")
-        interpolator = RBFInterpolator(
-                np.array(train_X),
-                np.array(train_Y),
-                kernel='thin_plate_spline',
-                smoothing=0.1
-            )
-    elif method_num == 4:
+    
+    elif method_num == 2 or method_num == 4:
+        
         # fill_distanceを計算
         current_h = compute_fill_distance(norm_eval_data, population)
-        # RBF補間用の学習データの計算
-        train_X = []
-        train_Y = []
         max_gen = NUM_GENERATIONS
         w_local = 0.0
         # 重みの動的計算 (Linear Decay)
-        # Gen 1で最大2.0, Gen 12で最小0.5 になるように徐々に減らす例
-        # max_gen = 12 (全世代数)
+        # Gen 1で最大2.0, Gen 15で最小0.5 になるように徐々に減らす例
+        # max_gen = 15 (全世代数)
         start_w = 2.0
         end_w = 0.5
-        
         # 進行度 (0.0 ～ 1.0)
         progress = (gen - 1) / (max_gen - 1)
         progress = min(max(progress, 0.0), 1.0)
         w_local = start_w - (progress * (start_w - end_w))
         w_global = start_w - (progress * (start_w - end_w))
-        # if gen <= switch_gen:
-        #     w_local = 2.0
-        # else:
-        #     w_local = 0.5
-        for individual in evaluated_population:
-            train_X.append(to_normalized_vec(individual, param_keys=param_keys, min_max_dict=min_max_dict))
-            train_Y.append(float(individual.get(refernce_key, 0.0)))
-        # print(f"学習データの次元数: {np.shape(np.array(train_X))}, ラベル数: {len(train_Y)}")
-        interpolator = RBFInterpolator(
-                np.array(train_X),
-                np.array(train_Y),
-                kernel='thin_plate_spline',
-                smoothing=0.01
-            )
 
         
 
@@ -168,8 +142,7 @@ def interpolation(
                 norm_eval_data=norm_eval_data
             )
         elif method_num == 4:
-            # 1. まずは純粋なガウス推定値（またはIDW）を計算
-            estimated_val = 0.0
+            # 1. まずは純粋なRBF推定値を計算
             estimated_val = calculate_by_RBF(
                 target_vec=target_vec,
                 interpolater=interpolator,
@@ -242,6 +215,34 @@ def calculate_by_Gaussian(
     # note: DO NOT divide by N; the scale is already handled by sigma
     value = A * math.exp(-0.5 * dist_sq) + C
     return value
+
+def build_interpolator(
+    evaluated_population: List[dict] = None,
+    method_num: int = 0,
+    param_keys: List[str] = PARAMS,
+    refernce_key = "fitness",
+    min_max_dict = min_max_dict,
+):
+    if method_num != 2 and method_num != 4:
+        return None
+    # RBF補間用の学習データの計算
+    train_X = []
+    train_Y = []
+    for ind in evaluated_population:
+        ind_vec = to_normalized_vec(ind, param_keys=param_keys, min_max_dict=min_max_dict)
+        train_X.append(ind_vec)
+        train_Y.append(float(ind[refernce_key]))
+    
+    train_X = np.array(train_X)
+    train_Y = np.array(train_Y)
+
+    interpolator = RBFInterpolator(
+            train_X,
+            train_Y,
+            kernel='thin_plate_spline',
+            smoothing=0.01
+        )
+    return interpolator
 
 
 def calculate_by_RBF(
