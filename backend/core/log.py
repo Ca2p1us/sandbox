@@ -31,9 +31,11 @@ EVALUATE_NAME_TO_ID = {v: k for k, v in EVALUATE_MAP.items()}
 INTERPOLATE_MAP = {
     0: "linear",
     1: "Gauss",
-    2: "RBF",
+    2: "TPS",
     3: "IDW",
     4: "Hybrid",
+    5: "Gaussian_RBF",
+    6: "IMQ_RBF",
     100: None,  # 補間なし等の特別扱い
     None: None
 }

@@ -162,11 +162,15 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     elif interpolate_num == 1:
         interpolate = "Gauss"
     elif interpolate_num == 2:
-        interpolate = "RBF"
+        interpolate = "TPS"
     elif interpolate_num == 3:
         interpolate = "IDW"
     elif interpolate_num == 4:
-        interpolate = "Hybrid"
+        interpolate = "Hybrid_RBF"
+    elif interpolate_num == 5:
+        interpolate = "Gaussian_RBF"
+    elif interpolate_num == 6:
+        interpolate = "IMQ_RBF"
     interpolation(
             population=population,
             method_num=interpolate_num,

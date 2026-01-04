@@ -3,6 +3,7 @@
 from typing import List, Dict, Tuple
 import math
 from scipy.interpolate import RBFInterpolator
+from scipy.spatial.distance import pdist
 import numpy as np
 from ..geneticAlgorithm.config import PARAMS,NUM_GENERATIONS, ATTACK_RANGE, DECAY_RANGE, SUSTAIN_RANGE, SUSTAIN_TIME_RANGE, RELEASE_RANGE, FREQUENCY_RANGE
 from ...engine import evaluate
@@ -91,7 +92,7 @@ def interpolation(
             raise ValueError(f"ratio が (0,1) の範囲にない。best/worst の target を確認してください。\nratio: {ratio}")
         sigma = get_sigma(best_params=best_params, worst_params=worst_params,ratio=ratio)
     
-    elif method_num == 2 or method_num == 4:
+    elif method_num == 2 or method_num == 4 or method_num == 5 or method_num == 6:
         
         # fill_distanceを計算
         current_h = compute_fill_distance(norm_eval_data, population)
@@ -141,7 +142,7 @@ def interpolation(
                 target_vec=target_vec,
                 norm_eval_data=norm_eval_data
             )
-        elif method_num == 4:
+        elif method_num == 4 or method_num == 5 or method_num == 6:
             # 1. まずは純粋なRBF推定値を計算
             estimated_val = calculate_by_RBF(
                 target_vec=target_vec,
@@ -223,7 +224,7 @@ def build_interpolator(
     refernce_key = "fitness",
     min_max_dict = min_max_dict,
 ):
-    if method_num != 2 and method_num != 4:
+    if method_num == 0 or method_num == 1 or method_num == 3:
         return None
     # RBF補間用の学習データの計算
     train_X = []
@@ -236,13 +237,40 @@ def build_interpolator(
     train_X = np.array(train_X)
     train_Y = np.array(train_Y)
 
+    # ε の自動推定
+    if len(train_X) >= 2:
+        median_nn = np.median(pdist(train_X))
+        epsilon = 1.0 / median_nn
+    else:
+        epsilon = 1.0  # 初期世代の保険
+
+    if method_num == 2 or method_num == 4:      # TPS
+        kernel = "thin_plate_spline"
+        epsilon = None
+        smoothing = 0.01
+
+    elif method_num == 5:    # Gaussian
+        kernel = "gaussian"
+        epsilon = epsilon
+        smoothing = 0.0
+
+    elif method_num == 6:    # IMQ
+        kernel = "inverse_multiquadric"
+        epsilon = epsilon
+        smoothing = 0.0
+
+    else:
+        return None
+
     interpolator = RBFInterpolator(
             train_X,
             train_Y,
-            kernel='thin_plate_spline',
-            smoothing=0.01
+            kernel=kernel,
+            epsilon=epsilon,
+            smoothing=smoothing
         )
     return interpolator
+
 
 
 def calculate_by_RBF(
