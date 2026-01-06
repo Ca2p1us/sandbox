@@ -223,6 +223,8 @@ def build_interpolator(
     param_keys: List[str] = PARAMS,
     refernce_key = "fitness",
     min_max_dict = min_max_dict,
+    generation: int = None,
+    MAX_GEN: int = NUM_GENERATIONS
 ):
     if method_num == 0 or method_num == 1 or method_num == 3:
         return None
@@ -238,11 +240,13 @@ def build_interpolator(
     train_Y = np.array(train_Y)
 
     # ε の自動推定
-    if len(train_X) >= 2:
-        median_nn = np.median(pdist(train_X))
-        epsilon = 1.0 / median_nn
-    else:
-        epsilon = 1.0  # 初期世代の保険
+    min_eps = 0.8
+    max_eps = 4.0
+    progress = generation / MAX_GEN
+    
+    epsilon = min_eps * (max_eps / min_eps) ** progress
+
+    print(f"epsilon:{epsilon}")
 
     if method_num == 2 or method_num == 4:      # TPS
         kernel = "thin_plate_spline"

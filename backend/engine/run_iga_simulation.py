@@ -195,6 +195,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             method_num=interpolate_num,
             param_keys=PARAMS,
             refernce_key="fitness",
+            generation=generation
         )
         # ベスト・ワースト個体の取得
         best, worst = get_best_and_worst_individuals_by_id(archive)
@@ -319,6 +320,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             method_num=interpolate_num,
             param_keys=PARAMS,
             refernce_key="fitness",
+            generation=NUM_GENERATIONS
         )
     best, worst = get_best_and_worst_individuals_by_id(archive)
     # ほかの個体の評価を補間
