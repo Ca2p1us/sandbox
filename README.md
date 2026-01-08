@@ -302,3 +302,18 @@ uv run python -m backend.core.geneticAlgorithm.interpolation
         - 評価済み個体に事前評価を与えている個体を追加したときに被覆半径がどう変化するか -> 最大空白縮小効果
         - この変化の大きさを事前評価に考慮することで探索により良い個体を選択しやすくする
         - 最近傍距離は現世代の各個体の最も近い評価済み個体との距離
+    - 1/7
+        - nn distanceの値に対して世代を経るごとに減衰する重みを設定していたが、二つの距離はもともとだんだん小さくなるはずだってことに気が付いたため重みは固定することにした
+        - fill distanceは割合の数字なので世代を経るごとに減衰する必要がある
+        - epsilonの値の制度への影響に関する読まなければならない論文が出てきた
+        - [Optimizing shape parameters in RBF methods: A systematic review of techniques, applications, and computational challenges](https://www.sciencedirect.com/science/article/pii/S1574013725001182)
+    - 1/8
+        - ガウス+コサインのコサイン側の係数が0.5とガウス関数に対して大きすぎたので0.1に調整
+        - 距離項の重みを具体的にw_nn = 1.0, w_h = 30.0に設定し固定
+        - 補間器作成時のepsilonの決め方を変更
+        - 0.8->4.0に線形に変化させる手法から、学習データ間の距離の中央値の逆数をepsilonとする手法に変更
+        - クリッピングでepsilonが大きくなりすぎたり小さくなりすぎるのを防ぐようにした
+        - 具体的には
+        kernel = "gaussian",epsilon = np.clip(raw_eps, 0.5, 2.0)
+        kernel = "inverse_multiquadric",epsilon = np.clip(raw_eps, 0.3, 5.0)
+        - smoothing = 1e-9で固定

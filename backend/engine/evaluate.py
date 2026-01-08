@@ -142,7 +142,7 @@ def calculate_Gaussian_cos(
             scores.append(0)
         else:
             # 正規分布の確率密度関数（最大値1）
-            score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + 0.5 * np.cos(2 * np.pi * frequency * float(val))
+            score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + 0.1 * np.cos(2 * np.pi * frequency * float(val))
             # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
             scores.append(score)
 
@@ -561,7 +561,7 @@ def evaluate_fitness_gaussian_cos(
                 scores.append(0)
             else:
                 # 正規分布の確率密度関数（最大値1）
-                score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + 0.5 * np.cos(2 * np.pi * frequency * float(val))
+                score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + 0.1 * np.cos(2 * np.pi * frequency * float(val))
                 # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
                 scores.append(score)
 

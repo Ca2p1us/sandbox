@@ -206,6 +206,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             best=best,
             worst=worst,
             method_num=interpolate_num,
+            gen=generation+1,
             target_key="fitness",
             interpolator=interpolator
         )
@@ -298,6 +299,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             best = best, 
             worst = worst,
             method_num=interpolate_num,
+            gen=generation+2,
             param_keys=PARAMS,
             target_key="pre_evaluation",
             interpolator=interpolator
@@ -330,6 +332,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             best=best,
             worst=worst,
             method_num=interpolate_num,
+            gen=NUM_GENERATIONS,
             target_key="fitness",
             interpolator=interpolator
         )

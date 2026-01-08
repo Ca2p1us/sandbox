@@ -161,14 +161,14 @@ def plot_gaussian_add_cosine():
     x = np.linspace(x_min, x_max, 1000)
     
     # ガウス関数の計算: f(x) = A * exp( - (x - μ)^2 / (2σ^2) )
-    y = amplitude * np.exp(-((x - mu)**2) / (2 * sigma**2)) + 0.5 * np.cos(2 * np.pi * f * x)
+    y = amplitude * (np.exp(-((x - mu)**2) / (2 * sigma**2)) + 0.1 * np.cos(2 * np.pi * f * x))
 
     # 4. プロット設定
     fig, ax = plt.subplots(figsize=(8, 6)) # fig, ax を取得するように変更
     
     # 4. 指定された点の計算 (x=250, x=0)
     points_x = [250, 0]
-    points_y = [amplitude * np.exp(-((px - mu)**2) / (2 * sigma**2))+ 0.5 * np.cos(2 * np.pi * f * px) for px in points_x]
+    points_y = [amplitude * (np.exp(-((px - mu)**2) / (2 * sigma**2)) + 0.1 * np.cos(2 * np.pi * f * px)) for px in points_x]
     
     # ガウス関数の描画
     ax.plot(x, y, color='black', linewidth=1.5, label='Gaussian Curve')
@@ -193,7 +193,7 @@ def plot_gaussian_add_cosine():
     ax.set_xticks(np.arange(0, 501, 50)) 
     
     # y軸: 0, 1, 2, 3, 4, 5, 6
-    ax.set_yticks(np.arange(0, 7.5, 1))
+    ax.set_yticks(np.arange(y_min, y_max+0.5, 1))
     
     # 軸の範囲設定
     ax.set_xlim(x_min-0.5, x_max+0.5)

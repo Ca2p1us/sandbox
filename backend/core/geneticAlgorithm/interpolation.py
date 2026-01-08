@@ -32,7 +32,7 @@ def interpolation(
   best: dict = None,
   worst: dict = None,
   method_num: int = 0,
-  gen:int = 0,
+  gen:int = 1,
   param_keys: List[str] = PARAMS,
   target_key: str = "pre_evaluation",
   refernce_key = "fitness",
@@ -98,20 +98,27 @@ def interpolation(
         current_h = compute_fill_distance(norm_eval_data, population)
         max_gen = NUM_GENERATIONS
         w_local = 0.0
-        # 重みの動的計算 (Linear Decay)
-        # Gen 1で最大2.0, Gen 15で最小0.5 になるように徐々に減らす例
-        # max_gen = 15 (全世代数)
-        start_w = 2.0
-        end_w = 0.5
-        # 進行度 (0.0 ～ 1.0)
-        progress = (gen - 1) / (max_gen - 1)
-        progress = min(max(progress, 0.0), 1.0)
-        w_local = start_w - (progress * (start_w - end_w))
-        w_global = start_w - (progress * (start_w - end_w))
+        # # 重みの動的計算 (Linear Decay)
+        # # max_gen = 15 (全世代数)
+        # start_w_nn = 1.0
+        # end_w_nn = 0.0
+        # start_w_h = 30.0
+        # end_w_h = 0.0
+        # # 進行度 (0.0 ～ 1.0)
+        # progress = (gen - 1) / (max_gen - 1)
+        # progress = min(max(progress, 0.0), 1.0)
+        # w_nn = start_w_nn - (progress * (start_w_nn - end_w_nn))
+        # w_h = start_w_h - (progress * (start_w_h - end_w_h))
+        w_nn = 1.0
+        w_h = 30.0
 
         
 
     # print(f"best_val: {best_val}, worst_val: {worst_val}")
+    rbf_values = []
+    nn_dists = []
+    delta_hs = []
+    ratios = []
     for ind in population:
         target_vec = to_normalized_vec(ind, param_keys, min_max_dict)
         if method_num == 0:
@@ -148,21 +155,51 @@ def interpolation(
                 target_vec=target_vec,
                 interpolater=interpolator,
             )
+            rbf_values.append(estimated_val)
             if target_key == "pre_evaluation":
                 # 情報量（不確実性）の計算: Archive内の最も近い点との距離
                 # 距離が遠いほど、その場所の情報価値は高い
                 nn_dist = min(euclidean(target_vec, ref_vec) for ref_vec, ref_val in norm_eval_data)
+                nn_dists.append(nn_dist)
                 h_after = compute_fill_distance_with_candidate(
                     norm_eval_data=norm_eval_data,
                     population=population,
                     candidate_vec=target_vec
                     )
                 delta_h = current_h - h_after
+                delta_h_norm = delta_h / current_h
+                delta_hs.append(delta_h_norm)
+                ratio = (w_nn * nn_dist) + (w_h * delta_h_norm) / estimated_val
+                ratios.append(ratio)
                 
                 # 最終スコア = 予測Fitness + (距離情報 * 重み)
-                ind[target_key] = estimated_val + (nn_dist * w_local) + (w_global * delta_h)
+                ind[target_key] = estimated_val + (w_nn * nn_dist) + (w_h * delta_h_norm)
+                # ind[target_key] = (w_nn * nn_dist) + (w_h * delta_h_norm)
             else:
                 ind[target_key] = estimated_val
+    if target_key == "pre_evaluation":
+        print(
+            f"[Gen {gen}] RBF min={min(rbf_values):.3f}, "
+            f"max={max(rbf_values):.3f}, "
+            f"mean={np.mean(rbf_values):.3f}"
+        )
+        if len(nn_dists) > 0:
+            print(
+                f"[Gen {gen}] nn_dist min={min(nn_dists):.3f}, "
+                f"max={max(nn_dists):.3f}, "
+                f"mean={np.mean(nn_dists):.3f}"
+            )
+            print(
+                f"[Gen {gen}] delta_h min={min(delta_hs):.3f}, "
+                f"max={max(delta_hs):.3f}, "
+                f"mean={np.mean(delta_hs):.3f}"
+            )
+            print(
+                f"[Gen {gen}] (w_nn * nn_dist) + (w_h * delta_h_norm)/RBF ratio "
+                f"min={min(ratios):.2f}, "
+                f"max={max(ratios):.2f}, "
+                f"mean={np.mean(ratios):.2f}"
+            )
     return
 
 def calculate_by_distance(
@@ -240,13 +277,19 @@ def build_interpolator(
     train_Y = np.array(train_Y)
 
     # ε の自動推定
-    min_eps = 0.8
-    max_eps = 4.0
+    dists = pdist(train_X)
+    if len(dists) > 0:
+        base_dist = np.mean(dists)
+    else:
+        base_dist = 1.0
+    
+    raw_eps = 1.0 / base_dist
+
     progress = generation / MAX_GEN
     
-    epsilon = min_eps * (max_eps / min_eps) ** progress
+    # epsilon = min_eps * (max_eps / min_eps) ** progress
 
-    print(f"epsilon:{epsilon}")
+    # print(f"epsilon:{epsilon}")
 
     if method_num == 2 or method_num == 4:      # TPS
         kernel = "thin_plate_spline"
@@ -255,23 +298,25 @@ def build_interpolator(
 
     elif method_num == 5:    # Gaussian
         kernel = "gaussian"
-        epsilon = epsilon
-        smoothing = 0.0
+        epsilon = np.clip(raw_eps, 0.5, 2.0)
+        smoothing = 1e-9
 
     elif method_num == 6:    # IMQ
         kernel = "inverse_multiquadric"
-        epsilon = epsilon
-        smoothing = 0.0
+        epsilon = np.clip(raw_eps, 0.3, 5.0)
+        smoothing = 1e-5
 
     else:
         return None
+
+    print(f"epsilon:{epsilon}")
 
     interpolator = RBFInterpolator(
             train_X,
             train_Y,
             kernel=kernel,
             epsilon=epsilon,
-            smoothing=smoothing
+            smoothing=smoothing,
         )
     return interpolator
 
