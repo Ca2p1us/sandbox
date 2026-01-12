@@ -49,7 +49,7 @@ def interpolation(
         for ind in population:
             ind[target_key] = RNG.uniform(0.0, 6.0)
         return
-    if not interpolator:
+    if not interpolator and (method_num == 2 or method_num == 4 or method_num == 5 or method_num == 6):
         print(f"interpolatorがNoneです。ランダムな{target_key}を付与します。")
         for ind in population:
             ind[target_key] = RNG.uniform(0.0, 6.0)
@@ -110,7 +110,6 @@ def interpolation(
         # w_nn = start_w_nn - (progress * (start_w_nn - end_w_nn))
         # w_h = start_w_h - (progress * (start_w_h - end_w_h))
         w_nn = 1.0
-        w_h = 30.0
 
         
 
@@ -140,10 +139,12 @@ def interpolation(
                 sigma=sigma,
             )
         elif method_num == 2:
-            ind[target_key] = calculate_by_RBF(
+            estimated_val = calculate_by_RBF(
                 target_vec=target_vec,
                 interpolater=interpolator,
             )
+            rbf_values.append(estimated_val)
+            ind[target_key] = estimated_val
         elif method_num == 3:
             ind[target_key] = calculate_by_IDW(
                 target_vec=target_vec,
@@ -160,24 +161,16 @@ def interpolation(
                 # 情報量（不確実性）の計算: Archive内の最も近い点との距離
                 # 距離が遠いほど、その場所の情報価値は高い
                 nn_dist = min(euclidean(target_vec, ref_vec) for ref_vec, ref_val in norm_eval_data)
-                nn_dists.append(nn_dist)
-                h_after = compute_fill_distance_with_candidate(
-                    norm_eval_data=norm_eval_data,
-                    population=population,
-                    candidate_vec=target_vec
-                    )
-                delta_h = current_h - h_after
-                delta_h_norm = delta_h / current_h
-                delta_hs.append(delta_h_norm)
-                ratio = (w_nn * nn_dist) + (w_h * delta_h_norm) / estimated_val
-                ratios.append(ratio)
+                nn_dists.append(w_nn * nn_dist)
+                ratio = w_nn * nn_dist
+                if ratio > estimated_val:
+                    ratios.append(ratio)
                 
                 # 最終スコア = 予測Fitness + (距離情報 * 重み)
-                ind[target_key] = estimated_val + (w_nn * nn_dist) + (w_h * delta_h_norm)
-                # ind[target_key] = (w_nn * nn_dist) + (w_h * delta_h_norm)
+                ind[target_key] = estimated_val + (w_nn * nn_dist)
             else:
                 ind[target_key] = estimated_val
-    if target_key == "pre_evaluation":
+    if target_key == "pre_evaluation" and (method_num == 2 or method_num == 4 or method_num == 5 or method_num == 6):
         print(
             f"[Gen {gen}] RBF min={min(rbf_values):.3f}, "
             f"max={max(rbf_values):.3f}, "
@@ -185,20 +178,12 @@ def interpolation(
         )
         if len(nn_dists) > 0:
             print(
-                f"[Gen {gen}] nn_dist min={min(nn_dists):.3f}, "
+                f"[Gen {gen}] w_nn * nn_dist min={min(nn_dists):.3f}, "
                 f"max={max(nn_dists):.3f}, "
                 f"mean={np.mean(nn_dists):.3f}"
             )
             print(
-                f"[Gen {gen}] delta_h min={min(delta_hs):.3f}, "
-                f"max={max(delta_hs):.3f}, "
-                f"mean={np.mean(delta_hs):.3f}"
-            )
-            print(
-                f"[Gen {gen}] (w_nn * nn_dist) + (w_h * delta_h_norm)/RBF ratio "
-                f"min={min(ratios):.2f}, "
-                f"max={max(ratios):.2f}, "
-                f"mean={np.mean(ratios):.2f}"
+                f"[Gen {gen}] Distance Dominant ratio : {len(ratios) / 9}"
             )
     return
 

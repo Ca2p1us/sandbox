@@ -589,6 +589,9 @@ def plot_interpolated_heatmap(
     """
     高次元評価関数の2次元断面を heatmap として可視化
     """
+    if interpolator is None:
+        print("補間器を使っていません")
+        return
 
     best_vec = individual_to_vector(best, param_keys)
     best_vec = np.array(best_vec)

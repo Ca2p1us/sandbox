@@ -317,3 +317,5 @@ uv run python -m backend.core.geneticAlgorithm.interpolation
         kernel = "gaussian",epsilon = np.clip(raw_eps, 0.5, 2.0)
         kernel = "inverse_multiquadric",epsilon = np.clip(raw_eps, 0.3, 5.0)
         - smoothing = 1e-9で固定
+    - 1/13
+        - 被覆距離の項を削除した。あまりに値が小さすぎた
