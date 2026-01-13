@@ -1,5 +1,5 @@
 from backend.engine import run_iga_simulation as iga
-from backend.core.log import sound_check, log_fitness, log_fitness_histories, log_comparison, log_error_history, log_compare
+from backend.core.log import sound_check, log_fitness, log_fitness_histories, log_comparison, log_error_history, log_compare, log_fitness_variance
 import numpy as np
 from backend.core.geneticAlgorithm.config import NUM_GENERATIONS, POPULATION_SIZE, PROPOSAL_POPULATION_SIZE, EVALUATE_SIZE, EXPERIMENT_TIMES
 
@@ -45,6 +45,13 @@ if choice == "2":
         best_fitness_histories=best_fitness_histories,
         ver="proposal"
     )
+    log_fitness_variance(
+        evaluate_num=int(evaluate_num),
+        interpolate_num=int(interpolate_num),
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_fitness_variance.png",
+        best_fitness_histories=best_fitness_histories,
+        ver="proposal"
+    )
 
 elif choice == "1":
     print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Gauss関数+cos関数\n4: Ackley関数\n5: Gaussian_peaks関数")
@@ -69,6 +76,13 @@ elif choice == "1":
         file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_best_fitness_histories.png",
         best_fitness_histories=best_fitness_histories,
         ver="conventional"
+    )
+    log_fitness_variance(
+        evaluate_num=int(evaluate_num),
+        interpolate_num=int(interpolate_num),
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_fitness_variance.png",
+        best_fitness_histories=best_fitness_histories,
+        ver="proposal"
     )
 
 elif choice == "3":
@@ -250,6 +264,13 @@ elif choice == "3":
         file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison_average.png",
         plot_series_list=ave_fitness_list,
         indicator="Average "
+    )
+    log_fitness_variance(
+        evaluate_num=int(evaluate_num),
+        interpolate_num=int(interpolate_num),
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_fitness_variance.png",
+        best_fitness_histories=best_fitness_histories_ave,
+        ver="proposal"
     )
 
 elif choice == "4":

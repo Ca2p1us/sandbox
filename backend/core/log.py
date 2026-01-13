@@ -354,6 +354,45 @@ def log_comparison(evaluate_num: int = None, interpolate_num: int = None, file_p
     plt.close()
     return
 
+def log_fitness_variance(evaluate_num: int = None, interpolate_num: int = None, file_path: str = None, best_fitness_histories = None, ver: str = None):
+    """
+    複数回のシミュレーションの世代ごとのbest個体のfitness分散履歴をグラフ表示する
+    best_fitness_histories: [[(世代番号, fitness値), ...], ...] のリスト
+    """
+    if not best_fitness_histories:
+        print("履歴データがありません。")
+        return
+
+    method = _get_method_name(evaluate_num)
+    interpolate = _get_interpolate_name(interpolate_num)
+
+    save_path = _get_save_path(ver, method, interpolate, "best_fitnesses", file_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+
+    # 各世代ごとのfitness値を集計
+    generation_dict = {}
+    for best_fitness_history in best_fitness_histories:
+        for gen, fit in best_fitness_history:
+            if gen not in generation_dict:
+                generation_dict[gen] = []
+            generation_dict[gen].append(fit)
+
+    # 世代ごとの分散を計算
+    generations = sorted(generation_dict.keys())
+    std_values = [np.std(generation_dict[gen]) for gen in generations]
+
+    ax.plot(generations, std_values,
+                marker='x', linestyle='--', label='Fitness Std')
+
+    _setup_plot(ax,None,y_label='Fitness Variance', title=f'{method} Fitness Variance History')
+    ax.legend(loc=0)
+    plt.savefig(save_path)
+    # plt.show()
+    plt.close()
+    return
+
 def log_compare(evaluate_num: int = None, interpolate_num: int = None, file_path: str = None, fitness_histories: list = None, tornament_sizes: list = None, population_size: int = None):
     """
     複数のトーナメントサイズのシミュレーション結果を1枚の画像にまとめる関数
