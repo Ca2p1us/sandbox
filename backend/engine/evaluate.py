@@ -50,6 +50,8 @@ def evaluate_fitness(
             ind[target_key] = calculate_Ackley(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
         elif evaluate_num == 5:
             ind[target_key] = calculate_Gaussian_peaks(individual=ind, param_keys=param_keys, target_params=[TARGET_PARAMS,TARGET_PARAMS_1,TARGET_PARAMS_2], noise_is_added=noise_is_added)
+        elif evaluate_num == 6:
+            ind[target_key] = calculate_mixed(individual=ind, param_keys=param_keys, target_params=TARGET_PARAMS, noise_is_added=noise_is_added)
     return None
 
 def calculate_Gaussian(
@@ -71,8 +73,7 @@ def calculate_Gaussian(
             scores.append(0)
         else:
             # 正規分布の確率密度関数（最大値1）
-            score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
-            # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
+            score = compute_Gaussian(val=val, target=target, sigma=sigma)
             scores.append(score)
 
     # 統合
@@ -84,6 +85,12 @@ def calculate_Gaussian(
     # total_score = int(round(total_score))  # 0～10の整数に丸める
     # total_score = (max(0, min(10, total_score)))  # 範囲外は補正
     return total_score
+def compute_Gaussian(
+    val: float,
+    target: float,
+    sigma: float = 75.0
+):
+    return np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2))
 
 def calculate_Sphere(
     individual: dict = None,
@@ -103,8 +110,7 @@ def calculate_Sphere(
             scores.append(0)
         else:
             # 正規分布の確率密度関数（最大値1）
-            score = -1 * (float(val) - target) ** 2
-            # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
+            score = compute_Sphere(val=val, target=target)
             scores.append(score)
 
     # 統合
@@ -116,6 +122,12 @@ def calculate_Sphere(
     # total_score = int(round(total_score))  # 0～10の整数に丸める
     # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
     return total_score
+
+def compute_Sphere(
+    val: float,
+    target: float,
+):
+    return -1 * (float(val) - target) ** 2
     
 def calculate_Gaussian_cos(
     individual: dict,
@@ -142,8 +154,7 @@ def calculate_Gaussian_cos(
             scores.append(0)
         else:
             # 正規分布の確率密度関数（最大値1）
-            score = np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + 0.1 * np.cos(2 * np.pi * frequency * float(val))
-            # score = np.exp(-(float(val) ** 2) / (2 * (sigma ** 2)))
+            score = compute_Gaussian_cos(val=val, target=target, sigma=sigma, frequency=frequency)
             scores.append(score)
 
     # 統合
@@ -155,6 +166,14 @@ def calculate_Gaussian_cos(
     # total_score = int(round(total_score))  # 0～10の整数に丸める
     # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
     return total_score
+
+def compute_Gaussian_cos(
+    val: float,
+    target: float,
+    sigma: float = 75.0,
+    frequency: float = 0.02,
+):
+    return np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + 0.1 * np.cos(2 * np.pi * frequency * float(val))
     
 def calculate_Ackley(
         individual: dict,
@@ -178,14 +197,22 @@ def calculate_Ackley(
             values.append(float(val))
 
     # 統合
-    fitness = 0
-    fitness = -A * np.exp(-B * np.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - np.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + np.e
+    fitness = compute_Ackley(values=values, target_params=target_params, A=A, B=B, C=C)
     # 必要に応じてスケーリングやノイズ付与も可能
     max = A + np.e
     fitness = 6.0 * (1.0 - fitness / max)
     if noise_is_added:
         fitness = add_noise(value=fitness, scale=1.0)
     return fitness
+
+def compute_Ackley(
+    values: List[float],
+    target_params: List[float],
+    A = 20,
+    B = 0.04,
+    C = 0.04
+):
+    return -A * np.exp(-B * np.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - np.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + np.e
 
 def calculate_Gaussian_peaks(
     individual: dict,
@@ -213,6 +240,66 @@ def calculate_Gaussian_peaks(
                 sigma = sigmas[j]
                 rate = rates[j]
                 dim_score += rate * np.exp(-((val - mu) ** 2) / (2 * sigma **2))
+            scores.append(dim_score)
+
+    # 統合
+    total_score = sum(scores)  if scores else 0
+    if noise_is_added:
+        total_score = add_noise(value=total_score, scale=1.0)  # ノイズを加えて
+
+    # total_score = total_score * 10  # 0～10にスケール
+    # total_score = int(round(total_score))  # 0～10の整数に丸める
+    # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
+    return total_score
+
+def compute_Gaussian_peaks(
+    val:float,
+    target_params:list[list] = [TARGET_PARAMS,TARGET_PARAMS_1,TARGET_PARAMS_2],
+    sigmas:list = SIGMA,
+    rates:list = RATE,
+):
+    score = 0.0
+    for j in range(len(rates)):
+        mu = target_params[j][0]
+        sigma = sigmas[j]
+        rate = rates[j]
+        score += rate * np.exp(-((val - mu) ** 2) / (2 * sigma **2))
+    return score
+
+def calculate_mixed(
+    individual: dict,
+    param_keys: List[str] = None,
+    target_params: list[list] = TARGET_PARAMS,
+    sigmas:list = SIGMA,
+    rates:list = RATE,
+    noise_is_added: bool = False,
+):
+    
+    scores = []
+    for i,key in enumerate(param_keys):
+        # ドット区切りでアクセス
+        val = individual
+        for k in key.split('.'):
+            val = val.get(k, None)
+            if val is None:
+                break
+        if val is None:
+            scores.append(0)
+        else:
+            # 正規分布の確率密度関数（最大値1）
+            dim_score = 0.0
+            if i == 1:
+                dim_score += compute_Gaussian(val=val, target=float(target_params[0]))
+            elif i == 2:
+                dim_score += compute_Gaussian(val=val, target=float(target_params[0]))
+            elif i == 3:
+                dim_score += compute_Gaussian_cos(val=val, target=float(target_params[0]))
+            elif i == 4:
+                dim_score += compute_Gaussian_peaks(val=val)
+            elif i == 5:
+                dim_score += compute_Ackley(values=[val], target_params=[target_params[0]])
+            elif i == 6:
+                dim_score += compute_Ackley(values=[val], target_params=[target_params[0]])
             scores.append(dim_score)
 
     # 統合

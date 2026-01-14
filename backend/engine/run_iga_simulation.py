@@ -38,7 +38,10 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
         evaluate_method = "Ackley"
     elif evaluate_num == 5:
     # 2-5. Gaussian_peaks関数
-            evaluate_method = "Gaussian_peaks"
+        evaluate_method = "Gaussian_peaks"
+    elif evaluate_num == 6:
+    # 2-6. Mixed関数
+        evaluate_method = "Mixed"
     # 1. 初期個体生成
     population = make_initial_population(POPULATION_SIZE)
     
@@ -154,6 +157,9 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     elif evaluate_num == 5:
     # 2-5. Gaussian_peaks関数
         evaluate_method = "Gaussian_peaks"
+    elif evaluate_num == 6:
+    # 2-6. Mixed関数
+        evaluate_method = "Mixed"
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
     # 初期個体の事前評価(補間)

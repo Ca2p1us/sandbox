@@ -22,7 +22,8 @@ EVALUATE_MAP = {
     2: "Sphere",
     3: "Gaussian_cos",
     4: "Ackley",
-    5: "Gaussian_peaks"
+    5: "Gaussian_peaks",
+    6: "Mixed"
 }
 # 名前 -> 評価関数 ID (逆引き用)
 EVALUATE_NAME_TO_ID = {v: k for k, v in EVALUATE_MAP.items()}
@@ -298,7 +299,7 @@ def log_average_fitness(evaluate_num: int = None, interpolate_num:int = None,fil
         json.dump({f"{times}_average_fitness":average_fitness_history}, f, indent=2)
 
     return
-def log_comparison(evaluate_num: int = None, interpolate_num: int = None, file_path: str = None, plot_series_list: list = None , indicator : str = None):
+def log_comparison(evaluate_num: int = None, interpolate_num: int = None, file_path: str = None, plot_series_list: list = None , indicator : str = None, ver: str = "Benchmark"):
     """
     複数回のシミュレーションの世代ごとのbest個体のfitness履歴をグラフ表示する
     best_fitness_histories: [[(世代番号, fitness値), ...], ...] のリスト
@@ -322,7 +323,7 @@ def log_comparison(evaluate_num: int = None, interpolate_num: int = None, file_p
     interpolate = _get_interpolate_name(interpolate_num)
 
     # 比較用パス生成 (ver="benchmark" とする)
-    save_path = _get_save_path("benchmark", method, interpolate, "", file_path)
+    save_path = _get_save_path(ver, method, interpolate, "", file_path)
     save_path.parent.mkdir(parents=True, exist_ok=True)
 
 
