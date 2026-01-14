@@ -269,7 +269,7 @@ elif choice == "3":
         evaluate_num=int(evaluate_num),
         interpolate_num=int(interpolate_num),
         file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_fitness_variance.png",
-        best_fitness_histories=best_fitness_histories_ave,
+        best_fitness_histories=best_fitness_histories,
         ver="proposal"
     )
 

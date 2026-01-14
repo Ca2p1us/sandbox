@@ -98,6 +98,7 @@ def _setup_plot(ax, method: str, x_label='Generation', y_label='Fitness', title=
     ax.set_ylabel(y_label, fontsize=18)
     ax.set_title(title)
     ax.set_xlim(0.5, NUM_GENERATIONS + 0.5)
+    ax.set_xticks(range(1, NUM_GENERATIONS + 1))
     
     if method in Y_LIM_SETTINGS:
         ax.set_ylim(*Y_LIM_SETTINGS[method])
@@ -114,6 +115,12 @@ def _get_save_path(ver: str, method: str, interpolate: Optional[str], category: 
              base_dir = Path(f'./result/comparison/{method}')
         else:
              base_dir = Path(f'./result/comparison/{method}/{interpolate}')
+    
+    elif ver == "benchmark":
+        if interpolate is None:
+             base_dir = Path(f'./result/benchmark/{method}')
+        else:
+             base_dir = Path(f'./result/benchmark/{method}/{interpolate}')
         
     # 2. 平均適応度 (result/{ver}/average/...)
     elif category == "average":
@@ -314,8 +321,8 @@ def log_comparison(evaluate_num: int = None, interpolate_num: int = None, file_p
     method = _get_method_name(evaluate_num)
     interpolate = _get_interpolate_name(interpolate_num)
 
-    # 比較用パス生成 (ver="comparison" とする)
-    save_path = _get_save_path("comparison", method, interpolate, "", file_path)
+    # 比較用パス生成 (ver="benchmark" とする)
+    save_path = _get_save_path("benchmark", method, interpolate, "", file_path)
     save_path.parent.mkdir(parents=True, exist_ok=True)
 
 
@@ -370,6 +377,8 @@ def log_fitness_variance(evaluate_num: int = None, interpolate_num: int = None, 
     save_path.parent.mkdir(parents=True, exist_ok=True)
 
     fig, ax = plt.subplots(figsize=(8, 5))
+    ax.set_ylim(0,1.0)
+    ax.set_yticks(np.arange(0, 1.1, 0.1))
 
     # 各世代ごとのfitness値を集計
     generation_dict = {}
