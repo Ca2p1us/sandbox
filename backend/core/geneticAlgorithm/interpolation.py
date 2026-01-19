@@ -270,7 +270,7 @@ def build_interpolator(
     
     raw_eps = 1.0 / base_dist
 
-    progress = generation / MAX_GEN
+    # progress = generation / MAX_GEN
     
     # epsilon = min_eps * (max_eps / min_eps) ** progress
 
