@@ -13,11 +13,13 @@ average_fitness_histories = []
 average_fitness_histories_few = []
 average_fitness_histories_many = []
 average_fitness_histories_benchmark = []
+best_fitness_histories_saf = []
+average_fitness_histories_saf = []
 noise_is_added = False
 look = False
 interpolate_num = 100
-print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション\n3: 比較\n4: トーナメントサイズの比較\n5: 個体数の比較")
-choice = input("実行するシミュレーションを選択 (1/5): ")
+print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション\n3: 比較\n4: トーナメントサイズの比較\n5: 個体数の比較\n6: SAF-IEDAシミュレーション")
+choice = input("実行するシミュレーションを選択 (1/6): ")
 if choice == "2":
     print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Gauss関数+cos関数\n4: Ackley関数\n5: Gaussian_peaks関数\n6: Mixed関数")
     evaluate_num = input("評価関数の番号を入力してください: ")
@@ -32,7 +34,6 @@ if choice == "2":
     if TF2 == "1":
         look = True
     for i in range(EXPERIMENT_TIMES):
-        print(f"評価関数 {i}: {evaluate_num}")
         print("提案型IGAシミュレーション"+str(i+1)+"回目を実行")
         best_fitness, average_fitness, error_history = iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=PROPOSAL_POPULATION_SIZE, EVALUATE_SIZE=EVALUATE_SIZE, evaluate_num = int(evaluate_num), interpolate_num = int(interpolate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=4)
         best_fitness_histories.append(best_fitness)
@@ -167,6 +168,39 @@ elif choice == "3":
     average_fitness_histories_benchmark = np.mean(average_fitness_histories_benchmark,axis=0)
     average_fitness_histories_benchmark = [tuple(row) for row in average_fitness_histories_benchmark]
 
+    # 4. SAF-IEDA (追加部分)
+    for i in range(EXPERIMENT_TIMES):
+        print(f"SAF-IEDAシミュレーション"+str(i+1)+"回目を実行")
+        # 比較のため、Top-Nc(真の評価数)には evaluate_size を使用
+        best_fitness, average_fitness = iga.run_simulation_SAF_IEDA(
+            NUM_GENERATIONS=NUM_GENERATIONS,
+            POPULATION_SIZE=population_size,
+            TOP_NC=evaluate_size, # 評価コストを揃えるため
+            evaluate_num=int(evaluate_num),
+            times=i+1,
+            noise_is_added=noise_is_added,
+            look=look,
+            tournament_size=4
+        )
+        best_fitness_histories_saf.append(best_fitness)
+        average_fitness_histories_saf.append(average_fitness)
+        print(f"SAF-IEDAシミュレーション"+str(i+1)+"回目が完了")
+    
+    # SAF-IEDAの平均計算
+    best_fitness_histories_saf_ave = np.mean(best_fitness_histories_saf, axis=0)
+    best_fitness_histories_saf_ave = [tuple(row) for row in best_fitness_histories_saf_ave]
+    average_fitness_histories_saf_ave = np.mean(average_fitness_histories_saf, axis=0)
+    average_fitness_histories_saf_ave = [tuple(row) for row in average_fitness_histories_saf_ave]
+
+    # 個別の履歴保存 (SAF)
+    log_fitness_histories(
+        evaluate_num=int(evaluate_num),
+        interpolate_num=100, 
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_SAF_best_fitness_histories.png",
+        best_fitness_histories=best_fitness_histories_saf,
+        ver="saf_ieda"
+    )
+
     best_fitness_list = [
     {
         'label': '補間なし9個体', 
@@ -186,11 +220,16 @@ elif choice == "3":
         'marker': 'o', 
         'linestyle': '-'
     },
-    # 追加のデータも辞書を足すだけ
     {
         'label': '参考データ(50個体)',
         'data': best_fitness_histories_benchmark,
         'marker': 'x',
+        'linestyle': '-.'
+    },
+    {
+        'label': 'SAF-IEDA', 
+        'data': best_fitness_histories_saf_ave, 
+        'marker': 's', 
         'linestyle': '-.'
     },
     # # 追加のデータも辞書を足すだけ
@@ -220,11 +259,16 @@ elif choice == "3":
         'marker': 'o', 
         'linestyle': '-'
     },
-    # 追加のデータも辞書を足すだけ
     {
         'label': '参考データ(50個体)',
         'data': average_fitness_histories_benchmark,
         'marker': 'x',
+        'linestyle': '-.'
+    },
+    {
+        'label': 'SAF-IEDA', 
+        'data': average_fitness_histories_saf_ave, 
+        'marker': 's', 
         'linestyle': '-.'
     },
     # # 追加のデータも辞書を足すだけ
@@ -401,3 +445,60 @@ elif choice == "5":
         indicator="Best Fitness by Pop Size "
     )
     print("個体数比較シミュレーションが完了しました。")
+elif choice == "6":
+    print(f"SAF-IEDAシミュレーションを開始します")
+    
+    # パラメータ入力
+    population_size_input = input(f"個体群サイズを入力してください (default: {POPULATION_SIZE}): ")
+    population_size = int(population_size_input) if population_size_input else POPULATION_SIZE
+    
+    # Top-Nc (SAFにおける真評価個体数)
+    default_top_nc = 5
+    top_nc_input = input(f"Top-Nc (評価個体数) を入力してください (default: {default_top_nc}): ")
+    top_nc = int(top_nc_input) if top_nc_input else default_top_nc
+
+    print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Gauss関数+cos関数\n4: Ackley関数\n5: Gaussian_peaks関数\n6: Mixed関数")
+    evaluate_num = input("評価関数の番号を入力してください: ")
+    
+    print(f"ノイズを追加しますか？\n0: 追加しない\n1: 追加する")
+    TF = input("ノイズを追加しますか？ (0/1): ")
+    if TF == "1":
+        noise_is_added = True
+    print(f"途中経過を見ますか？\n0: 見ない\n1: 見る")
+    TF2 = input("途中経過を見ますか？ (0/1): ")
+    if TF2 == "1":
+        look = True
+        
+    for i in range(EXPERIMENT_TIMES):
+        print("SAF-IEDAシミュレーション"+str(i+1)+"回目を実行")
+        
+        best_fitness, average_fitness = iga.run_simulation_SAF_IEDA(
+            NUM_GENERATIONS=NUM_GENERATIONS,
+            POPULATION_SIZE=population_size,
+            TOP_NC=top_nc,
+            evaluate_num=int(evaluate_num),
+            times=i+1,
+            noise_is_added=noise_is_added,
+            look=look,
+            tournament_size=4
+        )
+        best_fitness_histories.append(best_fitness)
+        average_fitness_histories.append(average_fitness)
+        print("SAF-IEDAシミュレーション"+str(i+1)+"回目が完了")
+        
+    # 結果の出力
+    log_fitness_histories(
+        evaluate_num=int(evaluate_num),
+        interpolate_num=100, # SAFでは補間番号はダミーで100などにしておくか、適宜調整
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_SAF_IEDA_best_fitness_histories.png",
+        best_fitness_histories=best_fitness_histories,
+        ver="saf_ieda"
+    )
+    # 分散などの出力が必要であれば以下も追加
+    log_fitness_variance(
+        evaluate_num=int(evaluate_num),
+        interpolate_num=100,
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_SAF_IEDA_fitness_variance.png",
+        best_fitness_histories=best_fitness_histories,
+        ver="saf_ieda"
+    )
