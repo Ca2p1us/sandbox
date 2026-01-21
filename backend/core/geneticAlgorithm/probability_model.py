@@ -26,57 +26,74 @@ def set_nested_value(ind, dot_key, value):
 RNG = np.random.default_rng(252)
 
 def sample_new_population_from_probability_model(best_individuals, num_samples, params_info, generation):
-    """
-    論文の SAF-IEDA に基づくサンプリング (確率モデルからの次世代生成)
-    """
     next_generation = []
     
-    # 全個体の適応度(fitness)の合計
-    fitness_sum = sum(ind['fitness'] for ind in best_individuals)
-    if fitness_sum == 0: 
-        fitness_sum = 1.0
+    # --- 1. 統計情報の計算 ---
+    
+    # 適応度と重みの計算
+    fitnesses = np.array([ind['fitness'] for ind in best_individuals])
+    if np.sum(fitnesses) == 0:
+        weights = np.ones(len(best_individuals)) / len(best_individuals)
+    else:
+        weights = fitnesses / np.sum(fitnesses)
 
+    current_std_devs = {}
+    
+    # 標準偏差の計算（これは全個体の分散を使う：カーネルの幅に相当）
+    for param_key in params_info:
+        vals = np.array([get_nested_value(ind, param_key) for ind in best_individuals])
+        std = np.std(vals)
+        
+        # ★追加: カーネル幅の拡大 (Bandwidth Scaling)
+        # Top-Ncの分布よりも「少し広め」に探索することで、
+        # 確率モデルの裾野を広げ、早期収束を防ぎます。
+        # 1.5 〜 2.0 程度の値を推奨します。
+        std *= 2.0 
+
+        # 最小探索幅 (5%ルール) は維持
+        param_range = PARAM_CONSTRAINTS.get(param_key, (0, 100))
+        val_range = param_range[1] - param_range[0]
+        min_std = val_range * 0.05
+        
+        if std < min_std:
+            std = min_std
+        current_std_devs[param_key] = std
+
+    # --- 2. 混合分布からのサンプリング ---
+    
     for _ in range(num_samples):
-        # 1. ベースとなる親を選択（ルーレット選択）
-        rand_val = RNG.uniform() * fitness_sum
-        current_sum = 0
-        selected_parent_ind = best_individuals[0]
+        new_ind = copy.deepcopy(best_individuals[0])
         
-        for ind in best_individuals:
-            current_sum += ind['fitness']
-            if current_sum >= rand_val:
-                selected_parent_ind = ind
-                break
+        # ★変更点: ここで「どの山（個体）周辺を探索するか」を確率的に決める
+        # これにより、複数の有望な領域を同時に探索できる（多峰性の維持）
+        selected_parent = RNG.choice(best_individuals, p=weights)
         
-        # 2. 親個体をディープコピーして新しい個体の雛形にする
-        # これによりネストされた構造(fmParamsListなど)を維持できます
-        new_ind = copy.deepcopy(selected_parent_ind)
-        
-        # 3. 各パラメータを確率モデルに従って更新
         for param_key in params_info:
-            # 定義域情報の取得
             param_range = PARAM_CONSTRAINTS.get(param_key, (0, 100))
             min_val, max_val = param_range
-            val_range = max_val - min_val
             
-            # --- 修正箇所: ヘルパー関数を使って値を取得 ---
-            base_value = get_nested_value(selected_parent_ind, param_key)
-            # ---------------------------------------------
+            # ★変更点: 全体の平均ではなく、「選ばれた個体の値」を中心にする
+            center_value = get_nested_value(selected_parent, param_key)
             
-            # サンプリング (摂動を加える)
-            std_dev = val_range * 0.2 
-            if std_dev == 0: std_dev = 1.0
+            # 標準偏差は「集団全体の広がり」を使う（または少し縮小しても良い）
+            # 論文のカーネル幅の概念に従い、集団の標準偏差をそのまま使うのが安全
+            std_dev = current_std_devs[param_key]
             
-            new_value = np.random.normal(base_value, std_dev)
+            # リサンプリング (Rejection Sampling)
+            max_retries = 100
+            new_value = center_value 
             
-            # 定義域内にクリッピング
-            new_value = max(min_val, min(max_val, new_value))
+            for _ in range(max_retries):
+                candidate = np.random.normal(center_value, std_dev)
+                if min_val <= candidate <= max_val:
+                    new_value = candidate
+                    break
+            else:
+                candidate = np.random.normal(center_value, std_dev)
+                new_value = max(min_val, min(max_val, candidate))
             
-            # --- 修正箇所: ヘルパー関数を使って値を設定 ---
             set_nested_value(new_ind, param_key, new_value)
-            # ---------------------------------------------
             
-        # 4. 個体情報の更新
         new_ind["chromosomeId"] = str(uuid.uuid4())
         new_ind["generation"] = generation
         new_ind["fitness"] = 0.0

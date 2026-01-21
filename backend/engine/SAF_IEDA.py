@@ -89,9 +89,19 @@ class SAF_SurrogateModel:
         if denom == 0: return 0.0
 
         # 次元ごとの類似度計算
-        # ここでは値の範囲に依存するため、簡易的なガウス幅(sigma)を設定
-        # 本来はパラメータの定義域から動的に決めるのが望ましいが、ここでは固定値または分散に基づく
-        sigma = 20.0 
+        # ここでは簡易的に「パラメータ定義域の 10%〜20%」程度をシグマとする
+        # もし全変数が同じスケール(0-255など)なら、そのスケールを変数として渡すのがベスト
+        # 仮に config から範囲が取れない場合、ref_pop の分散から推定する
+        # ref_pop (Top-Nc) の標準偏差の平均などをベースにする
+        pop_std = np.std(ref_pop, axis=0)
+        avg_std = np.mean(pop_std)
+        
+        # 分散が0になってしまった場合の対策
+        if avg_std < 1e-6:
+            sigma = 1.0 # デフォルト値
+        else:
+            # Top-Ncの広がりの「半分」程度を類似判定のカーネル幅にするなど
+            sigma = avg_std * 2.0
         
         for i in range(c):
             # i次元目の値の距離
