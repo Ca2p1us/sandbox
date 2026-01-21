@@ -50,6 +50,15 @@ SUSTAIN_TIME_RANGE = (0, 500)
 RELEASE_RANGE = (0, 500)
 FREQUENCY_RANGE = (0, 500)
 PARAMS = ["fmParamsList.operator1.attack", "fmParamsList.operator1.decay", "fmParamsList.operator1.sustain", "fmParamsList.operator1.sustainTime", "fmParamsList.operator1.release", "fmParamsList.operator1.frequency"]
+# パラメータキーと範囲変数のマッピング辞書を作成
+PARAM_CONSTRAINTS = {
+    "fmParamsList.operator1.attack": ATTACK_RANGE,
+    "fmParamsList.operator1.decay": DECAY_RANGE,
+    "fmParamsList.operator1.sustain": SUSTAIN_RANGE,
+    "fmParamsList.operator1.sustainTime": SUSTAIN_TIME_RANGE,
+    "fmParamsList.operator1.release": RELEASE_RANGE,
+    "fmParamsList.operator1.frequency": FREQUENCY_RANGE
+}
 FITNESS_KEY = ["fitness", "pre_evaluation"]
 TARGET_PARAMS = [250, 250, 250, 250, 250, 250]
 TARGET_PARAMS_1 = [100, 100, 100, 100, 100, 100]

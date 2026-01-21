@@ -2,6 +2,7 @@ from typing import List
 from ..core.geneticAlgorithm.selection import tournament
 from ..core.geneticAlgorithm.make_chromosome_params import make_chromosome_params
 from ..core.geneticAlgorithm import BLX_alpha
+from ..core.geneticAlgorithm.probability_model import sample_new_population_from_probability_model
 from ..core.geneticAlgorithm.repair import repair_fm_params as repair_gene
 from ..core.geneticAlgorithm.mutate import mutate 
 from ..core.geneticAlgorithm import make_chromosome_params
@@ -17,6 +18,7 @@ import copy
 
 
 Chromosomes = List[dict]
+RNG = np.random.default_rng(262)
 
 
 def make_initial_population(num_individuals: int) -> Chromosomes:
@@ -44,6 +46,8 @@ def run_simulation_normal_IGA(NUM_GENERATIONS=9, POPULATION_SIZE=10, evaluate_nu
     elif evaluate_num == 6:
     # 2-6. Mixed関数
         evaluate_method = "Mixed"
+    else:
+        raise ValueError("不適切な評価関数番号です")
     # 1. 初期個体生成
     population = make_initial_population(POPULATION_SIZE)
     
@@ -161,6 +165,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     elif evaluate_num == 6:
     # 2-6. Mixed関数
         evaluate_method = "Mixed"
+    else:
+        raise ValueError("不適切な評価関数番号です")
     # 1. 初期個体生成
     population = make_initial_population(PROPOSAL_POPULATION_SIZE)
     # 初期個体の事前評価(補間)
@@ -178,6 +184,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         interpolate = "Gaussian_RBF"
     elif interpolate_num == 6:
         interpolate = "IMQ_RBF"
+    else:
+        raise ValueError("不適切な補間番号です")
     interpolation(
             population=population,
             method_num=interpolate_num,
@@ -447,6 +455,8 @@ def run_simulation_SAF_IEDA(NUM_GENERATIONS=9, POPULATION_SIZE=9, TOP_NC=5, eval
     elif evaluate_num == 4: evaluate_method = "Ackley"
     elif evaluate_num == 5: evaluate_method = "Gaussian_peaks"
     elif evaluate_num == 6: evaluate_method = "Mixed"
+    else:
+        raise ValueError("不適切な評価関数番号です")
 
     # 1. 初期個体生成
     population = make_initial_population(POPULATION_SIZE)
@@ -454,24 +464,16 @@ def run_simulation_SAF_IEDA(NUM_GENERATIONS=9, POPULATION_SIZE=9, TOP_NC=5, eval
     # SAFモデルの初期化
     saf_model = SAF_SurrogateModel(num_vars=len(PARAMS))
 
-    for generation in range(NUM_GENERATIONS - 1):
-        
-        # --- Top-Nc 戦略の実装 ---
-        
-        # A. 属性頻度スコアの計算
-        pref_scores = calculate_preference_scores(population, PARAMS)
-        
-        # B. スコアに基づいて個体群をソート (スコアが高い順)
-        # 情報を付与してソートしやすくする
-        for i, ind in enumerate(population):
-            ind['pre_evaluation'] = pref_scores[i]
-        
-        # スコア降順でソート
-        sorted_population = sorted(population, key=lambda x: x['pre_evaluation'], reverse=True)
-        
-        # C. 上位Nc個体 (Top-Nc) と 残りの個体 (Estimated) に分割
-        top_nc_individuals = sorted_population[:TOP_NC]
-        estimated_individuals = sorted_population[TOP_NC:]
+    # ★ 第1世代用: ランダムにTop-Ncを選抜 (密度計算なし)
+    shuffled_pop = RNG.choice(population, len(population))
+    top_nc_individuals = shuffled_pop[:TOP_NC]
+    
+    # 推定個体群 (ログ用に便宜上定義、評価はしない)
+    estimated_individuals = shuffled_pop[TOP_NC:]
+    for ind in estimated_individuals:
+        ind['fitness'] = 0.0 # 仮置き
+
+    for generation in range(NUM_GENERATIONS):
         
         # --- 2. 真の評価 (Top-Ncのみ) ---
         # ユーザー評価のシミュレーション
@@ -491,29 +493,20 @@ def run_simulation_SAF_IEDA(NUM_GENERATIONS=9, POPULATION_SIZE=9, TOP_NC=5, eval
             population=estimated_individuals,
             evaluate_num=evaluate_num,
             param_keys=PARAMS,
-            noise_is_added=noise_is_added
+            noise_is_added=noise_is_added,
+            target_key="true_fitness"
         )
 
         # --- ログ記録 (真値ベース) ---
         # 全体の中から真のベストを探す
         best_ind = max(population, key=lambda x: x['fitness'])
-        best_fitness_history.append((generation + 1, float(best_ind["true_fitness"])))
+        best_fitness_history.append((generation + 1, float(best_ind["fitness"])))
         bests.append(copy.deepcopy(best_ind))
 
         total_fitness = sum(ind['fitness'] for ind in population)
         average_fitness = total_fitness / len(population)
         average_fitness_history.append((generation + 1, float(average_fitness)))
 
-        if look and times == 1:
-            # プロット
-            plot_individual_params(
-                population=population,
-                best=best_ind,
-                worst=min(population, key=lambda x: x['true_fitness']),
-                param_keys=PARAMS,
-                generation=generation + 1,
-                file_path=f'./result/saf_ieda/graph/{evaluate_method}/scatter/{evaluate_method}_noise{str(noise_is_added)}_{str(POPULATION_SIZE)}_individuals_{str(generation + 1)}gens'
-            )
         
         # --- 3. SAFモデルの学習 (Top-Ncの情報のみ使用) ---
         top_vectors = np.array([[get_nested_value(ind, k) for k in PARAMS] for ind in top_nc_individuals])
@@ -530,120 +523,51 @@ def run_simulation_SAF_IEDA(NUM_GENERATIONS=9, POPULATION_SIZE=9, TOP_NC=5, eval
             for i, ind in enumerate(estimated_individuals):
                 ind['fitness'] = predicted_vals[i]
 
+        if look and times == 1:
+            # プロット
+            plot_individual_params(
+                population=population,
+                best=best_ind,
+                worst=min(population, key=lambda x: x['fitness']),
+                param_keys=PARAMS,
+                generation=generation + 1,
+                file_path=f'./result/saf_ieda/graph/{evaluate_method}/scatter/{evaluate_method}_noise{str(noise_is_added)}_{str(POPULATION_SIZE)}_individuals_{str(generation + 1)}gens'
+            )
         # --- 5. 次世代生成 (EDA/GA) ---
         # 選択のためにpopulationリストを再構成（Top-Ncは真値、残りは予測値が入っている状態）
         # population変数はそのままオブジェクト参照しているので、中身のdictは更新されている
         
         next_generation: List[Chromosomes] = []
         
-        while len(next_generation) < POPULATION_SIZE:
-            # 選択 (Top-Ncの真値と、他個体の予測値が混在したfitnessを使用)
-            selected = tournament.exec_tournament_selection(
-                chromosomes_params=population, 
-                participants_num=tournament_size
-            )
-            
-            # 交叉 & 突然変異
-            offspring = BLX_alpha.exec_blx_alpha(
-                parents_chromosomes=selected,
-                func_repair_gene=repair_gene,
-                mutate=mutate
-            )
-            
-            if isinstance(offspring, list):
-                for ind in offspring:
-                    if len(next_generation) >= POPULATION_SIZE:
-                        break
-                    if isinstance(ind, dict):
-                        ind["fitness"] = 0.0
-                        ind["pre_evaluation"] = 0.0
-                        ind["true_fitness"] = 0.0
-                        ind["generation"] = generation + 2
-                        ind["chromosomeId"] = str(uuid.uuid4())
-                        next_generation.append(ind)
-            elif isinstance(offspring, dict):
-                offspring["fitness"] = 0.0
-                offspring["pre_evaluation"] = 0.0
-                offspring["true_fitness"] = 0.0
-                offspring["generation"] = generation + 2
-                offspring["chromosomeId"] = str(uuid.uuid4())
-                next_generation.append(offspring)
+        # 次世代の個体リストを生成
+        if generation == NUM_GENERATIONS:
+            break
+        next_generation = sample_new_population_from_probability_model(
+            best_individuals=top_nc_individuals,     # 評価の高かったTop-Nc個体群を渡す
+            num_samples=POPULATION_SIZE,             # 生成する個体数
+            params_info=PARAMS,                      # パラメータキーのリスト
+            generation=generation + 2                # 次の世代番号 (現在のgenerationは0始まりなので+2で次世代)
+        )
 
+        # 更新
         population = next_generation
 
-    # --- 最終世代の処理 ---
-    # A. 属性頻度スコアの計算
-    pref_scores = calculate_preference_scores(population, PARAMS)
-    
-    # B. スコアに基づいて個体群をソート (スコアが高い順)
-    # 情報を付与してソートしやすくする
-    for i, ind in enumerate(population):
-        ind['pre_evaluation'] = pref_scores[i]
-    
-    # スコア降順でソート
-    sorted_population = sorted(population, key=lambda x: x['pre_evaluation'], reverse=True)
-    
-    # C. 上位Nc個体 (Top-Nc) と 残りの個体 (Estimated) に分割
-    top_nc_individuals = sorted_population[:TOP_NC]
-    estimated_individuals = sorted_population[TOP_NC:]
-
-    # --- 2. 真の評価 (Top-Ncのみ) ---
-    # ユーザー評価のシミュレーション
-    evaluate_fitness(
-        population=top_nc_individuals,
-        evaluate_num=evaluate_num,
-        param_keys=PARAMS,
-        noise_is_added=noise_is_added,
-        target_key="fitness"
-    )
-    # true_fitnessに真値を格納 (Top-Ncは真値で確定)
-    for ind in top_nc_individuals:
-        ind['true_fitness'] = ind['fitness']
-
-    # (ログ用: 残りの個体の真値も計算しておくが、学習には使わない)
-    evaluate_fitness(
-        population=estimated_individuals,
-        evaluate_num=evaluate_num,
-        param_keys=PARAMS,
-        noise_is_added=noise_is_added
-    )
-
-    # --- ログ記録 (真値ベース) ---
-    # 全体の中から真のベストを探す
-    best_ind = max(population, key=lambda x: x['fitness'])
-    best_fitness_history.append((generation + 1, float(best_ind["true_fitness"])))
-    bests.append(copy.deepcopy(best_ind))
-
-    total_fitness = sum(ind['fitness'] for ind in population)
-    average_fitness = total_fitness / len(population)
-    average_fitness_history.append((generation + 1, float(average_fitness)))
-
-    if look and times == 1:
-        # プロット
-        plot_individual_params(
-            population=population,
-            best=best_ind,
-            worst=min(population, key=lambda x: x['true_fitness']),
-            param_keys=PARAMS,
-            generation=generation + 1,
-            file_path=f'./result/saf_ieda/graph/{evaluate_method}/scatter/{evaluate_method}_noise{str(noise_is_added)}_{str(POPULATION_SIZE)}_individuals_{str(generation + 1)}gens'
-        )
-    
-    # --- 3. SAFモデルの学習 (Top-Ncの情報のみ使用) ---
-    top_vectors = np.array([[get_nested_value(ind, k) for k in PARAMS] for ind in top_nc_individuals])
-    top_fitness_vals = np.array([ind['fitness'] for ind in top_nc_individuals])
-    
-    saf_model.fit(top_vectors, top_fitness_vals)
-
-    # --- 4. 適応度予測 (残りの個体) ---
-    if len(estimated_individuals) > 0:
-        est_vectors = np.array([[get_nested_value(ind, k) for k in PARAMS] for ind in estimated_individuals])
-        predicted_vals = saf_model.predict(est_vectors)
+        # --- Top-Nc 戦略の実装 ---
         
-        # 予測値でfitnessを上書き (選択に使用するため)
-        for i, ind in enumerate(estimated_individuals):
-            ind['fitness'] = predicted_vals[i]
-
+        # A. 属性頻度スコアの計算
+        pref_scores = calculate_preference_scores(population, PARAMS)
+        
+        # B. スコアに基づいて個体群をソート (スコアが高い順)
+        # 情報を付与してソートしやすくする
+        for i, ind in enumerate(population):
+            ind['pre_evaluation'] = pref_scores[i]
+        
+        # スコア降順でソート
+        sorted_population = sorted(population, key=lambda x: x['pre_evaluation'], reverse=True)
+        
+        # C. 上位Nc個体 (Top-Nc) と 残りの個体 (Estimated) に分割
+        top_nc_individuals = sorted_population[:TOP_NC]
+        estimated_individuals = sorted_population[TOP_NC:]
 
     # 最終結果の出力
     log(f"result/saf_ieda/last_gen_individuals/{evaluate_method}/{str(POPULATION_SIZE)}inds/simulation_{evaluate_method}_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(times)}.json", population, times=times)
