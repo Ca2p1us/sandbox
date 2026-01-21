@@ -540,6 +540,7 @@ def run_simulation_SAF_IEDA(NUM_GENERATIONS=9, POPULATION_SIZE=9, TOP_NC=5, eval
         next_generation: List[Chromosomes] = []
         
         # 次世代の個体リストを生成
+        top_nc_individuals = sorted(top_nc_individuals, key=lambda x: x['fitness'], reverse=True)
         if generation == NUM_GENERATIONS:
             break
         next_generation = sample_new_population_from_probability_model(
