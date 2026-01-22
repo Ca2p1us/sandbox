@@ -503,10 +503,6 @@ def run_simulation_SAF_IEDA(NUM_GENERATIONS=9, POPULATION_SIZE=9, TOP_NC=5, eval
         best_fitness_history.append((generation + 1, float(best_ind["fitness"])))
         bests.append(copy.deepcopy(best_ind))
 
-        total_fitness = sum(ind['fitness'] for ind in population)
-        average_fitness = total_fitness / len(population)
-        average_fitness_history.append((generation + 1, float(average_fitness)))
-
         
         # --- 3. SAFモデルの学習 (Top-Ncの情報のみ使用) ---
         top_vectors = np.array([[get_nested_value(ind, k) for k in PARAMS] for ind in top_nc_individuals])
@@ -522,6 +518,10 @@ def run_simulation_SAF_IEDA(NUM_GENERATIONS=9, POPULATION_SIZE=9, TOP_NC=5, eval
             # 予測値でfitnessを上書き (選択に使用するため)
             for i, ind in enumerate(estimated_individuals):
                 ind['fitness'] = predicted_vals[i]
+
+        total_fitness = sum(ind['fitness'] for ind in population)
+        average_fitness = total_fitness / len(population)
+        average_fitness_history.append((generation + 1, float(average_fitness)))
 
         if look and times == 1:
             # プロット
