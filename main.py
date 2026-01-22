@@ -67,7 +67,7 @@ elif choice == "1":
         look = True
     for i in range(EXPERIMENT_TIMES):
         print("普通のIGAシミュレーション"+str(i+1)+"回目を実行")
-        best_fitness, average_fitness = iga.run_simulation_normal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, POPULATION_SIZE=POPULATION_SIZE, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=3)
+        best_fitness, average_fitness = iga.run_simulation_normal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, POPULATION_SIZE=POPULATION_SIZE, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=4)
         best_fitness_histories.append(best_fitness)
         average_fitness_histories.append(average_fitness)
         print("普通のIGAシミュレーション"+str(i+1)+"回目が完了")
@@ -107,7 +107,7 @@ elif choice == "3":
         look = True
     for i in range(EXPERIMENT_TIMES):
         print(f"{evaluate_size}個体のIGAシミュレーション"+str(i+1)+"回目を実行")
-        best_fitness, average_fitness = iga.run_simulation_normal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, POPULATION_SIZE=evaluate_size, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=3)
+        best_fitness, average_fitness = iga.run_simulation_normal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, POPULATION_SIZE=evaluate_size, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=4)
         best_fitness_histories_few.append(best_fitness)
         average_fitness_histories_few.append(average_fitness)
         print(f"{evaluate_size}個体のIGAシミュレーション"+str(i+1)+"回目が完了")
@@ -442,7 +442,8 @@ elif choice == "5":
         interpolate_num=int(interpolate_num),
         file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_pop_size_comparison.png",
         plot_series_list=plot_series_list,
-        indicator="Best Fitness by Pop Size "
+        indicator="Best Fitness by Pop Size ",
+        ver="benchmark"
     )
     print("個体数比較シミュレーションが完了しました。")
 elif choice == "6":

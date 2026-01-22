@@ -414,7 +414,7 @@ def log_compare(evaluate_num: int = None, interpolate_num: int = None, file_path
     # タイトル設定
     title_text = f"{population_size}個体 " + ("補間あり" if interpolate else "補間なし")
     
-    save_path = _get_save_path("comparison", method, interpolate, "", file_path)
+    save_path = _get_save_path("benchmark", method, interpolate, "", file_path)
     save_path.parent.mkdir(parents=True, exist_ok=True)
 
     fig, ax = plt.subplots(figsize=(8, 5))

@@ -182,9 +182,6 @@ def interpolation(
                 f"max={max(nn_dists):.3f}, "
                 f"mean={np.mean(nn_dists):.3f}"
             )
-            print(
-                f"[Gen {gen}] Distance Dominant ratio : {len(ratios) / 9}"
-            )
     return
 
 def calculate_by_distance(
@@ -293,8 +290,6 @@ def build_interpolator(
 
     else:
         return None
-
-    print(f"epsilon:{epsilon}")
 
     interpolator = RBFInterpolator(
             train_X,

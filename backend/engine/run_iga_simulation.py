@@ -179,7 +179,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     elif interpolate_num == 3:
         interpolate = "IDW"
     elif interpolate_num == 4:
-        interpolate = "Hybrid_RBF"
+        interpolate = "Hybrid"
     elif interpolate_num == 5:
         interpolate = "Gaussian_RBF"
     elif interpolate_num == 6:
@@ -214,6 +214,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         )
         # ベスト・ワースト個体の取得
         best, worst = get_best_and_worst_individuals_by_id(archive)
+        gen_best, gen_worst = get_best_and_worst_individuals_by_id(evaluate_population)
         # ほかの個体の評価を補間
         interpolation(
             population=population,
@@ -238,28 +239,19 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         average = get_average_fitness(population)
         # print(best["fitness"])
         # --- ここで履歴に追加 ---
-        if best is not None and "fitness" in best:
-            best_fitness_history.append((generation + 1, float(best["fitness"])))
-            bests.append(best)
+        if gen_best is not None and "fitness" in gen_best:
+            best_fitness_history.append((generation + 1, float(gen_best["fitness"])))
+            bests.append(gen_best)
         if average is not None:
             average_fitness_history.append((generation + 1, float(average)))
         error_history.append((generation + 1, float(get_total_error(population=population, evaluate_num=evaluate_num))))
         if look and times == 1:
             plot_individual_params(
                 population=population,
-                best=best,worst=worst,
+                best=gen_best,worst=gen_worst,
                 param_keys=PARAMS,
                 generation=generation + 1,
                 file_path=f'./result/proposal/graph/{evaluate_method}/{interpolate}/scatter/{evaluate_method}_noise{str(noise_is_added)}_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}_individuals_{str(generation + 1)}gens'
-            )
-            plot_interpolated_heatmap(
-                interpolator=interpolator,
-                evaluated_population=archive,
-                best=best,
-                param_keys=PARAMS,
-                pair_indices=[(0,1),(2,3),(4,5)],
-                generation=generation + 1,
-                file_path=f'./result/proposal/heatmap/{evaluate_method}/{interpolate}/{evaluate_method}_noise{str(noise_is_added)}_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}_individuals_{str(generation + 1)}gens'
             )
         next_generation:List[Chromosomes]  = []
         # for _ in range(PROPOSAL_POPULATION_SIZE):
@@ -340,6 +332,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             generation=NUM_GENERATIONS
         )
     best, worst = get_best_and_worst_individuals_by_id(archive)
+    gen_best, gen_worst = get_best_and_worst_individuals_by_id(evaluate_population)
     # ほかの個体の評価を補間
     interpolation(
             population=population,
@@ -360,26 +353,17 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         )
     # 評価の平均値を表示
     average = get_average_fitness(population)
-    best_fitness_history.append((NUM_GENERATIONS, float(best["fitness"])))
+    best_fitness_history.append((NUM_GENERATIONS, float(gen_best["fitness"])))
     average_fitness_history.append((NUM_GENERATIONS, float(average)))
-    bests.append(best)
+    bests.append(gen_best)
     error_history.append((NUM_GENERATIONS, float(get_total_error(population=population, evaluate_num=evaluate_num))))
     if look and times == 1:
         plot_individual_params(
             population=population,
-            best=best,worst=worst,
+            best=gen_best,worst=gen_worst,
             param_keys=PARAMS,
             generation=NUM_GENERATIONS,
             file_path=f'./result/proposal/graph/{evaluate_method}/{interpolate}/scatter/{evaluate_method}_noise{str(noise_is_added)}_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}_individuals_{str(NUM_GENERATIONS)}gens'
-            )
-        plot_interpolated_heatmap(
-                interpolator=interpolator,
-                evaluated_population=archive,
-                best=best,
-                param_keys=PARAMS,
-                pair_indices=[(0,1),(2,3),(4,5)],
-                generation=NUM_GENERATIONS,
-                file_path=f'./result/proposal/heatmap/{evaluate_method}/{interpolate}/{evaluate_method}_noise{str(noise_is_added)}_{str(PROPOSAL_POPULATION_SIZE)}_{str(EVALUATE_SIZE)}_individuals_{str(NUM_GENERATIONS)}gens'
             )
     # 6. 最終結果の出力
     log(f"result/proposal/last_gen_individuals/{evaluate_method}/{interpolate}/{str(PROPOSAL_POPULATION_SIZE)}inds_{str(EVALUATE_SIZE)}eval/simulation_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(times)}.json", population,times = times)
@@ -499,9 +483,9 @@ def run_simulation_SAF_IEDA(NUM_GENERATIONS=9, POPULATION_SIZE=9, TOP_NC=5, eval
 
         # --- ログ記録 (真値ベース) ---
         # 全体の中から真のベストを探す
-        best_ind = max(population, key=lambda x: x['fitness'])
-        best_fitness_history.append((generation + 1, float(best_ind["fitness"])))
-        bests.append(copy.deepcopy(best_ind))
+        gen_best_ind = max(top_nc_individuals, key=lambda x: x['fitness'])
+        best_fitness_history.append((generation + 1, float(gen_best_ind["fitness"])))
+        bests.append(copy.deepcopy(gen_best_ind))
 
         
         # --- 3. SAFモデルの学習 (Top-Ncの情報のみ使用) ---
@@ -527,7 +511,7 @@ def run_simulation_SAF_IEDA(NUM_GENERATIONS=9, POPULATION_SIZE=9, TOP_NC=5, eval
             # プロット
             plot_individual_params(
                 population=population,
-                best=best_ind,
+                best=gen_best_ind,
                 worst=min(population, key=lambda x: x['fitness']),
                 param_keys=PARAMS,
                 generation=generation + 1,

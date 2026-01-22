@@ -205,6 +205,15 @@ def calculate_Ackley(
         fitness = add_noise(value=fitness, scale=1.0)
     return fitness
 
+# def compute_Ackley(
+#     values: List[float],
+#     target_params: List[float],
+#     A = 20,
+#     B = 0.04,
+#     C = 0.04
+# ):
+#     return -A * np.exp(-B * np.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - np.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + np.e
+
 def compute_Ackley(
     values: List[float],
     target_params: List[float],
@@ -212,7 +221,15 @@ def compute_Ackley(
     B = 0.04,
     C = 0.04
 ):
-    return -A * np.exp(-B * np.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - np.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + np.e
+    # Ackley関数の生の値を計算 (0に近いほど最適)
+    raw_val = -A * np.exp(-B * np.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - np.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + np.e
+
+    # calculate_Ackleyと同様の計算方法で適応度に変換
+    # (最大値(A+e)で正規化し反転させ、6.0倍する)
+    max_val = A + np.e
+    fitness = 6.0 * (1.0 - raw_val / max_val)
+
+    return fitness
 
 def calculate_Gaussian_peaks(
     individual: dict,
