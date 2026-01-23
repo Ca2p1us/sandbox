@@ -55,6 +55,17 @@ Y_LIM_SETTINGS = {
     "Mixed": (0.0, 6.5)
 }
 
+# 評価関数ごとの凡例位置設定
+# matplotlibのlocパラメータ: 'best', 'upper right', 'upper left', 'lower left', 'lower right', 'right', 'center left', ...
+LEGEND_LOC_SETTINGS = {
+    "Ackley": "upper left",      # Ackleyは左上が空いているので左上に
+    "Gaussian": "lower right",   # 右肩上がりなら右下が空きやすい
+    "Gaussian_peaks": "lower right",
+    "Mixed": "lower right",
+    "Sphere": "upper right",     # 必要に応じて変更
+    "default": "best"            # 設定がない場合のデフォルト
+}
+
 # --- ヘルパー関数 ---
 
 def _get_method_name(evaluate_input: Union[int, str]) -> str:
@@ -355,9 +366,13 @@ def log_comparison(evaluate_num: int = None, interpolate_num: int = None, file_p
     _setup_plot(ax,method,y_label=indicator+'Fitness')
     # X軸範囲設定 (データに合わせて動的に設定、または定数NUM_GENERATIONSを使用)
     ax.set_xlim(0.5, max_gen + 0.5 if max_gen > 0 else NUM_GENERATIONS + 0.5)
-    ax.legend(prop={"family": "MS Gothic", "size": 14}, loc=0)
-    # fig.tight_layout()
-    # plt.savefig(f'./result/graph/{method}_fitness_histories.png')
+    # method名に対応する位置を取得。なければ 'default' の値('best') を使用
+    legend_loc = LEGEND_LOC_SETTINGS.get(method, LEGEND_LOC_SETTINGS["default"])
+
+    ax.legend(
+        prop={"family": "MS Gothic", "size": 14},
+        loc=legend_loc  # ここに変数を渡す
+    )
     plt.savefig(save_path)
     plt.show()
     plt.close()

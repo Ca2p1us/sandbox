@@ -306,17 +306,17 @@ def calculate_mixed(
         else:
             # 正規分布の確率密度関数（最大値1）
             dim_score = 0.0
-            if i == 1:
+            if i == 0:
+                dim_score += compute_Gaussian(val=val, target=float(target_params[0]))
+            elif i == 1:
                 dim_score += compute_Gaussian(val=val, target=float(target_params[0]))
             elif i == 2:
-                dim_score += compute_Gaussian(val=val, target=float(target_params[0]))
-            elif i == 3:
                 dim_score += compute_Gaussian_cos(val=val, target=float(target_params[0]))
-            elif i == 4:
+            elif i == 3:
                 dim_score += compute_Gaussian_peaks(val=val)
-            elif i == 5:
+            elif i == 4:
                 dim_score += compute_Ackley(values=[val], target_params=[target_params[0]])
-            elif i == 6:
+            elif i == 5:
                 dim_score += compute_Ackley(values=[val], target_params=[target_params[0]])
             scores.append(dim_score)
 
