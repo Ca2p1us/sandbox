@@ -203,25 +203,25 @@ elif choice == "3":
 
     best_fitness_list = [
     {
-        'label': '補間なし9個体', 
+        'label': 'GA(9個体)', 
         'data': best_fitness_histories_few_ave, 
         'marker': 'o', 
         'linestyle': '--'
     },
     {
-        'label': '補間なし200個体', 
+        'label': 'GA(200個体)', 
         'data': best_fitness_histories_many_ave, 
         'marker': '^', 
         'linestyle': ':'
     },
     {
-        'label': '補間あり(提案)', 
+        'label': '提案手法', 
         'data': best_fitness_histories_ave, 
         'marker': 'o', 
         'linestyle': '-'
     },
     {
-        'label': '参考データ(50個体)',
+        'label': 'GA(50個体)',
         'data': best_fitness_histories_benchmark,
         'marker': 'x',
         'linestyle': '-.'
@@ -242,25 +242,25 @@ elif choice == "3":
     ]
     ave_fitness_list = [
     {
-        'label': '補間なし9個体', 
+        'label': 'GA(9個体)', 
         'data': average_fitness_histories_few_ave, 
         'marker': 'o', 
         'linestyle': '--'
     },
     {
-        'label': '補間なし200個体', 
+        'label': 'GA(200個体)', 
         'data': average_fitness_histories_many_ave, 
         'marker': '^', 
         'linestyle': ':'
     },
     {
-        'label': '補間あり(提案)', 
+        'label': '提案手法', 
         'data': average_fitness_histories_ave, 
         'marker': 'o', 
         'linestyle': '-'
     },
     {
-        'label': '参考データ(50個体)',
+        'label': 'GA(50個体)',
         'data': average_fitness_histories_benchmark,
         'marker': 'x',
         'linestyle': '-.'

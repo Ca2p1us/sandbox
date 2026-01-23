@@ -413,7 +413,7 @@ def log_compare(evaluate_num: int = None, interpolate_num: int = None, file_path
     interpolate = _get_interpolate_name(interpolate_num)
 
     # タイトル設定
-    title_text = f"{population_size}個体 " + ("補間あり" if interpolate else "補間なし")
+    title_text = f"{population_size}個体 " + ("提案手法" if interpolate else "GA")
     
     save_path = _get_save_path("benchmark", method, interpolate, "", file_path)
     save_path.parent.mkdir(parents=True, exist_ok=True)
