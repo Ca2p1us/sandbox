@@ -51,7 +51,8 @@ Y_LIM_SETTINGS = {
     "Ackley": (0, 6.0),
     "Gaussian_peaks": (0, 6.5),
     "Gaussian_cos": (0, 7.0), # 以前のコードで最大範囲だったものを採用
-    "Sphere": (-100000, 0.5)
+    "Sphere": (-100000, 0.5),
+    "Mixed": (0.0, 6.5)
 }
 
 # --- ヘルパー関数 ---

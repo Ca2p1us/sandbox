@@ -28,7 +28,7 @@ Y_AXIS_LIMITS = {
     "Gaussian_cos": (0, 7.2),
     "Ackley": (0, 6.0),
     "Gaussian_peaks": (0, 6.2),
-    "Mixed": (0.0, 10.2)
+    "Mixed": (0.0, 6.2)
 }
 
 # 手法の設定 (表示順序)
@@ -61,7 +61,7 @@ COLOR_MAP = {
 }
 
 # 軸ラベルの設定
-Y_LABEL = "最適解の適応度"
+Y_LABEL = "最終世代における最大適応度"
 X_LABEL = "手法"
 
 # ==========================================
@@ -99,7 +99,7 @@ def collect_data(func_name):
         dir_path = path_builder(func_name)
         dir_path = os.path.normpath(dir_path)
 
-        json_files = glob.glob(os.path.join(dir_path, "*.json"))
+        json_files = glob.glob(os.path.join(dir_path, "*noiseFalse*.json"))
         
         fitness_values = []
         for json_file in json_files:
@@ -145,7 +145,7 @@ def draw_boxplot(data, labels, colors, func_name, suffix=""):
         patch.set_facecolor(colors[i])
         patch.set_alpha(0.8)
 
-    plt.title(f"ベンチマーク関数: {func_name}", fontsize=14)
+    plt.title(f"評価関数: {func_name}", fontsize=14)
     plt.ylabel(Y_LABEL, fontsize=12)
     plt.xlabel(X_LABEL, fontsize=12)
     plt.grid(axis='y', linestyle='--', alpha=0.5)

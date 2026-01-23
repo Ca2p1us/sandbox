@@ -197,10 +197,10 @@ def calculate_Ackley(
             values.append(float(val))
 
     # 統合
-    fitness = compute_Ackley(values=values, target_params=target_params, A=A, B=B, C=C)
+    fitness = compute_Ackley(values=values, target_params=target_params, A=A, B=B, C=C, n = 6.0)
     # 必要に応じてスケーリングやノイズ付与も可能
-    max = A + np.e
-    fitness = 6.0 * (1.0 - fitness / max)
+    # max = A + np.e
+    # fitness = 6.0 * (1.0 - fitness / max)
     if noise_is_added:
         fitness = add_noise(value=fitness, scale=1.0)
     return fitness
@@ -219,7 +219,8 @@ def compute_Ackley(
     target_params: List[float],
     A = 20,
     B = 0.04,
-    C = 0.04
+    C = 0.04,
+    n = 1.0
 ):
     # Ackley関数の生の値を計算 (0に近いほど最適)
     raw_val = -A * np.exp(-B * np.sqrt(sum((values[i] - target_params[i])**2 for i in range(len(target_params)))/len(values))) - np.exp(sum(np.cos(C*(values[i] - target_params[i])) for i in range(len(target_params)))/len(values)) + A + np.e
@@ -227,7 +228,7 @@ def compute_Ackley(
     # calculate_Ackleyと同様の計算方法で適応度に変換
     # (最大値(A+e)で正規化し反転させ、6.0倍する)
     max_val = A + np.e
-    fitness = 6.0 * (1.0 - raw_val / max_val)
+    fitness = n * (1.0 - raw_val / max_val)
 
     return fitness
 
