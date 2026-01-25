@@ -2,6 +2,7 @@ import json
 import os
 import glob
 import matplotlib.pyplot as plt
+import numpy as np
 
 # ==========================================
 # 設定: 日本語フォントとラベル
@@ -41,13 +42,13 @@ METHODS_CONFIG = {
     "SAF-IEDA\n(200個体)": lambda func: os.path.join(
         "result", "saf_ieda", "best", func, "200inds"
     ),
-    "従来法\n(9個体)": lambda func: os.path.join(
+    "GA\n(9個体)": lambda func: os.path.join(
         "result", "conventional", "best", func, "9inds"
     ),
-    "従来法\n(50個体)": lambda func: os.path.join(
+    "GA\n(50個体)": lambda func: os.path.join(
         "result", "conventional", "best", func, "50inds"
     ),
-    "従来法\n(200個体)": lambda func: os.path.join(
+    "GA\n(200個体)": lambda func: os.path.join(
         "result", "conventional", "best", func, "200inds"
     ),
 }
@@ -55,7 +56,7 @@ METHODS_CONFIG = {
 # 手法ごとの色設定 (ラベルの一部でマッチングさせます)
 # これによりSAF-IEDAを抜いても提案手法の色(オレンジ)が維持されます
 COLOR_MAP = {
-    "従来法": "#d3d3a0",   # 黄緑系
+    "GA": "#d3d3a0",   # 黄緑系
     "SAF-IEDA": "#a0cbe8", # 青系
     "提案手法": "#f0c0a0"   # オレンジ系
 }
@@ -120,8 +121,17 @@ def collect_data(func_name):
                     break
             colors.append(color)
 
-            avg = sum(fitness_values) / len(fitness_values)
-            print(f"  {label.replace(chr(10), ' ')}: {len(fitness_values)}個ロード (平均: {avg:.4f})")
+            # --- 統計量の計算と出力 ---
+            avg = np.mean(fitness_values)    # 平均値
+            std = np.std(fitness_values)     # 標準偏差
+            med = np.median(fitness_values)  # 中央値
+            
+            clean_label = label.replace(chr(10), ' ')
+            print(f"  {clean_label}:")
+            print(f"    データ数: {len(fitness_values)}")
+            print(f"    平均値  : {avg:.4f}")
+            print(f"    標準偏差: {std:.4f}")
+            print(f"    中央値  : {med:.4f}")
     
     return plot_data, labels, colors
 
@@ -137,7 +147,7 @@ def draw_boxplot(data, labels, colors, func_name, suffix=""):
     plt.figure(figsize=(8, 6))
     
     # 箱ひげ図の描画
-    bp = plt.boxplot(data, labels=labels, patch_artist=True,
+    bp = plt.boxplot(data, tick_labels=labels, patch_artist=True,
                      medianprops=dict(color="black", linewidth=1.5))
 
     # 色の設定 (渡されたcolorsリストを使用)
