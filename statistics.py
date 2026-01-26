@@ -45,8 +45,8 @@ METHODS_CONFIG = {
     "GA\n(9個体)": lambda func: os.path.join(
         "result", "conventional", "best", func, "9inds"
     ),
-    "GA\n(50個体)": lambda func: os.path.join(
-        "result", "conventional", "best", func, "50inds"
+    "距離項なしサロゲート": lambda func: os.path.join(
+        "result", "proposal", "best", func, "TPS", "200inds_9eval"
     ),
     "GA\n(200個体)": lambda func: os.path.join(
         "result", "conventional", "best", func, "200inds"

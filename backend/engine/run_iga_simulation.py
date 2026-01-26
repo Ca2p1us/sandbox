@@ -6,7 +6,7 @@ from ..core.geneticAlgorithm.probability_model import sample_new_population_from
 from ..core.geneticAlgorithm.repair import repair_fm_params as repair_gene
 from ..core.geneticAlgorithm.mutate import mutate 
 from ..core.geneticAlgorithm import make_chromosome_params
-from ..core.geneticAlgorithm.interpolation import interpolation, get_evaluated_individuals, get_total_error, build_interpolator
+from ..core.geneticAlgorithm.interpolation import interpolation, interpolation_proper_normalization,get_evaluated_individuals, get_total_error, build_interpolator
 from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_pre_evaluation
 from ..core.geneticAlgorithm.config import TARGET_PARAMS, PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2
 from ..core.log import log, log_fitness, plot_individual_params, log_average_fitness, plot_interpolated_heatmap
@@ -186,12 +186,22 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         interpolate = "IMQ_RBF"
     else:
         raise ValueError("不適切な補間番号です")
-    interpolation(
+    if interpolate_num in [4, 5, 6]: # 提案手法系のメソッドIDの場合
+        interpolation_proper_normalization(
+            population=population,
+            evaluated_population=None, # 初期はない
+            interpolator=None,         # 初期はない
+            param_keys=PARAMS,
+            target_key="pre_evaluation",
+            w=0.3 # 必要に応じて調整
+        )
+    else:
+        interpolation(
             population=population,
             method_num=interpolate_num,
             param_keys=PARAMS,
             target_key="pre_evaluation",
-            )
+        )
     # 評価個体の選択
     evaluate_id = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE,gen = 1)
     evaluate_population = get_evaluated_individuals(population, evaluate_id)
@@ -300,17 +310,28 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
 
         population = next_generation
         #事前評価(補間)
-        interpolation(
-            population = population,
-            evaluated_population = archive,
-            best = best, 
-            worst = worst,
-            method_num=interpolate_num,
-            gen=generation+2,
-            param_keys=PARAMS,
-            target_key="pre_evaluation",
-            interpolator=interpolator
-        )
+        if interpolate_num in [4, 5, 6]: # 提案手法の場合
+            interpolation_proper_normalization(
+                population=population,
+                evaluated_population=archive,
+                interpolator=interpolator,
+                param_keys=PARAMS,
+                target_key="pre_evaluation",
+                w=0.3  # ★ここで重みを設定 (論文の考察に基づき調整)
+            )
+        else:
+            # 既存の手法 (単純加算やその他の補間)
+            interpolation(
+                population=population,
+                evaluated_population=archive,
+                best=best,
+                worst=worst,
+                method_num=interpolate_num,
+                gen=generation+2,
+                param_keys=PARAMS,
+                target_key="pre_evaluation",
+                interpolator=interpolator
+            )
         # 評価個体の選択
         evaluate_id = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE, gen=generation+1)
         evaluate_population = get_evaluated_individuals(population, evaluate_id)
