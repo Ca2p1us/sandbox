@@ -184,6 +184,103 @@ def interpolation(
             )
     return
 
+def interpolation_proper_normalization(
+    population: List[dict] = None,
+    evaluated_population: List[dict] = None,
+    interpolator: RBFInterpolator = None,
+    param_keys: List[str] = PARAMS,
+    target_key: str = "pre_evaluation",
+    min_max_dict: Dict[str, Tuple[float, float]] = min_max_dict, # グローバル設定をデフォルトに使用
+    w: float = 0.3  # 距離の重み (0.0 ~ 1.0)
+):
+    """
+    妥当な正規化（Min-Max Scaling）を用いた補間計算
+    interpolation関数と同様のインターフェースで動作するように設計
+    """
+    # --- エラーハンドリング (interpolation関数に準拠) ---
+    if not evaluated_population:
+        print(f"評価済み個体群がNoneです。ランダムな{target_key}を付与します。")
+        for ind in population:
+            ind[target_key] = RNG.uniform(0.0, 6.0)
+        return
+
+    if not interpolator:
+        print(f"interpolatorがNoneです。ランダムな{target_key}を付与します。")
+        for ind in population:
+            ind[target_key] = RNG.uniform(0.0, 6.0)
+        return
+    
+    if param_keys is None:
+        param_keys = ["fmParamsList.operator1.frequency"]
+
+    # --- 1. 次元数から距離の理論最大値を計算 ---
+    # 入力空間は [0,1] に正規化されるため、最大距離は sqrt(次元数)
+    dim = len(param_keys)
+    max_dist_theoretical = math.sqrt(dim)
+    if max_dist_theoretical == 0:
+        max_dist_theoretical = 1.0 # ゼロ除算防止
+
+    # --- 2. 評価済み個体群(Archive)のベクトルリストを作成 ---
+    archive_vecs = [to_normalized_vec(ind, param_keys, min_max_dict) for ind in evaluated_population]
+    
+    temp_results = []
+    
+    # --- 3. 1st Pass: 全個体の「生の推定適応度」と「生の距離」を計算 ---
+    for ind in population:
+        target_vec = to_normalized_vec(ind, param_keys, min_max_dict)
+        
+        # (a) 生の適応度推定 (RBF)
+        raw_fitness = calculate_by_RBF(target_vec, interpolator)
+        
+        # (b) 生の距離 (Nearest Neighbor)
+        # Archive内の最も近い点との距離
+        raw_dist = min(euclidean(target_vec, arc_vec) for arc_vec in archive_vecs)
+        
+        temp_results.append({
+            "ind": ind,
+            "raw_fitness": raw_fitness,
+            "raw_dist": raw_dist
+        })
+
+    # --- 4. 適応度のMin/Maxを取得 (動的スケーリング) ---
+    all_fitnesses = [r["raw_fitness"] for r in temp_results]
+    if not all_fitnesses:
+        return
+
+    f_min = min(all_fitnesses)
+    f_max = max(all_fitnesses)
+    f_range = f_max - f_min
+
+    # ゼロ除算防止 (全個体が同じ予測値になった場合)
+    if f_range < 1e-9:
+        f_range = 1.0 
+
+    # --- 5. 2nd Pass: 正規化と合成スコアの計算 ---
+    for r in temp_results:
+        # 適応度の正規化 -> [0, 1]
+        # (推定値 - 最小) / レンジ
+        norm_fitness = (r["raw_fitness"] - f_min) / f_range
+        
+        # 距離の正規化 -> [0, 1]
+        # 距離 / 理論最大距離
+        norm_dist = r["raw_dist"] / max_dist_theoretical
+        
+        # 加重和 (Weighted Sum)
+        # fitness(活用) vs distance(探索)
+        # wが大きいほど探索重視
+        final_score = (1.0 - w) * norm_fitness + w * norm_dist
+        
+        # 個体に値をセット
+        r["ind"][target_key] = final_score
+
+    # デバッグ用出力 (interpolation関数に合わせて)
+    # print(
+    #     f"[Proper Norm] Fitness Range: {f_min:.3f}-{f_max:.3f}, "
+    #     f"Scores assigned with w={w}"
+    # )
+
+    return
+
 def calculate_by_distance(
     target_vec: List[float] = None,
     max_dist: float = 0.0,

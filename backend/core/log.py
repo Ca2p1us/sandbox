@@ -358,9 +358,13 @@ def log_comparison(evaluate_num: int = None, interpolate_num: int = None, file_p
         ax.plot(
             generations, 
             fitness_values,
-            marker=series.get('marker', 'o'),  # 指定がなければ 'o'
-            linestyle=series.get('linestyle', '-'), # 指定がなければ '-'
-            label=series.get('label', 'No Label')
+            marker=series.get('marker', 'o'),
+            linestyle=series.get('linestyle', '-'),
+            label=series.get('label', 'No Label'),
+            linewidth=2.5,       # 線を太く (デフォルトは1.5)
+            markersize=8,        # マーカーを大きく (デフォルトは6)
+            markeredgewidth=1.0, # マーカーの枠線
+            alpha=0.8            # 重なりが見えるように若干透過
         )
     
     _setup_plot(ax,method,y_label=indicator+'Fitness')

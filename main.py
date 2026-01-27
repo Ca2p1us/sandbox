@@ -158,11 +158,11 @@ elif choice == "3":
     )
     benchmark_population_size = 50
     for i in range(EXPERIMENT_TIMES):
-        print(f"ベンチマーク"+str(i+1)+"回目を実行")
-        best_fitness, average_fitness= iga.run_simulation_normal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, POPULATION_SIZE=benchmark_population_size, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added, look=look,tournament_size=4)
+        print(f"距離項なしサロゲート"+str(i+1)+"回目を実行")
+        best_fitness, average_fitness, error_history = iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=population_size, EVALUATE_SIZE=evaluate_size, evaluate_num = int(evaluate_num), interpolate_num = 2, times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=4)
         best_fitness_histories_benchmark.append(best_fitness)
         average_fitness_histories_benchmark.append(average_fitness)
-        print(f"ベンチマーク"+str(i+1)+"回目が完了")
+        print(f"距離項なしサロゲート"+str(i+1)+"回目が完了")
     best_fitness_histories_benchmark = np.mean(best_fitness_histories_benchmark, axis=0)
     best_fitness_histories_benchmark = [tuple(row) for row in best_fitness_histories_benchmark]
     average_fitness_histories_benchmark = np.mean(average_fitness_histories_benchmark,axis=0)
@@ -203,6 +203,18 @@ elif choice == "3":
 
     best_fitness_list = [
     {
+        'label': '提案手法', 
+        'data': best_fitness_histories_ave, 
+        'marker': 'o', 
+        'linestyle': '-'
+    },
+    {
+        'label': '距離項なしサロゲート',
+        'data': best_fitness_histories_benchmark,
+        'marker': 'x',
+        'linestyle': '-.'
+    },
+    {
         'label': 'GA(9個体)', 
         'data': best_fitness_histories_few_ave, 
         'marker': 'o', 
@@ -213,18 +225,6 @@ elif choice == "3":
         'data': best_fitness_histories_many_ave, 
         'marker': '^', 
         'linestyle': ':'
-    },
-    {
-        'label': '提案手法', 
-        'data': best_fitness_histories_ave, 
-        'marker': 'o', 
-        'linestyle': '-'
-    },
-    {
-        'label': 'GA(50個体)',
-        'data': best_fitness_histories_benchmark,
-        'marker': 'x',
-        'linestyle': '-.'
     },
     {
         'label': 'SAF-IEDA', 
@@ -242,6 +242,18 @@ elif choice == "3":
     ]
     ave_fitness_list = [
     {
+        'label': '提案手法', 
+        'data': average_fitness_histories_ave, 
+        'marker': 'o', 
+        'linestyle': '-'
+    },
+    {
+        'label': '距離項なしサロゲート',
+        'data': average_fitness_histories_benchmark,
+        'marker': 'x',
+        'linestyle': '-.'
+    },
+    {
         'label': 'GA(9個体)', 
         'data': average_fitness_histories_few_ave, 
         'marker': 'o', 
@@ -252,18 +264,6 @@ elif choice == "3":
         'data': average_fitness_histories_many_ave, 
         'marker': '^', 
         'linestyle': ':'
-    },
-    {
-        'label': '提案手法', 
-        'data': average_fitness_histories_ave, 
-        'marker': 'o', 
-        'linestyle': '-'
-    },
-    {
-        'label': 'GA(50個体)',
-        'data': average_fitness_histories_benchmark,
-        'marker': 'x',
-        'linestyle': '-.'
     },
     {
         'label': 'SAF-IEDA', 
