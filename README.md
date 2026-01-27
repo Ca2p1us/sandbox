@@ -244,6 +244,8 @@ uv run python -m backend.core.geneticAlgorithm.interpolation
         - make_chromosome_params.py seed=242
         - probability_model.py seed=252
         - run_iga_simulation.py seed=262
+        - probability_model seed = 272 個体選択用
+        - probability_model seed=282 個体生成用
 - 補間関連
     - ガウス補間を上手くいかせるために上位と下位から実際の評価個体を選択するようにした
     - **各世代のベスト±標準偏差と平均±標準偏差をプロットをするべき**

@@ -39,17 +39,17 @@ METHODS_CONFIG = {
     "提案手法": lambda func: os.path.join(
         "result", "proposal", "best", func, "Hybrid", "200inds_9eval"
     ),
-    "SAF-IEDA\n(200個体)": lambda func: os.path.join(
-        "result", "saf_ieda", "best", func, "200inds"
+    "距離項なしサロゲート": lambda func: os.path.join(
+        "result", "proposal", "best", func, "TPS", "200inds_9eval"
     ),
     "GA\n(9個体)": lambda func: os.path.join(
         "result", "conventional", "best", func, "9inds"
     ),
-    "距離項なしサロゲート": lambda func: os.path.join(
-        "result", "proposal", "best", func, "TPS", "200inds_9eval"
-    ),
     "GA\n(200個体)": lambda func: os.path.join(
         "result", "conventional", "best", func, "200inds"
+    ),
+    "SAF-IEDA\n(200個体)": lambda func: os.path.join(
+        "result", "saf_ieda", "best", func, "200inds"
     ),
 }
 
@@ -155,9 +155,10 @@ def draw_boxplot(data, labels, colors, func_name, suffix=""):
         patch.set_facecolor(colors[i])
         patch.set_alpha(0.8)
 
-    plt.title(f"評価関数: {func_name}", fontsize=14)
-    plt.ylabel(Y_LABEL, fontsize=12)
-    plt.xlabel(X_LABEL, fontsize=12)
+    # plt.title(f"評価関数: {func_name}", fontsize=14)
+    plt.ylabel(Y_LABEL, fontsize=18)
+    plt.xlabel(X_LABEL, fontsize=18)
+    plt.tick_params(axis='x', labelsize=11)
     plt.grid(axis='y', linestyle='--', alpha=0.5)
 
     # Y軸の範囲設定

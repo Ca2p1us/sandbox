@@ -23,7 +23,8 @@ def set_nested_value(ind, dot_key, value):
 
 # ---------------------------------------------------
 
-RNG = np.random.default_rng(252)
+RNG = np.random.default_rng(272)
+RNG_2 = np.random.default_rng(282)
 
 def sample_new_population_from_probability_model(best_individuals, num_samples, params_info, generation):
     next_generation = []
@@ -84,12 +85,12 @@ def sample_new_population_from_probability_model(best_individuals, num_samples, 
             new_value = center_value 
             
             for _ in range(max_retries):
-                candidate = np.random.normal(center_value, std_dev)
+                candidate = RNG_2.normal(center_value, std_dev)
                 if min_val <= candidate <= max_val:
                     new_value = candidate
                     break
             else:
-                candidate = np.random.normal(center_value, std_dev)
+                candidate = RNG_2.normal(center_value, std_dev)
                 new_value = max(min_val, min(max_val, candidate))
             
             set_nested_value(new_ind, param_key, new_value)

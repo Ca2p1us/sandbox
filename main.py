@@ -203,18 +203,6 @@ elif choice == "3":
 
     best_fitness_list = [
     {
-        'label': 'GA(9個体)', 
-        'data': best_fitness_histories_few_ave, 
-        'marker': 'o', 
-        'linestyle': '--'
-    },
-    {
-        'label': 'GA(200個体)', 
-        'data': best_fitness_histories_many_ave, 
-        'marker': '^', 
-        'linestyle': ':'
-    },
-    {
         'label': '提案手法', 
         'data': best_fitness_histories_ave, 
         'marker': 'o', 
@@ -225,6 +213,18 @@ elif choice == "3":
         'data': best_fitness_histories_benchmark,
         'marker': 'x',
         'linestyle': '-.'
+    },
+    {
+        'label': 'GA(9個体)', 
+        'data': best_fitness_histories_few_ave, 
+        'marker': 'o', 
+        'linestyle': '--'
+    },
+    {
+        'label': 'GA(200個体)', 
+        'data': best_fitness_histories_many_ave, 
+        'marker': '^', 
+        'linestyle': ':'
     },
     {
         'label': 'SAF-IEDA', 
@@ -242,18 +242,6 @@ elif choice == "3":
     ]
     ave_fitness_list = [
     {
-        'label': 'GA(9個体)', 
-        'data': average_fitness_histories_few_ave, 
-        'marker': 'o', 
-        'linestyle': '--'
-    },
-    {
-        'label': 'GA(200個体)', 
-        'data': average_fitness_histories_many_ave, 
-        'marker': '^', 
-        'linestyle': ':'
-    },
-    {
         'label': '提案手法', 
         'data': average_fitness_histories_ave, 
         'marker': 'o', 
@@ -264,6 +252,18 @@ elif choice == "3":
         'data': average_fitness_histories_benchmark,
         'marker': 'x',
         'linestyle': '-.'
+    },
+    {
+        'label': 'GA(9個体)', 
+        'data': average_fitness_histories_few_ave, 
+        'marker': 'o', 
+        'linestyle': '--'
+    },
+    {
+        'label': 'GA(200個体)', 
+        'data': average_fitness_histories_many_ave, 
+        'marker': '^', 
+        'linestyle': ':'
     },
     {
         'label': 'SAF-IEDA', 
