@@ -641,3 +641,33 @@ if __name__ == "__main__":
     ax.set_title("Pre-evaluation vs Fitness after Gaussian Interpolation")
     plt.savefig("tests/interpolation_result.png")
     plt.show()
+
+def calc_average_nn_distance(
+    population: List[dict],
+    evaluated_population: List[dict],
+    param_keys: List[str] = PARAMS,
+    min_max_dict: Dict[str, Tuple[float, float]] = PARAM_RANGES
+) -> float:
+    """
+    集団内の全個体について、最も近い評価済み個体(Archive)までの距離を計算し、その平均値を返す
+    """
+    if not evaluated_population or not population:
+        return 0.0
+
+    # 評価済み個体の正規化ベクトルリスト
+    archive_vecs = [to_normalized_vec(ind, param_keys, min_max_dict) for ind in evaluated_population]
+    
+    total_min_dist = 0.0
+    count = 0
+
+    for ind in population:
+        target_vec = to_normalized_vec(ind, param_keys, min_max_dict)
+        # 最も近いArchive点との距離
+        min_dist = min(euclidean(target_vec, ref_vec) for ref_vec in archive_vecs)
+        total_min_dist += min_dist
+        count += 1
+    
+    if count == 0:
+        return 0.0
+    
+    return total_min_dist / count
