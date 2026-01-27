@@ -161,7 +161,7 @@ def draw_boxplot(data, labels, colors, func_name, suffix=""):
     plt.grid(axis='y', linestyle='--', alpha=0.5)
 
     # Y軸の範囲設定
-    if func_name in Y_AXIS_LIMITS:
+    if func_name in Y_AXIS_LIMITS and suffix != "_no_saf":
         y_min, y_max = Y_AXIS_LIMITS[func_name]
         plt.ylim(y_min, y_max)
 
