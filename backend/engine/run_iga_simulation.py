@@ -6,7 +6,7 @@ from ..core.geneticAlgorithm.probability_model import sample_new_population_from
 from ..core.geneticAlgorithm.repair import repair_fm_params as repair_gene
 from ..core.geneticAlgorithm.mutate import mutate 
 from ..core.geneticAlgorithm import make_chromosome_params
-from ..core.geneticAlgorithm.interpolation import interpolation, interpolation_proper_normalization,get_evaluated_individuals, get_total_error, build_interpolator
+from ..core.geneticAlgorithm.interpolation import interpolation, interpolation_proper_normalization,get_evaluated_individuals, get_total_error, build_interpolator, calc_average_nn_distance
 from ..core.geneticAlgorithm.pre_selection import select_top_individuals_by_pre_evaluation
 from ..core.geneticAlgorithm.config import TARGET_PARAMS, PARAMS, TARGET_PARAMS_1, TARGET_PARAMS_2
 from ..core.log import log, log_fitness, plot_individual_params, log_average_fitness, plot_interpolated_heatmap
@@ -143,6 +143,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
     best_fitness_history = []
     average_fitness_history = []
     error_history = []
+    distance_history = []
     bests = []
     archive = []
     evaluate_method = ""
@@ -215,6 +216,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
             noise_is_added=noise_is_added
         )
         archive.extend([copy.deepcopy(ind) for ind in evaluate_population])
+        avg_dist = calc_average_nn_distance(population, archive, PARAMS)
+        distance_history.append((generation + 1, float(avg_dist)))
         interpolator = build_interpolator(
             evaluated_population=archive,
             method_num=interpolate_num,
@@ -336,6 +339,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         evaluate_id = select_top_individuals_by_pre_evaluation(population, total_n=EVALUATE_SIZE, gen=generation+1)
         evaluate_population = get_evaluated_individuals(population, evaluate_id)
 
+        
+
     # --- ここで最終世代の評価値を再計算 ---
     evaluate_fitness(
             population=evaluate_population,
@@ -345,6 +350,8 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         )
     # ベスト・ワースト個体の取得
     archive.extend(copy.deepcopy(ind) for ind in evaluate_population)
+    avg_dist = calc_average_nn_distance(population, archive, PARAMS)
+    distance_history.append((NUM_GENERATIONS, float(avg_dist)))
     interpolator = build_interpolator(
             evaluated_population=archive,
             method_num=interpolate_num,
@@ -404,7 +411,7 @@ def run_simulation_proposal_IGA(NUM_GENERATIONS=9, PROPOSAL_POPULATION_SIZE=200,
         average_fitness_history=average_fitness_history,
         times=times
     )
-    return best_fitness_history, average_fitness_history, error_history
+    return best_fitness_history, average_fitness_history, error_history, distance_history
 
 def run_simulation_SAF_IEDA(NUM_GENERATIONS=9, POPULATION_SIZE=9, TOP_NC=5, evaluate_num=0, times:int=1, noise_is_added: bool = False, look: bool = False, tournament_size=3):
     """

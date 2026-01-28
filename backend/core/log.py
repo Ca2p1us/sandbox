@@ -142,6 +142,11 @@ def _get_save_path(ver: str, method: str, interpolate: Optional[str], category: 
         else:
             base_dir = Path(f'./result/{ver}/average/{method}/{interpolate}')
 
+    elif category == "distance_histories":
+        if interpolate is None:
+            base_dir = Path(f'./result/{ver}/distance_histories/{method}')
+        else:
+            base_dir = Path(f'./result/{ver}/distance_histories/{method}/{interpolate}/200inds_9eval')
     # 3. その他グラフ (result/{ver}/graph/...)
     else:
         # category: "best_fitnesses", "error_histories"
@@ -724,3 +729,57 @@ def plot_interpolated_heatmap(
         plt.tight_layout()
         plt.savefig(save_path)
         plt.close()
+
+def log_distance_history_json(evaluate_num: int = None, interpolate_num: int = None, file_path: str = None, distance_history: list = None, times: int = 1, ver: str = "proposal"):
+    """
+    世代ごとの最近傍距離履歴をjsonファイルに保存する
+    distance_history: [(世代番号, 距離), ...] のリスト
+    """
+    if not distance_history:
+        return
+
+    method = _get_method_name(evaluate_num)
+    interpolate = _get_interpolate_name(interpolate_num)
+    
+    # 保存パスの生成 (category="distance_histories" として保存)
+    save_path = _get_save_path(ver, method, interpolate, "distance_histories", file_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    # JSONファイルに保存
+    with save_path.open('w', encoding='utf-8') as f:
+        json.dump({f"{times}_distance_history": distance_history}, f, indent=2)
+
+    return
+
+def log_distance_history(evaluate_num: int = None, interpolate_num: int = None, file_path: str = None, distance_history: list = None, ver: str = None):
+    """
+    世代ごとの最近傍距離の推移をグラフ表示する
+    distance_history: [(世代番号, 選択個体平均距離, 全体平均距離), ...]
+    """
+    if not distance_history:
+        print("距離履歴データがありません。")
+        return
+    
+    method = _get_method_name(evaluate_num)
+    interpolate = _get_interpolate_name(interpolate_num)
+
+    # 保存先は graph フォルダの下に distance フォルダを作ると整理しやすい
+    save_path = _get_save_path(ver, method, interpolate, "distance_histories", file_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    fig, ax = plt.subplots(figsize=(8, 5))
+
+    generations = [item[0] for item in distance_history]
+    sel_dists = [item[1] for item in distance_history]
+    pop_dists = [item[2] for item in distance_history]
+
+    ax.plot(generations, sel_dists, marker='o', linestyle='-', color='red', label='Selected (Exploration)')
+    ax.plot(generations, pop_dists, marker='x', linestyle='--', color='gray', label='Population Mean (Baseline)')
+
+    _setup_plot(ax, method, y_label='Normalized NN Distance', title=f'{method} NN Distance History')
+    ax.set_ylim(0, 1.5) # 正規化距離なので最大でも√6(=2.45)程度、通常は1.0以下
+    ax.legend(loc='best')
+
+    plt.savefig(save_path)
+    plt.close()
+

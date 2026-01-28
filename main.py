@@ -1,5 +1,5 @@
 from backend.engine import run_iga_simulation as iga
-from backend.core.log import sound_check, log_fitness, log_fitness_histories, log_comparison, log_error_history, log_compare, log_fitness_variance
+from backend.core.log import log_fitness, log_fitness_histories, log_comparison, log_error_history, log_compare, log_fitness_variance, log_distance_history, log_distance_history_json
 import numpy as np
 from backend.core.geneticAlgorithm.config import NUM_GENERATIONS, POPULATION_SIZE, PROPOSAL_POPULATION_SIZE, EVALUATE_SIZE, EXPERIMENT_TIMES
 
@@ -35,7 +35,7 @@ if choice == "2":
         look = True
     for i in range(EXPERIMENT_TIMES):
         print("提案型IGAシミュレーション"+str(i+1)+"回目を実行")
-        best_fitness, average_fitness, error_history = iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=PROPOSAL_POPULATION_SIZE, EVALUATE_SIZE=EVALUATE_SIZE, evaluate_num = int(evaluate_num), interpolate_num = int(interpolate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=4)
+        best_fitness, average_fitness, error_history, distance_history = iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=PROPOSAL_POPULATION_SIZE, EVALUATE_SIZE=EVALUATE_SIZE, evaluate_num = int(evaluate_num), interpolate_num = int(interpolate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=4)
         best_fitness_histories.append(best_fitness)
         average_fitness_histories.append(average_fitness)
         print("提案型IGAシミュレーション"+str(i+1)+"回目が完了")
@@ -141,9 +141,17 @@ elif choice == "3":
     log_fitness(file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_average_fitness_histories.png", best_fitness_history= best_fitness_histories_many_ave, average_fitness_history=average_fitness_histories_many_ave,evaluate_num=int(evaluate_num),ver="conventional")
     for  i in range(EXPERIMENT_TIMES):
         print(f"提案型IGAシミュレーション"+str(i+1)+"回目を実行")
-        best_fitness, average_fitness, error_history = iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=population_size, EVALUATE_SIZE=evaluate_size, evaluate_num = int(evaluate_num), interpolate_num = int(interpolate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=4)
+        best_fitness, average_fitness, error_history, distance_history = iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=population_size, EVALUATE_SIZE=evaluate_size, evaluate_num = int(evaluate_num), interpolate_num = int(interpolate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=4)
         best_fitness_histories.append(best_fitness)
         average_fitness_histories.append(average_fitness)
+        log_distance_history_json(
+            evaluate_num=int(evaluate_num),
+            interpolate_num=int(interpolate_num),
+            file_path=f"_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(population_size)}_{str(evaluate_size)}eval_{str(i+1)}_distance_history.json",
+            distance_history=distance_history,
+            times=i+1,
+            ver="proposal"
+        )
         print(f"提案型IGAシミュレーション"+str(i+1)+"回目が完了")
     best_fitness_histories_ave = np.mean(best_fitness_histories, axis=0)
     best_fitness_histories_ave = [tuple(row) for row in best_fitness_histories_ave]
@@ -159,9 +167,17 @@ elif choice == "3":
     benchmark_population_size = 50
     for i in range(EXPERIMENT_TIMES):
         print(f"距離項なしサロゲート"+str(i+1)+"回目を実行")
-        best_fitness, average_fitness, error_history = iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=population_size, EVALUATE_SIZE=evaluate_size, evaluate_num = int(evaluate_num), interpolate_num = 2, times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=4)
+        best_fitness, average_fitness, error_history, distance_history = iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=population_size, EVALUATE_SIZE=evaluate_size, evaluate_num = int(evaluate_num), interpolate_num = 2, times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=4)
         best_fitness_histories_benchmark.append(best_fitness)
         average_fitness_histories_benchmark.append(average_fitness)
+        log_distance_history_json(
+            evaluate_num=int(evaluate_num),
+            interpolate_num=2,
+            file_path=f"_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_{str(population_size)}_{str(evaluate_size)}eval_{str(i+1)}_distance_history.json",
+            distance_history=distance_history,
+            times=i+1,
+            ver="proposal"
+        )
         print(f"距離項なしサロゲート"+str(i+1)+"回目が完了")
     best_fitness_histories_benchmark = np.mean(best_fitness_histories_benchmark, axis=0)
     best_fitness_histories_benchmark = [tuple(row) for row in best_fitness_histories_benchmark]
@@ -350,7 +366,7 @@ elif choice == "4":
                 best_fitness, average_fitness = iga.run_simulation_normal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, POPULATION_SIZE=population_size, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=ts)
             elif proposal_or_conventional == "1":
                 print(f"提案型IGAシミュレーション トーナメントサイズ {ts} "+str(i+1)+"回目を実行")
-                best_fitness, average_fitness, error_history = iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=population_size, EVALUATE_SIZE=evaluate_size, evaluate_num = int(evaluate_num), interpolate_num = int(interpolate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=ts)
+                best_fitness, average_fitness, error_history, _ = iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=population_size, EVALUATE_SIZE=evaluate_size, evaluate_num = int(evaluate_num), interpolate_num = int(interpolate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=ts)
             best_fitness_history.append(best_fitness)
         best_fitness_histories_all.append(np.mean(best_fitness_history, axis=0))
     log_compare(
@@ -410,7 +426,7 @@ elif choice == "5":
             elif proposal_or_conventional == "1":
                 print(f"提案型IGAシミュレーション 総個体数 {pop_size} "+str(i+1)+"回目を実行")
                 # 提案型の場合、総個体数をpop_sizeに変更
-                best_fitness, average_fitness, error_history = iga.run_simulation_proposal_IGA(
+                best_fitness, average_fitness, error_history, _ = iga.run_simulation_proposal_IGA(
                     NUM_GENERATIONS=NUM_GENERATIONS, 
                     PROPOSAL_POPULATION_SIZE=pop_size, 
                     EVALUATE_SIZE=evaluate_size, 

@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 import numpy as np
 import os
+
+plt.rcParams['font.family'] = 'MS Gothic'
 
 def plot_gauss_function():
     # 1. パラメータの設定
@@ -313,10 +317,160 @@ def plot_sphere_function():
     print(f"グラフを {filename} として保存しました。")
     plt.show()
 
+def _plot_and_save_3d(X, Y, Z, title, filename):
+    """共通の3Dプロット・保存関数"""
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+    
+    # サーフェスプロット
+    surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm, 
+                           linewidth=0, antialiased=False, alpha=0.9)
+    
+    # ラベルとタイトル
+    ax.set_title(title, fontsize=20)
+    ax.set_xlabel('Param 1', fontsize=14)
+    ax.set_ylabel('Param 2', fontsize=14)
+    ax.set_zlabel('Fitness', fontsize=14)
+    
+    # アングル調整（見やすい角度に）
+    ax.view_init(elev=35, azim=45)
+    
+    # カラーバー
+    fig.colorbar(surf, shrink=0.5, aspect=10, pad=0.1)
+    
+    plt.tight_layout()
+    
+    # ディレクトリ作成と保存
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    plt.savefig(filename, dpi=300)
+    plt.close()
+    print(f"Saved: {filename}")
+
+def plot_all_benchmark_functions():
+    """evaluate.pyの各評価関数を2次元入力(3Dグラフ)として可視化する"""
+    
+    # 定義域の設定 (0〜500)
+    x_min, x_max = 0, 500
+    y_min, y_max = 0, 500
+    resolution = 100
+    
+    x = np.linspace(x_min, x_max, resolution)
+    y = np.linspace(y_min, y_max, resolution)
+    X, Y = np.meshgrid(x, y)
+    
+    save_dir = "for_slide/benchmarks_3d"
+    
+    # evaluate.py と config.py に基づくパラメータ
+    mu = 250
+    sigma_gauss = 75.0
+    
+    # --- 1. Gaussian Function ---
+    # evaluate.py: calculate_Gaussian は sum(scores)
+    # compute_Gaussian(val) = exp(-(val-250)^2 / (2*75^2))
+    # 2次元なら f(x) + f(y)
+    
+    def _gauss_1d(v):
+        return np.exp(-((v - mu)**2) / (2 * sigma_gauss**2))
+        
+    Z_gauss = _gauss_1d(X) + _gauss_1d(Y)
+    
+    _plot_and_save_3d(X, Y, Z_gauss, "Gaussian Function", f"{save_dir}/Gaussian.png")
+
+
+    # --- 2. Gaussian Peaks Function ---
+    # config.py:
+    # TARGET_PARAMS = [250...], SIGMA=[50,30,30], RATE=[1,0.5,0.5]
+    # TARGET_PARAMS_1 = [100...], TARGET_PARAMS_2 = [400...]
+    # evaluate.py: 
+    # score += rate * exp(-(val-mu)^2 / 2*sigma^2)
+    # これを3つのピークについて合計し、さらに各次元で合計する
+    
+    target_params_list = [
+        [250]*6, # TARGET_PARAMS
+        [100]*6, # TARGET_PARAMS_1
+        [400]*6  # TARGET_PARAMS_2
+    ]
+    sigmas = [50, 30, 30]
+    rates = [1, 0.5, 0.5]
+    
+    def _peaks_1d(v):
+        val = 0.0
+        for j in range(3):
+            # 全次元共通のターゲット値を使用(index 0を参照)
+            mu_j = target_params_list[j][0]
+            sigma_j = sigmas[j]
+            rate_j = rates[j]
+            val += rate_j * np.exp(-((v - mu_j)**2) / (2 * sigma_j**2))
+        return val
+
+    Z_peaks = _peaks_1d(X) + _peaks_1d(Y)
+    
+    _plot_and_save_3d(X, Y, Z_peaks, "Gaussian Peaks Function", f"{save_dir}/Gaussian_peaks.png")
+
+
+    # --- 3. Gaussian Cos Function ---
+    # evaluate.py:
+    # compute_Gaussian_cos = exp(...) + 0.1 * cos(2*pi*frequency*val)
+    # frequency = 0.02 (configにはないがevaluate.pyのデフォルト)
+    # sigma = 75.0
+    
+    freq = 0.02
+    
+    def _gauss_cos_1d(v):
+        term1 = np.exp(-((v - mu)**2) / (2 * sigma_gauss**2))
+        term2 = 0.1 * np.cos(2 * np.pi * freq * v)
+        return term1 + term2
+
+    Z_cos = _gauss_cos_1d(X) + _gauss_cos_1d(Y)
+    
+    _plot_and_save_3d(X, Y, Z_cos, "Gaussian Cos Function", f"{save_dir}/Gaussian_cos.png")
+
+
+    # --- 4. Ackley Function ---
+    # evaluate.py:
+    # A=20, B=0.04, C=0.04 (evaluate.pyのデフォルト値)
+    # fitness = 6.0 * (1.0 - raw_val / (A+e))
+    # raw_val = -A*exp(-B*sqrt(mean_sq)) - exp(mean_cos) + A + e
+    
+    A = 20
+    B = 0.04
+    C = 0.04
+    n_scale = 6.0
+    
+    # ターゲット(250)からの差分
+    diff_X = X - mu
+    diff_Y = Y - mu
+    
+    # 2次元での平均
+    mean_sq = (diff_X**2 + diff_Y**2) / 2
+    mean_cos = (np.cos(C * diff_X) + np.cos(C * diff_Y)) / 2
+    
+    raw_val = -A * np.exp(-B * np.sqrt(mean_sq)) - np.exp(mean_cos) + A + np.e
+    max_val = A + np.e
+    
+    Z_ackley = n_scale * (1.0 - raw_val / max_val)
+    
+    _plot_and_save_3d(X, Y, Z_ackley, "Ackley Function", f"{save_dir}/Ackley.png")
+
+
+    # --- 5. Sphere Function ---
+    # evaluate.py:
+    # compute_Sphere = -1 * (val - target)**2
+    # calculate_Sphere = sum(scores) -> -(X-mu)^2 - (Y-mu)^2
+    # これはマイナスの値になる。
+    
+    def _sphere_1d(v):
+        return -1 * ((v - mu)**2)
+        
+    Z_sphere = _sphere_1d(X) + _sphere_1d(Y)
+    
+    _plot_and_save_3d(X, Y, Z_sphere, "Sphere Function", f"{save_dir}/Sphere.png")
+
 
 if __name__ == "__main__":
-    plot_gauss_function()
-    plot_gauss_func_peaks()
-    plot_gaussian_add_cosine()
-    plot_Ackley_function()
-    plot_sphere_function()
+    # plot_gauss_function()
+    # plot_gauss_func_peaks()
+    # plot_gaussian_add_cosine()
+    # plot_Ackley_function()
+    # plot_sphere_function()
+    plot_all_benchmark_functions()
