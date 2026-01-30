@@ -24,12 +24,12 @@ BENCHMARK_FUNCTIONS = [
 # Y軸の範囲設定 (最小値, 最大値)
 # 必要に応じて数値を調整してください
 Y_AXIS_LIMITS = {
-    "Gaussian": (0, 6.2),
+    "Gaussian": (0, 7.0),
     "Sphere": (0, 1.5),         # 状況に合わせて調整してください
-    "Gaussian_cos": (0, 7.2),
-    "Ackley": (0, 6.0),
-    "Gaussian_peaks": (0, 6.2),
-    "Mixed": (0.0, 6.2)
+    "Gaussian_cos": (0, 7.0),
+    "Ackley": (0, 7.0),
+    "Gaussian_peaks": (0, 7.0),
+    "Mixed": (0.0, 7.0)
 }
 
 # 距離グラフ用のY軸範囲設定 (必要に応じて調整)

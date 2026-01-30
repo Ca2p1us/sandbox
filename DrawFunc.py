@@ -327,7 +327,7 @@ def _plot_and_save_3d(X, Y, Z, title, filename):
                            linewidth=0, antialiased=False, alpha=0.9)
     
     # ラベルとタイトル
-    ax.set_title(title, fontsize=20)
+    # ax.set_title(title, fontsize=20)
     ax.set_xlabel('Param 1', fontsize=14)
     ax.set_ylabel('Param 2', fontsize=14)
     ax.set_zlabel('Fitness', fontsize=14)

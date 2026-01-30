@@ -47,12 +47,12 @@ INTERPOLATE_NAME_TO_ID = {v: k for k, v in INTERPOLATE_MAP.items() if v is not N
 # 関数ごとに微妙に異なっていた値を統合的に管理します。
 # 必要に応じてここを調整してください。
 Y_LIM_SETTINGS = {
-    "Gaussian": (0, 6.5),
-    "Ackley": (0, 6.0),
-    "Gaussian_peaks": (0, 6.5),
+    "Gaussian": (0, 7.0),
+    "Ackley": (0, 7.0),
+    "Gaussian_peaks": (0, 7.0),
     "Gaussian_cos": (0, 7.0), # 以前のコードで最大範囲だったものを採用
     "Sphere": (-100000, 0.5),
-    "Mixed": (0.0, 6.5)
+    "Mixed": (0.0, 7.0)
 }
 
 # 評価関数ごとの凡例位置設定
