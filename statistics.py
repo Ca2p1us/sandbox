@@ -2,6 +2,8 @@ import json
 import os
 import glob
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import re
 import numpy as np
 
 # ==========================================
@@ -33,7 +35,7 @@ Y_AXIS_LIMITS = {
 }
 
 # 距離グラフ用のY軸範囲設定 (必要に応じて調整)
-DISTANCE_Y_LIMITS = (0, 1.2)
+DISTANCE_Y_LIMITS = (0, 0.7)
 
 # 手法の設定 (表示順序)
 # key: グラフのX軸ラベル
@@ -139,40 +141,34 @@ def collect_data(func_name):
     return plot_data, labels, colors
 
 def draw_boxplot(data, labels, colors, func_name, suffix=""):
-    """
-    箱ひげ図を描画して保存する
-    suffix: ファイル名の末尾につける識別子 ("_all" や "_no_saf" など)
-    """
     if not data:
-        print(f"  データがないため {func_name}{suffix} のグラフ作成をスキップします。")
         return
 
     plt.figure(figsize=(8, 6))
-    
-    # 箱ひげ図の描画
     bp = plt.boxplot(data, tick_labels=labels, patch_artist=True,
                      medianprops=dict(color="black", linewidth=1.5))
-
-    # 色の設定 (渡されたcolorsリストを使用)
     for i, patch in enumerate(bp['boxes']):
         patch.set_facecolor(colors[i])
         patch.set_alpha(0.8)
 
-    # plt.title(f"評価関数: {func_name}", fontsize=14)
     plt.ylabel(Y_LABEL, fontsize=18)
     plt.xlabel(X_LABEL, fontsize=18)
     plt.tick_params(axis='x', labelsize=11)
     plt.grid(axis='y', linestyle='--', alpha=0.5)
 
-    # Y軸の範囲設定
     if func_name in Y_AXIS_LIMITS and suffix != "_no_saf":
-        y_min, y_max = Y_AXIS_LIMITS[func_name]
-        plt.ylim(y_min, y_max)
+        plt.ylim(Y_AXIS_LIMITS[func_name])
 
     plt.tight_layout()
-    output_file = f"boxplot_{func_name}{suffix}.png"
+    
+    # --- 保存先の変更 ---
+    output_dir = os.path.join("result", "analysis", "boxplot")
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, f"boxplot_{func_name}{suffix}.png")
+    # ------------------
+    
     plt.savefig(output_file, dpi=300)
-    print(f"  グラフを保存しました: {output_file}")
+    print(f"  保存完了: {output_file}")
     plt.close()
 
 def get_distance_history_from_file(filepath):
@@ -267,76 +263,292 @@ def collect_distance_data(func_name):
     return results
 
 def draw_distance_transition_graph(distance_data, func_name):
-    """
-    距離推移の折れ線グラフを描画
-    """
-    if not distance_data:
-        return
+    if not distance_data: return
 
     plt.figure(figsize=(8, 6))
-
     for label, data in distance_data.items():
-        gens = data["gens"]
-        means = data["means"]
-        stds = data["stds"]
-        color = data["color"]
-
-        # エラーバー(標準偏差)付きでプロットするか、線のみにするか
-        # 視認性のため、ここでは線と薄い塗りつぶし(標準偏差)を使用
-        plt.plot(gens, means, label=label, color=color, linewidth=2, marker='o', markersize=4)
-        
-        # 標準偏差の範囲を塗りつぶし
-        lower = np.array(means) - np.array(stds)
-        upper = np.array(means) + np.array(stds)
-        # 0以下にはならないのでクリップ
-        lower = np.maximum(lower, 0)
-        
-        plt.fill_between(gens, lower, upper, color=color, alpha=0.15)
+        plt.plot(data["gens"], data["means"], label=label, color=data["color"], linewidth=2, marker='o', markersize=4)
+        lower = np.maximum(np.array(data["means"]) - np.array(data["stds"]), 0)
+        upper = np.array(data["means"]) + np.array(data["stds"])
+        plt.fill_between(data["gens"], lower, upper, color=data["color"], alpha=0.15)
 
     plt.title(f"Average Nearest Neighbor Distance: {func_name}", fontsize=14)
     plt.xlabel("Generation", fontsize=16)
     plt.ylabel("Avg NN Distance (Normalized)", fontsize=16)
     plt.grid(True, linestyle='--', alpha=0.6)
     plt.legend(fontsize=12)
-    plt.ylim(*DISTANCE_Y_LIMITS) # Y軸固定
+    plt.ylim(*DISTANCE_Y_LIMITS)
+    plt.tight_layout()
+    
+    # --- 保存先の変更 ---
+    output_dir = os.path.join("result", "analysis", "distance_history")
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, f"distance_history_{func_name}.png")
+    # ------------------
+
+    plt.savefig(output_file, dpi=300)
+    print(f"  保存完了: {output_file}")
+    plt.close()
+
+
+def collect_weight_distance_data(func_name):
+    results = {}
+    target_dir = os.path.normpath(os.path.join("result", "benchmark", func_name, "Hybrid"))
+    
+    if not os.path.exists(target_dir):
+        # フォルダがない場合はユーザーに通知してスキップ（エラーにはしない）
+        # print(f"  [Skip] Weight dir not found: {target_dir}")
+        return {}
+
+    json_files = glob.glob(os.path.join(target_dir, "*weight_distance_history.json"))
+    if not json_files: return {}
+
+    print(f"--- データ収集: 重み別距離推移 ({func_name}) ---")
+    weight_map = {}
+
+    for json_file in json_files:
+        match = re.search(r"_(\d+(\.\d+)?)weight_", os.path.basename(json_file))
+        if not match: continue
+        weight = float(match.group(1))
+        
+        history = get_distance_history_from_file(json_file)
+        if history:
+            if weight not in weight_map: weight_map[weight] = {}
+            for gen, dist in history:
+                if gen not in weight_map[weight]: weight_map[weight][gen] = []
+                weight_map[weight][gen].append(dist)
+    
+    for w in sorted(weight_map.keys()):
+        gens = sorted(weight_map[w].keys())
+        results[w] = {
+            "gens": gens,
+            "means": [np.mean(weight_map[w][g]) for g in gens],
+            "stds": [np.std(weight_map[w][g]) for g in gens]
+        }
+        print(f"  w={w}: {len(weight_map[w][gens[0]])} trials")
+        
+    return results
+
+def draw_weight_distance_transition_graph(weight_data, func_name):
+    if not weight_data: return
+
+    plt.figure(figsize=(10, 7))
+    weights = sorted(weight_data.keys())
+    colors = cm.viridis(np.linspace(0, 1, len(weights)))
+
+    for idx, w in enumerate(weights):
+        data = weight_data[w]
+        plt.plot(data["gens"], data["means"], label=f"w={w}", color=colors[idx], linewidth=2, marker='o', markersize=4)
+        lower = np.maximum(np.array(data["means"]) - np.array(data["stds"]), 0)
+        upper = np.array(data["means"]) + np.array(data["stds"])
+        plt.fill_between(data["gens"], lower, upper, color=colors[idx], alpha=0.1)
+
+    plt.title(f"Distance History by Weight: {func_name}", fontsize=14)
+    plt.xlabel("Generation", fontsize=16)
+    plt.ylabel("Avg NN Distance (Normalized)", fontsize=16)
+    plt.grid(True, linestyle='--', alpha=0.6)
+    plt.legend(fontsize=10, loc='upper right', bbox_to_anchor=(1.15, 1))
+    plt.ylim(*DISTANCE_Y_LIMITS)
+    plt.tight_layout()
+    
+    # --- 保存先の変更 ---
+    output_dir = os.path.join("result", "analysis", "weight_distance_history")
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, f"weight_distance_history_{func_name}.png")
+    # ------------------
+
+    plt.savefig(output_file, dpi=300)
+    print(f"  保存完了: {output_file}")
+    plt.close()
+
+
+def draw_weight_win_counts(weight_data, func_name):
+    """
+    重みごとの勝利数（最小距離記録回数）グラフ
+    """
+    if not weight_data:
+        return
+
+    weights = list(weight_data.keys())
+    
+    # 最終世代での最小距離を持つ重みを特定して表示
+    best_final_w = None
+    min_final_dist = float('inf')
+
+    for w in weights:
+        means = weight_data[w]["means"]
+        if means:
+            final_val = means[-1] 
+            if final_val < min_final_dist:
+                min_final_dist = final_val
+                best_final_w = w
+    
+    if best_final_w is not None:
+        print(f"  ★ [{func_name}] 最終世代で最も距離が小さい重み: w={best_final_w} (Distance: {min_final_dist:.4f})")
+
+    # 共通する世代を取得
+    common_gens = set(weight_data[weights[0]]["gens"])
+    for w in weights[1:]:
+        common_gens &= set(weight_data[w]["gens"])
+    
+    sorted_gens = sorted(list(common_gens))
+    if not sorted_gens:
+        return
+
+    win_counts = {w: 0 for w in weights}
+
+    for gen in sorted_gens:
+        min_val = float('inf')
+        best_w = None
+        for w in weights:
+            try:
+                idx = weight_data[w]["gens"].index(gen)
+                val = weight_data[w]["means"][idx]
+                if val < min_val:
+                    min_val = val
+                    best_w = w
+            except ValueError:
+                pass
+        
+        if best_w is not None:
+            win_counts[best_w] += 1
+
+    plt.figure(figsize=(10, 6))
+    sorted_weights = sorted(weights)
+    counts = [win_counts[w] for w in sorted_weights]
+    labels = [str(w) for w in sorted_weights]
+    
+    bars = plt.bar(labels, counts, color='skyblue', edgecolor='black', alpha=0.7)
+    
+    plt.xlabel("Weight (w)", fontsize=14)
+    plt.ylabel("Win Count (Generations)", fontsize=14)
+    plt.title(f"Number of Generations with Lowest Avg NN Distance: {func_name}", fontsize=12)
+    plt.grid(axis='y', linestyle='--', alpha=0.5)
+    
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2, height, f'{int(height)}', ha='center', va='bottom')
 
     plt.tight_layout()
-    output_file = f"distance_history_{func_name}.png"
+    
+    # --- 保存先の変更 (weight_distance_historyと同じ場所に入れます) ---
+    output_dir = os.path.join("result", "analysis", "weight_distance_history")
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, f"weight_win_counts_{func_name}.png")
+    # ------------------
+
     plt.savefig(output_file, dpi=300)
-    print(f"  距離推移グラフを保存しました: {output_file}")
+    print(f"  保存完了: {output_file}")
     plt.close()
+
+
+def run_analysis(func_name, plot_types):
+    """
+    指定された関数とプロットタイプに基づいて解析を実行する
+    plot_types: list of str ("boxplot", "distance", "weight")
+    """
+    print(f"\n[{func_name}] の解析を開始します...")
+
+    # 1. 適応度比較 (Boxplot)
+    if "boxplot" in plot_types:
+        all_data, all_labels, all_colors = collect_data(func_name)
+        if all_data:
+            draw_boxplot(all_data, all_labels, all_colors, func_name, suffix="_all")
+            
+            # SAF抜き
+            no_saf_data = []
+            no_saf_labels = []
+            no_saf_colors = []
+            for d, l, c in zip(all_data, all_labels, all_colors):
+                if "SAF-IEDA" not in l:
+                    no_saf_data.append(d)
+                    no_saf_labels.append(l)
+                    no_saf_colors.append(c)
+            if no_saf_data:
+                draw_boxplot(no_saf_data, no_saf_labels, no_saf_colors, func_name, suffix="_no_saf")
+        else:
+            print("  適応度データが見つかりませんでした。")
+
+    # 2. 手法別距離推移
+    if "distance" in plot_types:
+        dist_data = collect_distance_data(func_name)
+        if dist_data:
+            draw_distance_transition_graph(dist_data, func_name)
+        else:
+            print("  手法別距離データが見つかりませんでした。")
+
+    # 3. 重み別距離推移
+    if "weight" in plot_types:
+        weight_dist_data = collect_weight_distance_data(func_name)
+        if weight_dist_data:
+            # 既存の折れ線グラフ描画
+            draw_weight_distance_transition_graph(weight_dist_data, func_name)
+            
+            # ★追加: 勝利数カウント（棒グラフ）の描画★
+            draw_weight_win_counts(weight_dist_data, func_name)
+        else:
+            print("  重み別距離データが見つかりませんでした。(result/benchmark/.../Hybrid を確認してください)")
+
 
 if __name__ == "__main__":
     if not os.path.exists("result"):
-        print("警告: 'result' ディレクトリが見つかりません。")
+        print("警告: 'result' ディレクトリが見つかりません。実行場所を確認してください。")
 
-    for func in BENCHMARK_FUNCTIONS:
-        # 1. 全データの収集
-        all_data, all_labels, all_colors = collect_data(func)
+    print("=========================================")
+    print("      統計グラフ作成・解析ツール")
+    print("=========================================")
+    print("解析モードを選択してください:")
+    print("1: 全ベンチマーク関数を一括出力 (従来モード)")
+    print("2: 個別のベンチマーク関数を選択して出力")
+    
+    mode = input("モードを選択 (1/2): ")
+
+    if mode == "1":
+        # 全関数一括実行
+        print("\n--- 全関数一括モードを実行します ---")
+        for func in BENCHMARK_FUNCTIONS:
+            run_analysis(func, plot_types=["boxplot", "distance", "weight"])
+            print("")
+
+    elif mode == "2":
+        # 関数選択
+        print("\n解析するベンチマーク関数を選択してください:")
+        for i, func in enumerate(BENCHMARK_FUNCTIONS):
+            print(f"{i+1}: {func}")
         
-        if not all_data:
-            continue
+        try:
+            func_idx = int(input(f"番号を入力 (1-{len(BENCHMARK_FUNCTIONS)}): ")) - 1
+            if 0 <= func_idx < len(BENCHMARK_FUNCTIONS):
+                target_func = BENCHMARK_FUNCTIONS[func_idx]
+                
+                # グラフタイプ選択
+                print(f"\n[{target_func}] に対して作成するグラフを選択してください:")
+                print("1: 適応度箱ひげ図 (Boxplot)")
+                print("2: 手法別距離推移 (Distance History)")
+                print("3: 重み別距離推移 (Weight Distance Comparison)")
+                print("4: すべて作成")
+                
+                plot_choice = input("番号を入力 (1/2/3/4): ")
+                
+                selected_plots = []
+                if plot_choice == "1":
+                    selected_plots = ["boxplot"]
+                elif plot_choice == "2":
+                    selected_plots = ["distance"]
+                elif plot_choice == "3":
+                    selected_plots = ["weight"]
+                elif plot_choice == "4":
+                    selected_plots = ["boxplot", "distance", "weight"]
+                else:
+                    print("無効な入力です。すべて作成します。")
+                    selected_plots = ["boxplot", "distance", "weight"]
 
-        # 2. 全手法入りのグラフ作成 (_all)
-        draw_boxplot(all_data, all_labels, all_colors, func, suffix="_all")
+                run_analysis(target_func, selected_plots)
+            
+            else:
+                print("無効な番号です。終了します。")
+        except ValueError:
+            print("入力エラーです。数値を入力してください。")
 
-        # 3. SAF-IEDAを除外したデータの作成
-        no_saf_data = []
-        no_saf_labels = []
-        no_saf_colors = []
-
-        for d, l, c in zip(all_data, all_labels, all_colors):
-            if "SAF-IEDA" not in l:
-                no_saf_data.append(d)
-                no_saf_labels.append(l)
-                no_saf_colors.append(c)
-
-        # 4. SAF-IEDA抜きのグラフ作成 (_no_saf)
-        if no_saf_data:
-            draw_boxplot(no_saf_data, no_saf_labels, no_saf_colors, func, suffix="_no_saf")
-
-        dist_data = collect_distance_data(func)
-        if dist_data:
-            draw_distance_transition_graph(dist_data, func)
-        
-        print("") # 空行
+    else:
+        print("無効なモードです。終了します。")

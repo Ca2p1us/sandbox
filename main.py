@@ -18,8 +18,8 @@ average_fitness_histories_saf = []
 noise_is_added = False
 look = False
 interpolate_num = 100
-print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション\n3: 比較\n4: トーナメントサイズの比較\n5: 個体数の比較\n6: SAF-IEDAシミュレーション")
-choice = input("実行するシミュレーションを選択 (1/6): ")
+print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション\n3: 比較\n4: トーナメントサイズの比較\n5: 個体数の比較\n6: SAF-IEDAシミュレーション\n7: 重み付きサロゲートモデル比較シミュレーション")
+choice = input("実行するシミュレーションを選択 (1/7): ")
 if choice == "2":
     print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Gauss関数+cos関数\n4: Ackley関数\n5: Gaussian_peaks関数\n6: Mixed関数")
     evaluate_num = input("評価関数の番号を入力してください: ")
@@ -519,3 +519,77 @@ elif choice == "6":
         best_fitness_histories=best_fitness_histories,
         ver="saf_ieda"
     )
+elif choice == "7":
+    print("重み付きサロゲートモデル比較シミュレーション")
+    population_size_input = input(f"個体群サイズを入力してください (default: {PROPOSAL_POPULATION_SIZE}): ")
+    population_size = int(population_size_input) if population_size_input else PROPOSAL_POPULATION_SIZE
+
+    evaluate_size_input = input(f"評価個体数を入力してください (default: {EVALUATE_SIZE}): ")
+    evaluate_size = int(evaluate_size_input) if evaluate_size_input else EVALUATE_SIZE
+
+    print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Gauss関数+cos関数\n4: Ackley関数\n5: Gaussian_peaks関数\n6: Mixed関数")
+    evaluate_num = input("評価関数の番号を入力してください: ")
+    print(f"補間方法を選択してください。\n0: 距離に基づく線形補間\n1: ガウス関数に基づく補間\n2: TPS補間(距離項なし)\n3: IDW補間\n4: TPS補間\n5: Gaussian_RBF補間\n6: IMQ補間")
+    interpolate_num = input("補間方法の番号を入力してください: ")
+    
+    print(f"ノイズを追加しますか？\n0: 追加しない\n1: 追加する")
+    TF = input("ノイズを追加しますか？ (0/1): ")
+    if TF == "1":
+        noise_is_added = True
+    print(f"途中経過を見ますか？\n0: 見ない\n1: 見る")
+    TF2 = input("途中経過を見ますか？ (0/1): ")
+    if TF2 == "1":
+        look = True
+
+    # 比較する重み w のリスト
+    weights = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    plot_series_list = []
+    markers = ['o', '^', 's', 'D', 'x', '*', 'v', '<', '>', 'p', 'h']
+
+    for idx, w in enumerate(weights):
+        best_fitness_histories_w = []
+        print(f"重み w={w} のシミュレーションを実行中...")
+        for i in range(EXPERIMENT_TIMES):
+            print(f"  w={w} : {i+1}回目")
+            best_fitness, average_fitness, error_history, distance_history = iga.run_simulation_proposal_IGA(
+                NUM_GENERATIONS=NUM_GENERATIONS, 
+                PROPOSAL_POPULATION_SIZE=population_size, 
+                EVALUATE_SIZE=evaluate_size, 
+                evaluate_num = int(evaluate_num), 
+                interpolate_num = int(interpolate_num), 
+                times = i+1, 
+                noise_is_added=noise_is_added, 
+                look=look, 
+                tournament_size=4, 
+                w=w
+            )
+            best_fitness_histories_w.append(best_fitness)
+            log_distance_history_json(
+                evaluate_num=int(evaluate_num),
+                interpolate_num=int(interpolate_num),
+                file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"_"+str(w)+"weight_distance_history.json",
+                distance_history=distance_history,
+                ver="benchmark"
+            )
+        
+        # 平均を計算
+        best_fitness_histories_w_ave = np.mean(best_fitness_histories_w, axis=0)
+        best_fitness_histories_w_ave = [tuple(row) for row in best_fitness_histories_w_ave]
+        
+        plot_series_list.append({
+            'label': f'w={w}',
+            'data': best_fitness_histories_w_ave,
+            'marker': markers[idx % len(markers)],
+            'linestyle': '-'
+        })
+
+    # グラフの保存
+    log_comparison(
+        evaluate_num=int(evaluate_num),
+        interpolate_num=int(interpolate_num),
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_weight_comparison.png",
+        plot_series_list=plot_series_list,
+        indicator="Best Fitness by Weight ",
+        ver="benchmark"
+    )
+    
