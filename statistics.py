@@ -272,11 +272,11 @@ def draw_distance_transition_graph(distance_data, func_name):
         upper = np.array(data["means"]) + np.array(data["stds"])
         plt.fill_between(data["gens"], lower, upper, color=data["color"], alpha=0.15)
 
-    plt.title(f"Average Nearest Neighbor Distance: {func_name}", fontsize=14)
+    # plt.title(f"Average Nearest Neighbor Distance: {func_name}", fontsize=14)
     plt.xlabel("Generation", fontsize=16)
     plt.ylabel("Avg NN Distance (Normalized)", fontsize=16)
     plt.grid(True, linestyle='--', alpha=0.6)
-    plt.legend(fontsize=12)
+    plt.legend(fontsize=18, loc='upper right')
     plt.ylim(*DISTANCE_Y_LIMITS)
     plt.tight_layout()
     
@@ -336,6 +336,8 @@ def draw_weight_distance_transition_graph(weight_data, func_name):
     weights = sorted(weight_data.keys())
     colors = cm.viridis(np.linspace(0, 1, len(weights)))
 
+    data = None # 変数初期化
+
     for idx, w in enumerate(weights):
         data = weight_data[w]
         plt.plot(data["gens"], data["means"], label=f"w={w}", color=colors[idx], linewidth=2, marker='o', markersize=4)
@@ -343,11 +345,24 @@ def draw_weight_distance_transition_graph(weight_data, func_name):
         upper = np.array(data["means"]) + np.array(data["stds"])
         plt.fill_between(data["gens"], lower, upper, color=colors[idx], alpha=0.1)
 
-    plt.title(f"Distance History by Weight: {func_name}", fontsize=14)
-    plt.xlabel("Generation", fontsize=16)
-    plt.ylabel("Avg NN Distance (Normalized)", fontsize=16)
+    # plt.title(f"Distance History by Weight: {func_name}", fontsize=14)]
+    plt.title("")
+    plt.xlabel("世代", fontsize=18)
+    
+    # --- 修正箇所: 1刻み設定 ---
+    if data is not None:
+        plt.xticks(np.arange(min(data["gens"]), max(data["gens"]) + 1, 1))
+    # -------------------------
+
+    plt.ylabel("平均最近傍距離", fontsize=18)
+
+    # --- 追加箇所: 軸目盛りのフォントサイズを変更 ---
+    plt.tick_params(labelsize=15) 
+    # ---------------------------------------------
+
     plt.grid(True, linestyle='--', alpha=0.6)
-    plt.legend(fontsize=10, loc='upper right', bbox_to_anchor=(1.15, 1))
+    # plt.legend(fontsize=10, loc='upper right', bbox_to_anchor=(1.15, 1))
+    plt.legend(fontsize=20, loc='upper right')
     plt.ylim(*DISTANCE_Y_LIMITS)
     plt.tight_layout()
     
@@ -364,10 +379,10 @@ def draw_weight_distance_transition_graph(weight_data, func_name):
 
 def draw_weight_win_counts(weight_data, func_name):
     """
-    重みごとの勝利数（最小距離記録回数）グラフ
+    重みごとの勝利数（最小距離記録回数）グラフを描画し、カウントデータを返す
     """
     if not weight_data:
-        return
+        return {}
 
     weights = list(weight_data.keys())
     
@@ -393,7 +408,7 @@ def draw_weight_win_counts(weight_data, func_name):
     
     sorted_gens = sorted(list(common_gens))
     if not sorted_gens:
-        return
+        return {}
 
     win_counts = {w: 0 for w in weights}
 
@@ -431,16 +446,48 @@ def draw_weight_win_counts(weight_data, func_name):
 
     plt.tight_layout()
     
-    # --- 保存先の変更 (weight_distance_historyと同じ場所に入れます) ---
     output_dir = os.path.join("result", "analysis", "weight_distance_history")
     os.makedirs(output_dir, exist_ok=True)
     output_file = os.path.join(output_dir, f"weight_win_counts_{func_name}.png")
-    # ------------------
 
     plt.savefig(output_file, dpi=300)
     print(f"  保存完了: {output_file}")
     plt.close()
 
+    return win_counts # 戻り値としてカウントデータを返す
+
+def draw_total_weight_win_counts(aggregated_counts):
+    """
+    全関数の勝利数を合計して棒グラフを描画
+    """
+    if not aggregated_counts:
+        return
+
+    plt.figure(figsize=(10, 6))
+    sorted_weights = sorted(aggregated_counts.keys())
+    counts = [aggregated_counts[w] for w in sorted_weights]
+    labels = [str(w) for w in sorted_weights]
+    
+    bars = plt.bar(labels, counts, color='lightgreen', edgecolor='black', alpha=0.7)
+    
+    plt.xlabel("Weight (w)", fontsize=14)
+    plt.ylabel("Total Win Count (Generations)", fontsize=14)
+    plt.title("Total Number of Generations with Lowest Avg NN Distance (All Functions)", fontsize=12)
+    plt.grid(axis='y', linestyle='--', alpha=0.5)
+    
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2, height, f'{int(height)}', ha='center', va='bottom')
+
+    plt.tight_layout()
+    
+    output_dir = os.path.join("result", "analysis", "weight_distance_history")
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, "total_weight_win_counts.png")
+
+    plt.savefig(output_file, dpi=300)
+    print(f"  全体勝利数グラフを保存しました: {output_file}")
+    plt.close()
 
 def run_analysis(func_name, plot_types):
     """
@@ -448,6 +495,7 @@ def run_analysis(func_name, plot_types):
     plot_types: list of str ("boxplot", "distance", "weight")
     """
     print(f"\n[{func_name}] の解析を開始します...")
+    win_counts = {}
 
     # 1. 適応度比較 (Boxplot)
     if "boxplot" in plot_types:
@@ -481,13 +529,12 @@ def run_analysis(func_name, plot_types):
     if "weight" in plot_types:
         weight_dist_data = collect_weight_distance_data(func_name)
         if weight_dist_data:
-            # 既存の折れ線グラフ描画
             draw_weight_distance_transition_graph(weight_dist_data, func_name)
-            
-            # ★追加: 勝利数カウント（棒グラフ）の描画★
-            draw_weight_win_counts(weight_dist_data, func_name)
+            win_counts = draw_weight_win_counts(weight_dist_data, func_name) # 変更: 戻り値を受け取る
         else:
-            print("  重み別距離データが見つかりませんでした。(result/benchmark/.../Hybrid を確認してください)")
+            print("  重み比較データなし")
+
+    return win_counts # 追加: データを返す
 
 
 if __name__ == "__main__":
@@ -506,9 +553,22 @@ if __name__ == "__main__":
     if mode == "1":
         # 全関数一括実行
         print("\n--- 全関数一括モードを実行します ---")
+        
+        aggregated_win_counts = {} # 追加: 集計用辞書
+        
         for func in BENCHMARK_FUNCTIONS:
-            run_analysis(func, plot_types=["boxplot", "distance", "weight"])
+            counts = run_analysis(func, plot_types=["boxplot", "distance", "weight"])
+            
+            # 追加: 勝利数を集計
+            if counts:
+                for w, c in counts.items():
+                    aggregated_win_counts[w] = aggregated_win_counts.get(w, 0) + c
             print("")
+            
+        # 追加: 最後に合計グラフを描画
+        if aggregated_win_counts:
+            print("\n--- 全関数合計の重み比較グラフを作成します ---")
+            draw_total_weight_win_counts(aggregated_win_counts)
 
     elif mode == "2":
         # 関数選択

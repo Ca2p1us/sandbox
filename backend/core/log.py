@@ -372,7 +372,7 @@ def log_comparison(evaluate_num: int = None, interpolate_num: int = None, file_p
             alpha=0.8            # 重なりが見えるように若干透過
         )
     
-    _setup_plot(ax,method,y_label=indicator+'Fitness')
+    _setup_plot(ax,method,x_label="世代",y_label=indicator+'適応度')
     # X軸範囲設定 (データに合わせて動的に設定、または定数NUM_GENERATIONSを使用)
     ax.set_xlim(0.5, max_gen + 0.5 if max_gen > 0 else NUM_GENERATIONS + 0.5)
     # method名に対応する位置を取得。なければ 'default' の値('best') を使用
@@ -778,7 +778,8 @@ def log_distance_history(evaluate_num: int = None, interpolate_num: int = None, 
 
     _setup_plot(ax, method, y_label='Normalized NN Distance', title=f'{method} NN Distance History')
     ax.set_ylim(0, 1.5) # 正規化距離なので最大でも√6(=2.45)程度、通常は1.0以下
-    ax.legend(loc='best')
+    # ax.legend(loc='best')
+    ax.legend(loc='best', fontsize=16)
 
     plt.savefig(save_path)
     plt.close()

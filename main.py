@@ -316,7 +316,7 @@ elif choice == "3":
         interpolate_num=int(interpolate_num),
         file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison.png",
         plot_series_list=best_fitness_list,
-        indicator="Best ",
+        indicator="最大",
         ver="comparison"
     )
     log_comparison(
@@ -324,7 +324,7 @@ elif choice == "3":
         interpolate_num=int(interpolate_num),
         file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison_average.png",
         plot_series_list=ave_fitness_list,
-        indicator="Average ",
+        indicator="平均",
         ver="comparison"
     )
     log_fitness_variance(
