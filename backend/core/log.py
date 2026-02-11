@@ -323,7 +323,7 @@ def log_comparison(evaluate_num: int = None, interpolate_num: int = None, file_p
     Args:
         evaluate_num (int): 評価関数のID
         interpolate_num (int): 補間手法のID
-        file_path_suffix (str): 保存ファイル名のサフィックス (例: "_comparison.png")
+        file_path_suffix (str): 保存ファイル名のサフィックス (例: "_comparison.pdf")
         plot_series_list (list): 描画するデータのリスト。
             形式: [
                 {'label': '凡例名1', 'data': [(世代, fit), ...], 'marker': 'o', 'linestyle': '-'},
@@ -724,7 +724,7 @@ def plot_interpolated_heatmap(
         ax.grid(False)
 
         # --- 保存 ---
-        save_path = Path(f"{file_path}_heatmap_pair{i+1}_{j+1}.png")
+        save_path = Path(f"{file_path}_heatmap_pair{i+1}_{j+1}.pdf")
         save_path.parent.mkdir(parents=True, exist_ok=True)
         plt.tight_layout()
         plt.savefig(save_path)

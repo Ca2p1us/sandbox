@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import re
 import numpy as np
+from scipy import stats
 
 # ==========================================
 # 設定: 日本語フォントとラベル
@@ -73,6 +74,56 @@ X_LABEL = "手法"
 # ==========================================
 # 処理ロジック
 # ==========================================
+
+def perform_statistical_test(data, labels, func_name):
+    """
+    1. シャピロ・ウィルク検定で正規性を確認
+    2. 正規性がある場合はウェルチのt検定、ない場合はマン・ホイットニーのU検定を実行
+    """
+    target1 = "提案手法"
+    target2 = "距離項なしサロゲート"
+
+    idx1 = next((i for i, l in enumerate(labels) if target1 in l), None)
+    idx2 = next((i for i, l in enumerate(labels) if target2 in l), None)
+
+    if idx1 is None or idx2 is None:
+        return
+
+    group1 = data[idx1]
+    group2 = data[idx2]
+
+    print(f"\n  --- 統計的検定結果 ({func_name}) ---")
+
+    # --- 1. 正規性の検定 (Shapiro-Wilk) ---
+    # p > 0.05 なら正規分布とみなせる
+    _, p_norm1 = stats.shapiro(group1) if len(group1) >= 3 else (0, 0)
+    _, p_norm2 = stats.shapiro(group2) if len(group2) >= 3 else (0, 0)
+
+    is_normal1 = p_norm1 > 0.05
+    is_normal2 = p_norm2 > 0.05
+
+    print(f"    正規性確認 (Shapiro-Wilk):")
+    print(f"      {target1}: p={p_norm1:.4e} ({'正規分布' if is_normal1 else '非正規分布'})")
+    print(f"      {target2}: p={p_norm2:.4e} ({'正規分布' if is_normal2 else '非正規分布'})")
+
+    # --- 2. 検定の選択と実行 ---
+    if is_normal1 and is_normal2:
+        # 両方正規分布ならウェルチのt検定
+        t_stat, p_val = stats.ttest_ind(group1, group2, equal_var=False)
+        test_name = "ウェルチのt検定 (パラメトリック)"
+    else:
+        # どちらかが非正規ならマン・ホイットニーのU検定
+        t_stat, p_val = stats.mannwhitneyu(group1, group2, alternative='two-sided')
+        test_name = "マン・ホイットニーのU検定 (ノンパラメトリック)"
+
+    print(f"    採用された検定: {test_name}")
+    print(f"    p値: {p_val:.4e}")
+
+    if p_val < 0.05:
+        print(f"    => 有意差あり (p < 0.05)")
+    else:
+        print(f"    => 有意差なし (p >= 0.05)")
+    print("  ----------------------------------------------")
 
 def get_final_fitness_from_file(filepath):
     try:
@@ -164,7 +215,7 @@ def draw_boxplot(data, labels, colors, func_name, suffix=""):
     # --- 保存先の変更 ---
     output_dir = os.path.join("result", "analysis", "boxplot")
     os.makedirs(output_dir, exist_ok=True)
-    output_file = os.path.join(output_dir, f"boxplot_{func_name}{suffix}.png")
+    output_file = os.path.join(output_dir, f"boxplot_{func_name}{suffix}.pdf")
     # ------------------
     
     plt.savefig(output_file, dpi=300)
@@ -283,7 +334,7 @@ def draw_distance_transition_graph(distance_data, func_name):
     # --- 保存先の変更 ---
     output_dir = os.path.join("result", "analysis", "distance_history")
     os.makedirs(output_dir, exist_ok=True)
-    output_file = os.path.join(output_dir, f"distance_history_{func_name}.png")
+    output_file = os.path.join(output_dir, f"distance_history_{func_name}.pdf")
     # ------------------
 
     plt.savefig(output_file, dpi=300)
@@ -369,7 +420,7 @@ def draw_weight_distance_transition_graph(weight_data, func_name):
     # --- 保存先の変更 ---
     output_dir = os.path.join("result", "analysis", "weight_distance_history")
     os.makedirs(output_dir, exist_ok=True)
-    output_file = os.path.join(output_dir, f"weight_distance_history_{func_name}.png")
+    output_file = os.path.join(output_dir, f"weight_distance_history_{func_name}.pdf")
     # ------------------
 
     plt.savefig(output_file, dpi=300)
@@ -448,7 +499,7 @@ def draw_weight_win_counts(weight_data, func_name):
     
     output_dir = os.path.join("result", "analysis", "weight_distance_history")
     os.makedirs(output_dir, exist_ok=True)
-    output_file = os.path.join(output_dir, f"weight_win_counts_{func_name}.png")
+    output_file = os.path.join(output_dir, f"weight_win_counts_{func_name}.pdf")
 
     plt.savefig(output_file, dpi=300)
     print(f"  保存完了: {output_file}")
@@ -483,7 +534,7 @@ def draw_total_weight_win_counts(aggregated_counts):
     
     output_dir = os.path.join("result", "analysis", "weight_distance_history")
     os.makedirs(output_dir, exist_ok=True)
-    output_file = os.path.join(output_dir, "total_weight_win_counts.png")
+    output_file = os.path.join(output_dir, "total_weight_win_counts.pdf")
 
     plt.savefig(output_file, dpi=300)
     print(f"  全体勝利数グラフを保存しました: {output_file}")
@@ -503,15 +554,12 @@ def run_analysis(func_name, plot_types):
         if all_data:
             draw_boxplot(all_data, all_labels, all_colors, func_name, suffix="_all")
             
-            # SAF抜き
-            no_saf_data = []
-            no_saf_labels = []
-            no_saf_colors = []
-            for d, l, c in zip(all_data, all_labels, all_colors):
-                if "SAF-IEDA" not in l:
-                    no_saf_data.append(d)
-                    no_saf_labels.append(l)
-                    no_saf_colors.append(c)
+            # --- ここでt検定を実行 ---
+            perform_statistical_test(all_data, all_labels, func_name)
+            
+            no_saf_data = [d for d, l in zip(all_data, all_labels) if "SAF-IEDA" not in l]
+            no_saf_labels = [l for l in all_labels if "SAF-IEDA" not in l]
+            no_saf_colors = [c for c, l in zip(all_colors, all_labels) if "SAF-IEDA" not in l]
             if no_saf_data:
                 draw_boxplot(no_saf_data, no_saf_labels, no_saf_colors, func_name, suffix="_no_saf")
         else:

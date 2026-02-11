@@ -42,14 +42,14 @@ if choice == "2":
     log_fitness_histories(
         evaluate_num=int(evaluate_num),
         interpolate_num=int(interpolate_num),
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_best_fitness_histories.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_best_fitness_histories.pdf",
         best_fitness_histories=best_fitness_histories,
         ver="proposal"
     )
     log_fitness_variance(
         evaluate_num=int(evaluate_num),
         interpolate_num=int(interpolate_num),
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_fitness_variance.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_fitness_variance.pdf",
         best_fitness_histories=best_fitness_histories,
         ver="proposal"
     )
@@ -74,14 +74,14 @@ elif choice == "1":
     log_fitness_histories(
         evaluate_num=int(evaluate_num),
         interpolate_num=100,
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_best_fitness_histories.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(POPULATION_SIZE)+"_best_fitness_histories.pdf",
         best_fitness_histories=best_fitness_histories,
         ver="conventional"
     )
     log_fitness_variance(
         evaluate_num=int(evaluate_num),
         interpolate_num=int(interpolate_num),
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_fitness_variance.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_fitness_variance.pdf",
         best_fitness_histories=best_fitness_histories,
         ver="proposal"
     )
@@ -118,10 +118,10 @@ elif choice == "3":
     log_fitness_histories(
         evaluate_num=int(evaluate_num),
         interpolate_num=100,
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(evaluate_size)+"_best_fitness_histories.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(evaluate_size)+"_best_fitness_histories.pdf",
         best_fitness_histories=best_fitness_histories_few,
         ver="conventional")
-    log_fitness(file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(evaluate_size)+"_average_fitness_histories.png", best_fitness_history= best_fitness_histories_few_ave, average_fitness_history=average_fitness_histories_few_ave,evaluate_num=int(evaluate_num),ver="conventional")
+    log_fitness(file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(evaluate_size)+"_average_fitness_histories.pdf", best_fitness_history= best_fitness_histories_few_ave, average_fitness_history=average_fitness_histories_few_ave,evaluate_num=int(evaluate_num),ver="conventional")
     for i in range(EXPERIMENT_TIMES):
         print(f"{population_size}個体のIGAシミュレーション"+str(i+1)+"回目を実行")
         best_fitness, average_fitness = iga.run_simulation_normal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, POPULATION_SIZE=population_size, evaluate_num = int(evaluate_num), times = i+1, noise_is_added=noise_is_added, look=look,tournament_size=4)
@@ -135,10 +135,10 @@ elif choice == "3":
     log_fitness_histories(
         evaluate_num=int(evaluate_num),
         interpolate_num=100,
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_best_fitness_histories.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_best_fitness_histories.pdf",
         best_fitness_histories=best_fitness_histories_many,
         ver="conventional")
-    log_fitness(file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_average_fitness_histories.png", best_fitness_history= best_fitness_histories_many_ave, average_fitness_history=average_fitness_histories_many_ave,evaluate_num=int(evaluate_num),ver="conventional")
+    log_fitness(file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_average_fitness_histories.pdf", best_fitness_history= best_fitness_histories_many_ave, average_fitness_history=average_fitness_histories_many_ave,evaluate_num=int(evaluate_num),ver="conventional")
     for  i in range(EXPERIMENT_TIMES):
         print(f"提案型IGAシミュレーション"+str(i+1)+"回目を実行")
         best_fitness, average_fitness, error_history, distance_history = iga.run_simulation_proposal_IGA(NUM_GENERATIONS=NUM_GENERATIONS, PROPOSAL_POPULATION_SIZE=population_size, EVALUATE_SIZE=evaluate_size, evaluate_num = int(evaluate_num), interpolate_num = int(interpolate_num), times = i+1, noise_is_added=noise_is_added, look=look, tournament_size=4)
@@ -160,7 +160,7 @@ elif choice == "3":
     log_fitness_histories(
         evaluate_num=int(evaluate_num),
         interpolate_num=int(interpolate_num),
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_best_fitness_histories.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_best_fitness_histories.pdf",
         best_fitness_histories=best_fitness_histories,
         ver="proposal"
     )
@@ -212,7 +212,7 @@ elif choice == "3":
     log_fitness_histories(
         evaluate_num=int(evaluate_num),
         interpolate_num=100, 
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_SAF_best_fitness_histories.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_SAF_best_fitness_histories.pdf",
         best_fitness_histories=best_fitness_histories_saf,
         ver="saf_ieda"
     )
@@ -297,7 +297,7 @@ elif choice == "3":
 ]
 
     log_fitness(
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_average_fitness_histories.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_average_fitness_histories.pdf",
         best_fitness_history= best_fitness_histories_ave,
         average_fitness_history=average_fitness_histories_ave,
         evaluate_num=int(evaluate_num),
@@ -307,14 +307,14 @@ elif choice == "3":
     log_error_history(
         evaluate_num=int(evaluate_num),
         interpolate_num=int(interpolate_num),
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_error_history.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_error_history.pdf",
         error_history= error_history,
         ver="proposal"
     )
     log_comparison(
         evaluate_num=int(evaluate_num),
         interpolate_num=int(interpolate_num),
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison.pdf",
         plot_series_list=best_fitness_list,
         indicator="最大",
         ver="comparison"
@@ -322,7 +322,7 @@ elif choice == "3":
     log_comparison(
         evaluate_num=int(evaluate_num),
         interpolate_num=int(interpolate_num),
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison_average.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_comparison_average.pdf",
         plot_series_list=ave_fitness_list,
         indicator="平均",
         ver="comparison"
@@ -330,7 +330,7 @@ elif choice == "3":
     log_fitness_variance(
         evaluate_num=int(evaluate_num),
         interpolate_num=int(interpolate_num),
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_fitness_variance.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(PROPOSAL_POPULATION_SIZE)+"_"+str(EVALUATE_SIZE)+"eval_fitness_variance.pdf",
         best_fitness_histories=best_fitness_histories,
         ver="proposal"
     )
@@ -372,7 +372,7 @@ elif choice == "4":
     log_compare(
         evaluate_num=int(evaluate_num),
         interpolate_num=int(interpolate_num),
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_tornament_size_comparison.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_tornament_size_comparison.pdf",
         fitness_histories=best_fitness_histories_all,
         tornament_sizes=tornament_sizes,
         population_size=population_size,
@@ -456,7 +456,7 @@ elif choice == "5":
     log_comparison(
         evaluate_num=int(evaluate_num),
         interpolate_num=int(interpolate_num),
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_pop_size_comparison.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_pop_size_comparison.pdf",
         plot_series_list=plot_series_list,
         indicator="Best Fitness by Pop Size ",
         ver="benchmark"
@@ -507,7 +507,7 @@ elif choice == "6":
     log_fitness_histories(
         evaluate_num=int(evaluate_num),
         interpolate_num=100, # SAFでは補間番号はダミーで100などにしておくか、適宜調整
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_SAF_IEDA_best_fitness_histories.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_SAF_IEDA_best_fitness_histories.pdf",
         best_fitness_histories=best_fitness_histories,
         ver="saf_ieda"
     )
@@ -515,7 +515,7 @@ elif choice == "6":
     log_fitness_variance(
         evaluate_num=int(evaluate_num),
         interpolate_num=100,
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_SAF_IEDA_fitness_variance.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_SAF_IEDA_fitness_variance.pdf",
         best_fitness_histories=best_fitness_histories,
         ver="saf_ieda"
     )
@@ -587,7 +587,7 @@ elif choice == "7":
     log_comparison(
         evaluate_num=int(evaluate_num),
         interpolate_num=int(interpolate_num),
-        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_weight_comparison.png",
+        file_path="_noise"+str(noise_is_added)+"_"+str(NUM_GENERATIONS)+"gens_"+str(population_size)+"_"+str(evaluate_size)+"eval_weight_comparison.pdf",
         plot_series_list=plot_series_list,
         indicator="Best Fitness by Weight ",
         ver="benchmark"
