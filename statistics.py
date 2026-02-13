@@ -584,6 +584,62 @@ def run_analysis(func_name, plot_types):
 
     return win_counts # 追加: データを返す
 
+def draw_combined_boxplot():
+    """
+    4つの評価関数を2x2のグリッドで箱ひげ図として描画する
+    """
+    # 対象とする4つの評価関数
+    target_funcs = ["Gaussian", "Gaussian_cos", "Gaussian_peaks", "Ackley"]
+    
+    # 図の作成 (サイズは log.py の設定を参考に調整)
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    axes = axes.flatten()
+    
+    output_dir = os.path.join("result", "analysis", "boxplot")
+    os.makedirs(output_dir, exist_ok=True)
+    
+    print("--- 4関数結合箱ひげ図の作成を開始します ---")
+
+    for i, func_name in enumerate(target_funcs):
+        ax = axes[i]
+        
+        # データの収集
+        data, labels, colors = collect_data(func_name)
+        
+        if data:
+            # 箱ひげ図の描画
+            bp = ax.boxplot(data, tick_labels=labels, patch_artist=True,
+                            medianprops=dict(color="black", linewidth=1.5))
+            
+            # 色塗り
+            for j, patch in enumerate(bp['boxes']):
+                patch.set_facecolor(colors[j])
+                patch.set_alpha(0.8)
+            
+            # 軸設定
+            ax.set_title(func_name, fontsize=18)
+            ax.set_ylabel("最終世代における最大適応度", fontsize=14)
+            ax.tick_params(axis='x', labelsize=11)
+            ax.grid(axis='y', linestyle='--', alpha=0.5)
+            
+            # Y軸範囲の適用
+            if func_name in Y_AXIS_LIMITS:
+                ax.set_ylim(Y_AXIS_LIMITS[func_name])
+        else:
+            # データがない場合の表示
+            ax.text(0.5, 0.5, 'No Data', ha='center', va='center', fontsize=16)
+            ax.set_title(func_name, fontsize=18)
+            print(f"  警告: {func_name} のデータが見つかりませんでした。")
+
+    # レイアウト調整
+    plt.tight_layout()
+    
+    # 保存
+    output_file = os.path.join(output_dir, "combined_boxplot_4metrics.pdf")
+    plt.savefig(output_file, dpi=300)
+    print(f"保存完了: {output_file}")
+    plt.close()
+
 
 if __name__ == "__main__":
     if not os.path.exists("result"):
@@ -657,6 +713,9 @@ if __name__ == "__main__":
                 print("無効な番号です。終了します。")
         except ValueError:
             print("入力エラーです。数値を入力してください。")
+    elif mode == "3":
+        # 結合箱ひげ図モード
+        draw_combined_boxplot()
 
     else:
         print("無効なモードです。終了します。")

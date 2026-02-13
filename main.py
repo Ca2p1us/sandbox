@@ -1,5 +1,5 @@
 from backend.engine import run_iga_simulation as iga
-from backend.core.log import log_fitness, log_fitness_histories, log_comparison, log_error_history, log_compare, log_fitness_variance, log_distance_history, log_distance_history_json
+from backend.core.log import log_fitness, log_fitness_histories, log_comparison, log_error_history, log_compare, log_fitness_variance, log_distance_history, log_distance_history_json, log_four_metrics, log_four_metrics_comparison
 import numpy as np
 from backend.core.geneticAlgorithm.config import NUM_GENERATIONS, POPULATION_SIZE, PROPOSAL_POPULATION_SIZE, EVALUATE_SIZE, EXPERIMENT_TIMES
 
@@ -18,7 +18,7 @@ average_fitness_histories_saf = []
 noise_is_added = False
 look = False
 interpolate_num = 100
-print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション\n3: 比較\n4: トーナメントサイズの比較\n5: 個体数の比較\n6: SAF-IEDAシミュレーション\n7: 重み付きサロゲートモデル比較シミュレーション")
+print(f"IGAシミュレーション\n1: 普通のIGAシミュレーション\n2: 提案型IGAシミュレーション\n3: 比較\n4: トーナメントサイズの比較\n5: 個体数の比較\n6: SAF-IEDAシミュレーション\n7: 重み付きサロゲートモデル比較シミュレーション\n8: 4つの評価関数シミュレーション")
 choice = input("実行するシミュレーションを選択 (1/7): ")
 if choice == "2":
     print(f"IGAシミュレーションの評価関数を選択\n1: ガウス関数\n2: スフィア関数\n3: Gauss関数+cos関数\n4: Ackley関数\n5: Gaussian_peaks関数\n6: Mixed関数")
@@ -592,4 +592,185 @@ elif choice == "7":
         indicator="Best Fitness by Weight ",
         ver="benchmark"
     )
+
+elif choice == "8":
+    print("4つの評価関数シミュレーション (比較モード)")
+    
+    # 共通パラメータ入力
+    print(f"補間方法を選択してください。\n0: 距離に基づく線形補間\n1: ガウス関数に基づく補間\n2: TPS補間(距離項なし)\n3: IDW補間\n4: TPS補間\n5: Gaussian_RBF補間\n6: IMQ補間")
+    interpolate_num_val = int(input("補間方法の番号を入力してください: "))
+    
+    print(f"ノイズを追加しますか？\n0: 追加しない\n1: 追加する")
+    TF = input("ノイズを追加しますか？ (0/1): ")
+    noise_is_added = (TF == "1")
+    
+    print(f"途中経過を見ますか？\n0: 見ない\n1: 見る")
+    TF2 = input("途中経過を見ますか？ (0/1): ")
+    look = (TF2 == "1")
+
+    # 評価関数のリスト (IDと名前の対応)
+    target_evaluations = [
+        (1, "Gaussian"),
+        (3, "Gaussian_cos"),
+        (5, "Gaussian_peaks"), 
+        (4, "Ackley")
+    ]
+    
+    # 全関数の比較データを格納する辞書
+    # key: FunctionName, value: list of series dicts
+    all_comparison_data = {}
+
+    for eval_id, eval_name in target_evaluations:
+        print(f"\n==========================================")
+        print(f"--- {eval_name} (ID: {eval_id}) シミュレーション開始 ---")
+        print(f"==========================================")
+        
+        # 各手法のデータ格納用リスト
+        best_fitness_histories_proposal = []
+        best_fitness_histories_benchmark = []
+        best_fitness_histories_few = []
+        best_fitness_histories_many = []
+        best_fitness_histories_saf = []
+        
+        # 1. Proposal Method
+        print(f"[{eval_name}] 提案手法実行中...")
+        for i in range(EXPERIMENT_TIMES):
+            print(f"  Proposal {i+1}th run")
+            best_fitness, _, _, _ = iga.run_simulation_proposal_IGA(
+                NUM_GENERATIONS=NUM_GENERATIONS, 
+                PROPOSAL_POPULATION_SIZE=PROPOSAL_POPULATION_SIZE, 
+                EVALUATE_SIZE=EVALUATE_SIZE, 
+                evaluate_num=eval_id, 
+                interpolate_num=interpolate_num_val, 
+                times=i+1, 
+                noise_is_added=noise_is_added, 
+                look=look, 
+                tournament_size=4
+            )
+            best_fitness_histories_proposal.append(best_fitness)
+
+        # 2. Benchmark (TPS distance-free, fixed interpolate_num=2)
+        print(f"[{eval_name}] 距離項なしサロゲート実行中...")
+        for i in range(EXPERIMENT_TIMES):
+            print(f"  Benchmark {i+1}th run")
+            best_fitness, _, _, _ = iga.run_simulation_proposal_IGA(
+                NUM_GENERATIONS=NUM_GENERATIONS, 
+                PROPOSAL_POPULATION_SIZE=PROPOSAL_POPULATION_SIZE, 
+                EVALUATE_SIZE=EVALUATE_SIZE, 
+                evaluate_num=eval_id, 
+                interpolate_num=2, 
+                times=i+1, 
+                noise_is_added=noise_is_added, 
+                look=look, 
+                tournament_size=4
+            )
+            best_fitness_histories_benchmark.append(best_fitness)
+
+        # 3. GA Small Population (evaluate_size)
+        print(f"[{eval_name}] GA(少数個体)実行中...")
+        for i in range(EXPERIMENT_TIMES):
+            print(f"  GA(Few) {i+1}th run")
+            best_fitness, _ = iga.run_simulation_normal_IGA(
+                NUM_GENERATIONS=NUM_GENERATIONS, 
+                POPULATION_SIZE=EVALUATE_SIZE, 
+                evaluate_num=eval_id, 
+                times=i+1, 
+                noise_is_added=noise_is_added, 
+                look=look, 
+                tournament_size=4
+            )
+            best_fitness_histories_few.append(best_fitness)
+
+        # 4. GA Large Population (proposal_population_size)
+        print(f"[{eval_name}] GA(多数個体)実行中...")
+        for i in range(EXPERIMENT_TIMES):
+            print(f"  GA(Many) {i+1}th run")
+            best_fitness, _ = iga.run_simulation_normal_IGA(
+                NUM_GENERATIONS=NUM_GENERATIONS, 
+                POPULATION_SIZE=PROPOSAL_POPULATION_SIZE, 
+                evaluate_num=eval_id, 
+                times=i+1, 
+                noise_is_added=noise_is_added, 
+                look=look, 
+                tournament_size=4
+            )
+            best_fitness_histories_many.append(best_fitness)
+
+        # # 5. SAF-IEDA (Added part)
+        # print(f"[{eval_name}] SAF-IEDA実行中...")
+        # for i in range(EXPERIMENT_TIMES):
+        #     print(f"  SAF-IEDA {i+1}th run")
+        #     best_fitness, _ = iga.run_simulation_SAF_IEDA(
+        #         NUM_GENERATIONS=NUM_GENERATIONS,
+        #         POPULATION_SIZE=PROPOSAL_POPULATION_SIZE,
+        #         TOP_NC=EVALUATE_SIZE,
+        #         evaluate_num=eval_id,
+        #         times=i+1,
+        #         noise_is_added=noise_is_added,
+        #         look=look,
+        #         tournament_size=4
+        #     )
+        #     best_fitness_histories_saf.append(best_fitness)
+
+        # --- 平均値の計算 ---
+        def calc_average_history(histories):
+            if not histories: return []
+            num_gens = len(histories[0])
+            avg_hist = []
+            for g in range(num_gens):
+                vals = [h[g][1] for h in histories]
+                avg = sum(vals) / len(vals)
+                avg_hist.append((histories[0][g][0], avg))
+            return avg_hist
+
+        avg_proposal = calc_average_history(best_fitness_histories_proposal)
+        avg_benchmark = calc_average_history(best_fitness_histories_benchmark)
+        avg_few = calc_average_history(best_fitness_histories_few)
+        avg_many = calc_average_history(best_fitness_histories_many)
+        avg_saf = calc_average_history(best_fitness_histories_saf)
+
+        # --- プロット用データ作成 ---
+        series_list = [
+            {
+                'label': '提案手法', 
+                'data': avg_proposal, 
+                'marker': 'o', 
+                'linestyle': '-'
+            },
+            {
+                'label': '距離項なし',
+                'data': avg_benchmark,
+                'marker': 'x',
+                'linestyle': '-.'
+            },
+            {
+                'label': f'GA ({EVALUATE_SIZE}個体)', 
+                'data': avg_few, 
+                'marker': 'o', 
+                'linestyle': '--'
+            },
+            {
+                'label': f'GA ({PROPOSAL_POPULATION_SIZE}個体)', 
+                'data': avg_many, 
+                'marker': '^', 
+                'linestyle': ':'
+            },
+            {
+                'label': 'SAF-IEDA', 
+                'data': avg_saf, 
+                'marker': 's', 
+                'linestyle': '-.'
+            }
+        ]
+        
+        all_comparison_data[eval_name] = series_list
+
+    # プロット実行
+    log_four_metrics_comparison(
+        interpolate_num=interpolate_num_val,
+        file_path=f"_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_4metrics_FULL_comparison.pdf",
+        comparison_data=all_comparison_data,
+        ver="comparison"
+    )
+    print("\n全シミュレーション完了。比較画像を確認してください。")
     

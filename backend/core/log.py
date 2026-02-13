@@ -12,7 +12,7 @@ from typing import List, Optional, Union
 import japanize_matplotlib
 from pathlib import Path
 
-plt.rcParams['font.family'] = 'MS Gothic'
+# plt.rcParams['font.family'] = 'MS Gothic'
 
 # --- 定数・マッピング定義 ---
 
@@ -105,7 +105,7 @@ def _get_interpolate_name(interpolate_input: Union[int, str, None]) -> Optional[
 
     return "Unknown"
 
-def _setup_plot(ax, method: str, x_label='Generation', y_label='Fitness', title=''):
+def _setup_plot(ax, method: str, x_label='世代', y_label='最大適応度', title=''):
     """グラフの共通設定を適用するヘルパー関数"""
     ax.set_xlabel(x_label, fontsize=18)
     ax.set_ylabel(y_label, fontsize=18)
@@ -784,3 +784,152 @@ def log_distance_history(evaluate_num: int = None, interpolate_num: int = None, 
     plt.savefig(save_path)
     plt.close()
 
+
+def log_four_metrics(interpolate_num: int = None, file_path: str = None, fitness_histories: dict = None, ver: str = "proposal"):
+    """
+    4つの評価関数の結果を2x2のグリッドで表示する
+    fitness_histories: { "EvaluationName": [(generation, fitness), ...], ... }
+    """
+    if not fitness_histories:
+        print("データがありません。")
+        return
+
+    interpolate = _get_interpolate_name(interpolate_num)
+    
+    # 保存パス生成
+    save_path = _get_save_path(ver, "FourMetrics", interpolate, "", file_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    axes = axes.flatten()
+
+    # 評価関数の順番とタイトル
+    metrics = ["Gaussian", "Gaussian_cos", "Gaussian_peaks", "Ackley"]
+    
+    for i, metric in enumerate(metrics):
+        ax = axes[i]
+        history = fitness_histories.get(metric, [])
+        
+        if not history:
+            ax.text(0.5, 0.5, 'No Data', horizontalalignment='center', verticalalignment='center')
+            ax.set_title(metric)
+            continue
+
+        generations = [item[0] for item in history]
+        fitness_values = [item[1] for item in history]
+
+        ax.plot(generations, fitness_values, marker='o', linestyle='-', color='blue', label='Best Fitness')
+        
+        # 共通設定の適用 using _setup_plot but overriding some defaults
+        _setup_plot(ax, metric, title=metric)
+        ax.legend(loc=LEGEND_LOC_SETTINGS.get(metric, 'best'))
+
+
+    plt.savefig(save_path)
+    # plt.show()
+    plt.close()
+    return
+
+def log_four_metrics_comparison(interpolate_num: int = None, file_path: str = None, comparison_data: dict = None, ver: str = "comparison"):
+    """
+    4つの評価関数の比較結果を2x2のグリッドで表示する
+    """
+    if not comparison_data:
+        print("データがありません。")
+        return
+
+    interpolate = None
+    if interpolate_num is not None:
+         interpolate = _get_interpolate_name(interpolate_num)
+    
+    # 保存パス生成
+    save_path = _get_save_path(ver, "FourMetricsComparison", interpolate, "", file_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+
+    fig, axes = plt.subplots(2, 2, figsize=(20, 15))
+    axes = axes.flatten()
+
+    # 日本語フォント設定（MS Gothicなど、環境に合わせて変更可）
+    # japanize_matplotlibが入っていても、明示的に指定することで確実になります
+    font_dict = {"family": "MS Gothic", "size": 18}
+
+    # 評価関数の順番とタイトル
+    metrics = ["Gaussian", "Gaussian_cos", "Gaussian_peaks", "Ackley"]
+    
+    # 凡例用のハンドルとラベルを収集するためのリスト
+    all_handles = []
+    all_labels = []
+
+    for i, metric in enumerate(metrics):
+        ax = axes[i]
+        series_list = comparison_data.get(metric, [])
+        
+        if not series_list:
+            ax.text(0.5, 0.5, 'No Data', horizontalalignment='center', verticalalignment='center')
+            ax.set_title(metric)
+            continue
+            
+        max_gen = 0
+        for series in series_list:
+            data = series.get('data', [])
+            if not data:
+                continue
+                
+            generations = [item[0] for item in data]
+            fitness_values = [item[1] for item in data]
+            
+            if generations:
+                max_gen = max(max_gen, max(generations))
+
+            ax.plot(
+                generations, 
+                fitness_values,
+                marker=series.get('marker', None),
+                linestyle=series.get('linestyle', '-'),
+                label=series.get('label', 'No Label'),
+                linewidth=5,
+                markersize=16,
+                alpha=0.8
+            )
+
+        # 共通設定の適用
+        _setup_plot(ax, metric, title=metric)
+        
+        # 【修正1】日本語フォントを適用してラベルを再設定
+        ax.set_xlabel('世代', fontdict=font_dict)
+        ax.set_ylabel('最大適応度', fontdict=font_dict)
+        
+        ax.set_xlim(0.5, max_gen + 0.5 if max_gen > 0 else NUM_GENERATIONS + 0.5)
+        
+        # 凡例情報の収集（最初のグラフから取得、あるいは統合）
+        if i == 0: # 全グラフ共通の凡例と仮定して最初のグラフから取得
+            handles, labels = ax.get_legend_handles_labels()
+            all_handles = handles
+            all_labels = labels
+
+    # 【修正2】レイアウト調整と凡例表示
+    if all_handles:
+        # rect=[left, bottom, right, top]
+        # bottomを0.08 -> 0.12 (12%) に増やしてスペース確保
+        plt.tight_layout(rect=[0, 0.08, 1, 1])
+        
+        # グラフの下側中央に凡例を表示
+        fig.legend(
+            all_handles, 
+            all_labels, 
+            loc='lower center',       
+            bbox_to_anchor=(0.5, 0.02), # 位置調整
+            ncol=len(all_labels),         
+            prop={"family": "MS Gothic", "size": 24}, # 凡例サイズを大きく設定
+            frameon=True              
+        )
+    else:
+        plt.tight_layout()
+
+    # 【重要】最後の plt.tight_layout() を削除しました
+    # （これがあると rect の設定がリセットされて凡例が潰れるため）
+
+    plt.savefig(save_path)
+    # plt.show()
+    plt.close()
+    return

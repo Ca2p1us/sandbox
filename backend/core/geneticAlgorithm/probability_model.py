@@ -37,6 +37,7 @@ def sample_new_population_from_probability_model(best_individuals, num_samples, 
         weights = np.ones(len(best_individuals)) / len(best_individuals)
     else:
         weights = fitnesses / np.sum(fitnesses)
+    print("weights", weights)
 
     current_std_devs = {}
     
