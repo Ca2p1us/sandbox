@@ -696,21 +696,21 @@ elif choice == "8":
             )
             best_fitness_histories_many.append(best_fitness)
 
-        # # 5. SAF-IEDA (Added part)
-        # print(f"[{eval_name}] SAF-IEDA実行中...")
-        # for i in range(EXPERIMENT_TIMES):
-        #     print(f"  SAF-IEDA {i+1}th run")
-        #     best_fitness, _ = iga.run_simulation_SAF_IEDA(
-        #         NUM_GENERATIONS=NUM_GENERATIONS,
-        #         POPULATION_SIZE=PROPOSAL_POPULATION_SIZE,
-        #         TOP_NC=EVALUATE_SIZE,
-        #         evaluate_num=eval_id,
-        #         times=i+1,
-        #         noise_is_added=noise_is_added,
-        #         look=look,
-        #         tournament_size=4
-        #     )
-        #     best_fitness_histories_saf.append(best_fitness)
+        # 5. SAF-IEDA (Added part)
+        print(f"[{eval_name}] SAF-IEDA実行中...")
+        for i in range(EXPERIMENT_TIMES):
+            print(f"  SAF-IEDA {i+1}th run")
+            best_fitness, _ = iga.run_simulation_SAF_IEDA(
+                NUM_GENERATIONS=NUM_GENERATIONS,
+                POPULATION_SIZE=PROPOSAL_POPULATION_SIZE,
+                TOP_NC=EVALUATE_SIZE,
+                evaluate_num=eval_id,
+                times=i+1,
+                noise_is_added=noise_is_added,
+                look=look,
+                tournament_size=4
+            )
+            best_fitness_histories_saf.append(best_fitness)
 
         # --- 平均値の計算 ---
         def calc_average_history(histories):
@@ -768,7 +768,7 @@ elif choice == "8":
     # プロット実行
     log_four_metrics_comparison(
         interpolate_num=interpolate_num_val,
-        file_path=f"_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_4metrics_FULL_comparison.pdf",
+        file_path=f"_noise{str(noise_is_added)}_{str(NUM_GENERATIONS)}gens_4metrics_FULL_comparison.png",
         comparison_data=all_comparison_data,
         ver="comparison"
     )

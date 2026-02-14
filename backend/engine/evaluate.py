@@ -165,7 +165,7 @@ def calculate_Gaussian_cos(
     # total_score = total_score * 10  # 0～10にスケール
     # total_score = int(round(total_score))  # 0～10の整数に丸める
     # individual["fitness"] = (max(0, min(10, total_score)))  # 範囲外は補正
-    return total_score
+    return total_score + 0.1
 
 def compute_Gaussian_cos(
     val: float,
@@ -173,7 +173,7 @@ def compute_Gaussian_cos(
     sigma: float = 75.0,
     frequency: float = 0.02,
 ):
-    return np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + 0.1 * np.cos(2 * np.pi * frequency * float(val))
+    return np.exp(-((float(val) - target) ** 2) / (2 * sigma ** 2)) + 0.1 * np.cos(2 * np.pi * frequency * float(val)) +0.1
     
 def calculate_Ackley(
         individual: dict,
